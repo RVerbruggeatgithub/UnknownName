@@ -63,27 +63,44 @@ class Game:
         self.spawn_list = []
         self.bonus_menu = BonusPickerMenu(self.win, 5)
         self.action_list = {
-            "ATK_1" : {"Description": "Attack Damage + 5%", "modifier" : 0.05, "pictogram" : pictogram_attack_damage, "color" : (255, 0, 0, 200), "background_color" : (255, 0, 0,255) },
-            "SPD_1" : {"Description": "Attack Speed + 5%", "modifier" : 0.05, "pictogram" : pictogram_attack_speed, "color" : (255, 0, 0, 200), "background_color" : (255, 0, 0,255) },
-            "SPD_2": {"Description": "Attack Speed + 5%", "modifier": 0.05, "pictogram": pictogram_attack_speed,
-                      "color": (255, 0, 0, 200), "background_color": (255, 0, 0, 255)},
-            "SPD_3": {"Description": "Attack Speed + 5%", "modifier": 0.05, "pictogram": pictogram_attack_speed,
-                      "color": (255, 0, 0, 200), "background_color": (255, 0, 0, 255)},
-            "SPD_4": {"Description": "Attack Speed + 5%", "modifier": 0.05, "pictogram": pictogram_attack_speed,
-                      "color": (255, 0, 0, 200), "background_color": (255, 0, 0, 255)},
-            "SPD_5": {"Description": "Attack Speed + 5%", "modifier": 0.05, "pictogram": pictogram_attack_speed,
-                      "color": (255, 0, 0, 200), "background_color": (255, 0, 0, 255)}
+            "ATK_1" : {"Description": "Attack Damage + 5%", "modifier" : 0.05, "pictogram" : pictogram_attack_damage, "color" : (255, 255, 255, 200), "background_color" : (255, 255, 255 ,255) },
+            "SPEED_1" : {"Description": "Attack Speed + 5%", "modifier" : 0.05, "pictogram" : pictogram_attack_speed, "color" : (255, 255, 255, 200), "background_color" : (255, 255, 255 ,255) },
+            "RANGE_1": {"Description": "Attack Range + 5%", "modifier": 0.05, "pictogram": pictogram_attack_speed,
+                      "color": (255, 255, 255, 200), "background_color": (255, 255, 255, 255)},
+            "BRANGE_1": {"Description": "Blast Range + 5%", "modifier": 0.05, "pictogram": pictogram_attack_speed,
+                      "color": (255, 255, 255, 200), "background_color": (255, 255, 255, 255)},
+            "CRITC_1": {"Description": "Crit Chance + 5%", "modifier": 0.05, "pictogram": pictogram_attack_speed,
+                      "color": (255, 255, 255, 200), "background_color": (255, 255, 255, 255)},
+            "CRITD_1": {"Description": "Crit Chance + 50%", "modifier": 0.50, "pictogram": pictogram_attack_speed,
+                      "color": (255, 255, 255, 200), "background_color": (255, 255, 255, 255)},
+            "TOWER": {"Description": "Tower +1", "modifier": 1, "pictogram": pictogram_attack_speed,
+                        "color": (255, 255, 255, 200), "background_color": (255, 255, 255, 255)},
+            "OBSTACLE": {"Description": "Obstacle +1", "modifier": 1, "pictogram": pictogram_attack_speed,
+                      "color": (255, 255, 255, 200), "background_color": (255, 255, 255, 255)}
+        }
+
+        self.action_list2 = {
+            "ATK_2" : {"Description": "Attack Damage + 8%", "modifier" : 0.08, "pictogram" : pictogram_attack_damage, "color" : (0, 32, 255, 200), "background_color" : (0, 32, 255,255) },
+            "SPEED_2" : {"Description": "Attack Speed + 8%", "modifier" : 0.08, "pictogram" : pictogram_attack_speed, "color" : (0, 32, 255, 200), "background_color" : (0, 32, 255,255) },
+            "RANGE_2": {"Description": "Attack Range + 8%", "modifier": 0.08, "pictogram": pictogram_attack_speed,
+                      "color": (0, 32, 255, 200), "background_color": (0, 32, 255, 255)},
+            "BRANGE_2": {"Description": "Blast Range + 8%", "modifier": 0.08, "pictogram": pictogram_attack_speed,
+                      "color": (0, 32, 255, 200), "background_color": (0, 32, 255, 255)},
         }
 
         self.bonus_options = []
-        for u in range(5):
-            key, action_item = random.choice(list(self.action_list.items()))
+        u = 0
+        while u < 5:
+            # 75% chance to get basic item
+            if random.random() < 0.75:
+                key, action_item = random.choice(list(self.action_list.items()))
+            else:
+                key, action_item = random.choice(list(self.action_list2.items()))
+
             if key not in self.bonus_options:
                 self.bonus_options.append(key)
                 self.bonus_menu.add_btn(key, action_item["Description"], action_item["modifier"], action_item["pictogram"], action_item["color"], action_item["background_color"])
-
-
-
+                u += 1
 
 
 
@@ -207,6 +224,7 @@ class Game:
 
                         bonus_menu_button = self.bonus_menu.get_clicked(mouse_pos[0], mouse_pos[1])
                         print(bonus_menu_button)
+                        # change below to only happen if button is clicked..
                         self.show_bonus_menu = False
                         """
                         if event.button == 3 and self.wave_complete:
@@ -395,6 +413,7 @@ class Game:
                         self.enemies_removed = 0
                         self.wave += 1
                         self.spawn_list = []
+                        self.show_bonus_menu = True
             self.draw()
                 # End of if not pause block
         pygame.quit()
