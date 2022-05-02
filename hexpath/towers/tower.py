@@ -22,6 +22,7 @@ class Tower:
         self.height = 0
         self.crit_chance = 0
         self.crit_damage = 1.2
+        self.range = 100
         self.sell_value = [0,0,0, None]
         self.price = [0,0,0, None]
         self.upgrade_bonus_dmg = [0, 2, 3, None]
@@ -29,6 +30,7 @@ class Tower:
         self.selected = False
         self.name = "default tower"
         self.ico_name = "buy_default_tower"
+        self.accuracy = 0.5
         # define menu and buttons
         self.menu_bg = menu_bg
         #self.menu = TowerMenu(self, self.x, self.y, 120, 70, self.menu_bg)
@@ -44,6 +46,16 @@ class Tower:
         self.delay = 50
         self.structure_placement_sound = structure_placement_sound
         self.projectiles = None
+        self.projectile_speed = 10
+        # modifiers:
+        self.mod_crit_chance = 0
+        self.mod_crit_damage = 0
+        self.mod_damage = 0
+        self.mod_accuracy = 0
+        self.mod_max_splash_range = 0
+        self.mod_projectile_speed = 0
+        self.mod_attack_speed = 0
+        self.mod_attack_range = 0
 
     def draw(self, win):
         """
@@ -57,6 +69,18 @@ class Tower:
         # draw menu
         if self.selected:
             self.menu.draw(win)
+
+    def clear_modifiers(self):
+        self.mod_crit_chance = 0
+        self.mod_crit_damage = 0
+        self.mod_damage = 0
+        self.mod_accuracy = 0
+        self.mod_max_splash_range = 0
+        self.mod_projectile_speed = 0
+        self.mod_attack_speed = 0
+
+    def print_modifiers(self):
+        print ("mod_crit_chance:", self.mod_crit_chance, "mod_crit_damage", self.mod_crit_damage, "mod_damage", self.mod_damage, "mod_accuracy", self.mod_accuracy, "mod_max_splash_range", self.mod_max_splash_range, "mod_projectile_speed", self.mod_projectile_speed, "mod_attack_speed", self.mod_attack_speed, "mod_attack_range", self.mod_attack_range)
 
     def draw_tower_menu(self, win):
         if self.selected:

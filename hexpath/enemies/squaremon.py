@@ -23,7 +23,7 @@ class Squaremon(Enemy):
     def __init__(self, path):
         super().__init__(path)
         self.name = "Squaremon"
-        self.max_health = 23
+        self.max_health = 12
         self.health = self.max_health
         self.imgs = self.load_image()
         self.speed_increase = 1.8
@@ -46,7 +46,7 @@ class SquaremonGreen(Enemy):
     def __init__(self, path):
         super().__init__(path)
         self.name = "SquaremonGreen"
-        self.max_health = 100
+        self.max_health = 30
         self.health = self.max_health
         self.imgs = self.load_image()
         self.speed_increase = 0.7

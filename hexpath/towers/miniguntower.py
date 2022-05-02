@@ -49,6 +49,7 @@ class MinigunTower(Tower):
         self.action_sound = minigun_sound
         self.projectiles = []
         self.enable_double_fire = False
+        self.projectile_speed = 12
 
     def get_upgrade_cost(self):
         """
@@ -131,28 +132,31 @@ class MinigunTower(Tower):
                     # get all enemies in range of explosion projectile.explosion_range
                     for enemy in enemies:
                         check_distance = projectile.get_distance(enemy.x, enemy.y)
-                        if check_distance <= self.max_splash_range:
-                            # The closer the unit to the source 'explosion' the more damage.
-                            projectile.delete = True
-                            resulting_damage = self.damage
-                            color = (255, 0, 0)
-                            label_font_size = 14
-                            if random.random() < self.crit_chance:
-                                resulting_damage = resulting_damage * self.crit_damage
-                                color = (255,215,0)
-                                label_font_size = 18
-                            resulting_damage = int(resulting_damage)
-                            # cur_opponent.hp -= resulting_damage
-                            labels.append(Label(enemy.x, enemy.y, resulting_damage, color, label_font_size))
+                        if check_distance <= (self.max_splash_range + self.mod_max_splash_range):
+                            if random.random() < (self.accuracy + self.mod_accuracy):
+                                # The closer the unit to the source 'explosion' the more damage.
+                                projectile.delete = True
+                                resulting_damage = self.damage + self.mod_damage
+                                color = (255, 0, 0)
+                                label_font_size = 14
+                                if random.random() < (self.crit_chance + self.mod_crit_chance):
+                                    resulting_damage = resulting_damage * (self.crit_damage + self.mod_crit_damage)
+                                    color = (255,215,0)
+                                    label_font_size = 18
+                                resulting_damage = int(resulting_damage)
+                                # cur_opponent.hp -= resulting_damage
+                                labels.append(Label(enemy.x, enemy.y, resulting_damage, color, label_font_size))
 
-                            enemy.hit(resulting_damage)
-                                # death_ = pygame.mixer.Sound(projectile.target.death_sound)
-                                # death_.set_volume(0.1)
-                                # death_.play()
+                                enemy.hit(resulting_damage)
+                                    # death_ = pygame.mixer.Sound(projectile.target.death_sound)
+                                    # death_.set_volume(0.1)
+                                    # death_.play()
 
-                                # dropping_items.append(enemy.items)
-                                # enemies.remove(enemy)
-
+                                    # dropping_items.append(enemy.items)
+                                    # enemies.remove(enemy)
+                            else:
+                                label_font_size = 14
+                                labels.append(Label(enemy.x, enemy.y, "MISS", (66, 66, 66), label_font_size))
                         # add
                     self.projectiles.remove(projectile)
                     return labels
@@ -166,7 +170,7 @@ class MinigunTower(Tower):
             nme_center_y = enemy.y + enemy.img.get_height() / 2
 
             dis = math.sqrt((twr_center_x - nme_center_x) ** 2 + (twr_center_y - nme_center_y) ** 2)
-            if dis < self.range:
+            if dis < (self.range + self.mod_attack_range):
                 self.inRange = True
                 enemy_closest.append(enemy)
 
@@ -200,7 +204,7 @@ class MinigunTower(Tower):
         self.turret_image = turret_imgs[self.tower_count]
         # do bullets cycle here?
 
-        self.delay -= self.attack_speed
+        self.delay -= self.attack_speed + self.mod_attack_speed
         if (self.delay <= 0):
             """
             action_sound = pygame.mixer.Sound(self.action_sound)
@@ -214,7 +218,7 @@ class MinigunTower(Tower):
             death_.set_volume(0.1)
             death_.play()
             if not self.enable_double_fire:
-                self.projectiles.append(Bullet(self.x, self.y, enemy.x, enemy.y, enemy))
+                self.projectiles.append(Bullet(self.x, self.y, enemy.x, enemy.y, enemy, (self.projectile_speed + self.mod_projectile_speed)))
             else:
                 spawn_x_mod_a = random.randint(1, 30) - 15
                 spawn_y_mod_a = random.randint(1, 30) - 15

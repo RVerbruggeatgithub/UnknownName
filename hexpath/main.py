@@ -51,6 +51,7 @@ class Game:
         self.menu.add_btn(ico_minigun, "buy_minigun", "Minigun", 3)
         self.menu.add_btn(ico_obstruction, "buy_obstacle", "Obstacle", 5)
         self.gate_health = 10000
+        # This mode allow to create a path from point A to B returns start and end location as lists in console.
         self.build_mode = False
         self.wave_complete = True
         self.enemy_counter = 0
@@ -61,66 +62,174 @@ class Game:
         self.tower_no_clip = False
         self.wave_enemy_total = 0
         self.spawn_list = []
+        # Should we go through the list of bonuses and apply them to the tower?
+        self.update_bonuses = False
         self.bonus_menu = BonusPickerMenu(self.win, 5)
         self.action_list = {
-            "ATK_1" : {"Description": "Attack Damage + 5%", "modifier" : 0.05, "pictogram" : pictogram_attack_damage, "color" : (255, 255, 255, 200), "background_color" : (255, 255, 255 ,255) },
-            "SPEED_1" : {"Description": "Attack Speed + 5%", "modifier" : 0.05, "pictogram" : pictogram_attack_speed, "color" : (255, 255, 255, 200), "background_color" : (255, 255, 255 ,255) },
+            "ATK_1" : {"Description": "Attack Damage + 1", "modifier" : 1, "pictogram" : pictogram_attack_damage, "color" : (255, 255, 255, 200), "background_color" : (255, 255, 255 ,255) },
+            "SPEED_1" : {"Description": "Attack Speed + 10%", "modifier" : 0.1, "pictogram" : pictogram_attack_speed, "color" : (255, 255, 255, 200), "background_color" : (255, 255, 255 ,255) },
             "RANGE_1": {"Description": "Attack Range + 5%", "modifier": 0.05, "pictogram": pictogram_attack_speed,
                       "color": (255, 255, 255, 200), "background_color": (255, 255, 255, 255)},
             "BRANGE_1": {"Description": "Blast Range + 5%", "modifier": 0.05, "pictogram": pictogram_attack_speed,
                       "color": (255, 255, 255, 200), "background_color": (255, 255, 255, 255)},
             "CRITC_1": {"Description": "Crit Chance + 5%", "modifier": 0.05, "pictogram": pictogram_attack_speed,
                       "color": (255, 255, 255, 200), "background_color": (255, 255, 255, 255)},
-            "CRITD_1": {"Description": "Crit Chance + 50%", "modifier": 0.50, "pictogram": pictogram_attack_speed,
-                      "color": (255, 255, 255, 200), "background_color": (255, 255, 255, 255)},
-            "TOWER": {"Description": "Tower +1", "modifier": 1, "pictogram": pictogram_attack_speed,
+            "ACC_1": {"Description": "Accuracy + 5%", "modifier": 0.05, "pictogram": pictogram_attack_speed,
                         "color": (255, 255, 255, 200), "background_color": (255, 255, 255, 255)},
-            "OBSTACLE": {"Description": "Obstacle +1", "modifier": 1, "pictogram": pictogram_attack_speed,
-                      "color": (255, 255, 255, 200), "background_color": (255, 255, 255, 255)}
+            "BULSP_1": {"Description": "Projectile speed + 8%", "modifier": 0.08, "pictogram": pictogram_attack_speed,
+                      "color": (255, 255, 255, 200), "background_color": (255, 255, 255, 255)},
         }
 
         self.action_list2 = {
-            "ATK_2" : {"Description": "Attack Damage + 8%", "modifier" : 0.08, "pictogram" : pictogram_attack_damage, "color" : (0, 32, 255, 200), "background_color" : (0, 32, 255,255) },
-            "SPEED_2" : {"Description": "Attack Speed + 8%", "modifier" : 0.08, "pictogram" : pictogram_attack_speed, "color" : (0, 32, 255, 200), "background_color" : (0, 32, 255,255) },
-            "RANGE_2": {"Description": "Attack Range + 8%", "modifier": 0.08, "pictogram": pictogram_attack_speed,
+            "ATK_2" : {"Description": "Attack Damage + 2", "modifier" : 2, "pictogram" : pictogram_attack_damage, "color" : (0, 32, 255, 200), "background_color" : (0, 32, 255,255) },
+            "SPEED_2" : {"Description": "Attack Speed + 20 %", "modifier" : 0.2, "pictogram" : pictogram_attack_speed, "color" : (0, 32, 255, 200), "background_color" : (0, 32, 255,255) },
+            "RANGE_2": {"Description": "Attack Range + 10%", "modifier": 0.1, "pictogram": pictogram_attack_speed,
                       "color": (0, 32, 255, 200), "background_color": (0, 32, 255, 255)},
-            "BRANGE_2": {"Description": "Blast Range + 8%", "modifier": 0.08, "pictogram": pictogram_attack_speed,
+            "BRANGE_2": {"Description": "Blast Range + 10%", "modifier": 0.1, "pictogram": pictogram_attack_speed,
                       "color": (0, 32, 255, 200), "background_color": (0, 32, 255, 255)},
+            "OBSTACLE_1": {"Description": "Obstacle +1", "modifier": 1, "pictogram": pictogram_attack_speed,
+                         "color": (0, 32, 255, 200), "background_color": (0, 32, 255, 255)},
+            "CRITD_1": {"Description": "Crit Damage + 50%", "modifier": 0.50, "pictogram": pictogram_attack_speed,
+                        "color": (255, 255, 255, 200), "background_color": (255, 255, 255, 255)},
+        }
+
+        self.action_list3 = {
+            "TOWER_1": {"Description": "Tower! +1", "modifier": 1, "pictogram": pictogram_attack_speed,
+                        "color": (221,160,221, 200), "background_color": (221,160,221, 255)},
+            "SPEED_3": {"Description": "Attack Speed + 30%", "modifier": 0.3, "pictogram": pictogram_attack_speed,
+                        "color": (221,160,221, 200), "background_color": (221,160,221, 255)},
+            "OBSTACLE_2": {"Description": "Obstacle +2", "modifier": 2, "pictogram": pictogram_attack_speed,
+                         "color": (221,160,221, 200), "background_color": (0, 32, 255, 255)},
         }
 
         self.bonus_options = []
-        u = 0
-        while u < 5:
-            # 75% chance to get basic item
-            if random.random() < 0.75:
-                key, action_item = random.choice(list(self.action_list.items()))
-            else:
-                key, action_item = random.choice(list(self.action_list2.items()))
-
-            if key not in self.bonus_options:
-                self.bonus_options.append(key)
-                self.bonus_menu.add_btn(key, action_item["Description"], action_item["modifier"], action_item["pictogram"], action_item["color"], action_item["background_color"])
-                u += 1
+        self.applied_bonuses = []
+        self.build_bonus_menu()
 
 
 
         self.show_bonus_menu = True
+        self.show_build_menu = False
         self.enemy_spawn_points = [
-            {"source": [375, 266.50635094610965], "destination": [700, 396.41016151377545]},
-            {"source": [775, 93.30127018922192], "destination": [900, 396.41016151377545]}
+            {"source": [250, 396.41016151377545], "destination": [900, 396.41016151377545]},
+            {"source": [750, 223.20508075688772], "destination": [450, 656.217782649107]}
         ]
         self.portals = []
         for enemy_spawn_point in self.enemy_spawn_points:
             self.portals.append(Portal(enemy_spawn_point["source"][0], enemy_spawn_point["source"][1]))
         self.waves = [
-                [{"type": "Squaremon", "count": 2, "interval": 0.8},{"type": "SquaremonGreen", "count" : 3, "interval": 0.5}],
-                [{"type": "Squaremon", "count" : 4, "interval": 0.6}],
-                [{"type": "Squaremon", "count" : 5, "interval": 0.5},{"type": "SquaremonGreen", "count" : 1, "interval": 0.5}],
-                [{"type": "SquaremonGreen", "count" : 8, "interval": 4},{"type": "SquaremonGreen", "count" : 2, "interval": 0.5}],
-                [{"type": "SquaremonGreen", "count": 12, "interval": 4},{"type": "SquaremonGreen", "count": 4, "interval": 0.5}],
-                [{"type": "Squaremon", "count": 15, "interval": 0.5},{"type": "SquaremonGreen", "count": 5, "interval": 0.5}],
-                [{"type": "SquaremonGreen", "count": 18, "interval": 4},{"type": "SquaremonGreen", "count": 7, "interval": 0.5}],
-                [{"type": "Squaremon", "count": 22, "interval": 0.5},{"type": "SquaremonGreen", "count": 10, "interval": 0.5}],
+                [{"type": "Squaremon", "count": 1, "interval": 0.8}],
+                [{"type": "Squaremon", "count": 2, "interval": 0.8}],
+                [{"type": "Squaremon", "count": 3, "interval": 0.8}],
+                [{"type": "Squaremon", "count" : 5, "interval": 0.6}],
+                [{"type": "Squaremon", "count": 7, "interval": 0.6}],
+                [{"type": "Squaremon", "count": 8, "interval": 0.6}],
+                [{"type": "Squaremon", "count": 10, "interval": 0.6}],
+                [{"type": "Squaremon", "count" : 4, "interval": 0.5},{"type": "SquaremonGreen", "count" : 1, "interval": 0.5}],
+                [{"type": "Squaremon", "count" : 6, "interval": 4},{"type": "SquaremonGreen", "count" : 2, "interval": 0.5}],
+                [{"type": "Squaremon", "count": 8, "interval": 4},{"type": "SquaremonGreen", "count": 2, "interval": 0.5}],
+                [{"type": "Squaremon", "count": 11, "interval": 0.5},{"type": "SquaremonGreen", "count": 3, "interval": 0.5}],
+                [{"type": "Squaremon", "count": 14, "interval": 4},{"type": "SquaremonGreen", "count": 4, "interval": 0.5}],
+                [{"type": "Squaremon", "count": 16, "interval": 0.5},{"type": "SquaremonGreen", "count": 5, "interval": 0.5}],
+                [{"type": "Squaremon", "count": 16, "interval": 0.5},{"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
+                [{"type": "Squaremon", "count": 18, "interval": 0.5},{"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
+            [{"type": "Squaremon", "count": 18, "interval": 0.5},
+             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
+            [{"type": "Squaremon", "count": 18, "interval": 0.5},
+             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
+            [{"type": "Squaremon", "count": 18, "interval": 0.5},
+             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
+            [{"type": "Squaremon", "count": 18, "interval": 0.5},
+             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
+            [{"type": "Squaremon", "count": 18, "interval": 0.5},
+             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
+            [{"type": "Squaremon", "count": 18, "interval": 0.5},
+             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
+            [{"type": "Squaremon", "count": 18, "interval": 0.5},
+             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
+            [{"type": "Squaremon", "count": 18, "interval": 0.5},
+             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
+            [{"type": "Squaremon", "count": 18, "interval": 0.5},
+             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
+            [{"type": "Squaremon", "count": 18, "interval": 0.5},
+             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
+            [{"type": "Squaremon", "count": 18, "interval": 0.5},
+             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
+            [{"type": "Squaremon", "count": 18, "interval": 0.5},
+             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
+            [{"type": "Squaremon", "count": 18, "interval": 0.5},
+             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
+            [{"type": "Squaremon", "count": 18, "interval": 0.5},
+             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
+            [{"type": "Squaremon", "count": 18, "interval": 0.5},
+             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
+            [{"type": "Squaremon", "count": 18, "interval": 0.5},
+             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
+            [{"type": "Squaremon", "count": 18, "interval": 0.5},
+             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
+            [{"type": "Squaremon", "count": 18, "interval": 0.5},
+             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
+            [{"type": "Squaremon", "count": 18, "interval": 0.5},
+             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
+            [{"type": "Squaremon", "count": 18, "interval": 0.5},
+             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
+            [{"type": "Squaremon", "count": 18, "interval": 0.5},
+             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
+            [{"type": "Squaremon", "count": 18, "interval": 0.5},
+             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
+            [{"type": "Squaremon", "count": 18, "interval": 0.5},
+             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
+            [{"type": "Squaremon", "count": 18, "interval": 0.5},
+             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
+            [{"type": "Squaremon", "count": 18, "interval": 0.5},
+             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
+            [{"type": "Squaremon", "count": 18, "interval": 0.5},
+             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
+            [{"type": "Squaremon", "count": 18, "interval": 0.5},
+             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
+            [{"type": "Squaremon", "count": 18, "interval": 0.5},
+             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
+            [{"type": "Squaremon", "count": 18, "interval": 0.5},
+             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
+            [{"type": "Squaremon", "count": 18, "interval": 0.5},
+             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
+            [{"type": "Squaremon", "count": 18, "interval": 0.5},
+             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
+            [{"type": "Squaremon", "count": 18, "interval": 0.5},
+             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
+            [{"type": "Squaremon", "count": 18, "interval": 0.5},
+             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
+            [{"type": "Squaremon", "count": 18, "interval": 0.5},
+             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
+            [{"type": "Squaremon", "count": 18, "interval": 0.5},
+             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
+            [{"type": "Squaremon", "count": 18, "interval": 0.5},
+             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
+            [{"type": "Squaremon", "count": 18, "interval": 0.5},
+             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
+            [{"type": "Squaremon", "count": 18, "interval": 0.5},
+             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
+            [{"type": "Squaremon", "count": 18, "interval": 0.5},
+             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
+            [{"type": "Squaremon", "count": 18, "interval": 0.5},
+             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
+            [{"type": "Squaremon", "count": 18, "interval": 0.5},
+             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
+            [{"type": "Squaremon", "count": 18, "interval": 0.5},
+             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
+            [{"type": "Squaremon", "count": 18, "interval": 0.5},
+             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
+            [{"type": "Squaremon", "count": 18, "interval": 0.5},
+             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
+            [{"type": "SquaremonGreen", "count": 12, "interval": 0.5}],
+            [{"type": "SquaremonGreen", "count": 12, "interval": 0.5}],
+            [{"type": "SquaremonGreen", "count": 12, "interval": 0.5}],
+            [{"type": "SquaremonGreen", "count": 12, "interval": 0.5}],
+            [{"type": "SquaremonGreen", "count": 12, "interval": 0.5}],
+            [{"type": "SquaremonGreen", "count": 12, "interval": 0.5}],
+            [{"type": "SquaremonGreen", "count": 12, "interval": 0.5}],
+            [{"type": "SquaremonGreen", "count": 12, "interval": 0.5}],
+            [{"type": "SquaremonGreen", "count": 12, "interval": 0.5}],
             ]
 
         self.enemies_removed = 0
@@ -146,6 +255,7 @@ class Game:
 
             if self.build_mode:
                 self.map_update_required = False
+                self.show_bonus_menu = False
 
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
@@ -222,10 +332,32 @@ class Game:
                                 if map_location.click(mouse_pos[0], mouse_pos[1]):
                                     clicked_location = map_location
 
-                        bonus_menu_button = self.bonus_menu.get_clicked(mouse_pos[0], mouse_pos[1])
-                        print(bonus_menu_button)
-                        # change below to only happen if button is clicked..
-                        self.show_bonus_menu = False
+                        if self.show_bonus_menu:
+                            self.show_build_menu = False
+                            bonus_menu_button = self.bonus_menu.get_clicked(mouse_pos[0], mouse_pos[1])
+                            # change below to only happen if button is clicked..
+                            if bonus_menu_button is not None:
+                                # apply structure related directly, don't add to bonuses
+                                structures = ["OBSTACLE_1", "OBSTACLE_2", "TOWER_1"]
+                                if bonus_menu_button in structures:
+                                    if bonus_menu_button == "TOWER_1":
+                                        for button in self.menu.buttons:
+                                            if button.name == "buy_minigun":
+                                                button.update_quantity(1)
+                                    if bonus_menu_button == "OBSTACLE_1":
+                                        for button in self.menu.buttons:
+                                            if button.name == "buy_obstacle":
+                                                button.update_quantity(1)
+                                    if bonus_menu_button == "OBSTACLE_2":
+                                        for button in self.menu.buttons:
+                                            if button.name == "buy_obstacle":
+                                                button.update_quantity(2)
+                                else:
+                                    self.applied_bonuses.append(bonus_menu_button)
+                                self.update_bonuses = True
+                                self.show_bonus_menu = False
+                                self.show_build_menu = True
+                                self.build_bonus_menu()
                         """
                         if event.button == 3 and self.wave_complete:
                            if clicked_location is not None:
@@ -252,7 +384,7 @@ class Game:
                             if event.button == 1:
                                 allowed = True
                                 hit = False
-                                tower_list = self.attack_towers[:]
+                                tower_list = self.attack_towers[:] + self.obstacles[:]
 
                                 for tower in tower_list:
                                     if tower.collide(self.moving_object):
@@ -307,6 +439,7 @@ class Game:
                                                     button.update_quantity(-1)
                                             if (self.moving_object.name in attack_tower_names):
                                                 self.attack_towers.append(self.moving_object)
+
                                             else:
                                                 self.obstacles.append(self.moving_object)
                                             self.moving_object.moving = False
@@ -318,7 +451,7 @@ class Game:
                         else:
                             side_menu_button = self.menu.get_clicked(mouse_pos[0], mouse_pos[1])
                             item_quantity = self.menu.get_item_quantity(side_menu_button)
-                            if side_menu_button and item_quantity > 0:
+                            if side_menu_button and item_quantity > 0 and self.show_build_menu:
                                 # availability = self.menu.get_item_quantity(buy_minigun)
                                 # if self.money >= cost:
                                 self.add_tower(side_menu_button)
@@ -341,6 +474,10 @@ class Game:
                                             tw.selected = False
 
                 if not self.pause:
+
+                    if self.update_bonuses:
+                        self.apply_bonuses_to_towers()
+                        self.update_bonuses = False
 
                     if len(self.paths) > 0 and self.wave < len(self.waves):
                         self.moving_object = False
@@ -392,7 +529,6 @@ class Game:
                     for enemy in to_del:
                         # self.gate_health -= enemy.gate_damage
                         # print(d.travelled_path)
-                        print("ding")
                         self.enemies_removed += 1
                         self.enemies.remove(enemy)
 
@@ -403,7 +539,6 @@ class Game:
                             for label in list_of_labels:
                                 self.label_collector.append(label)
 
-                    print(self.enemies_removed, self.wave_enemy_total)
                     if self.enemies_removed == self.wave_enemy_total:
                         self.wave_complete = True
                         self.wave_enemy_total = 0
@@ -414,6 +549,7 @@ class Game:
                         self.wave += 1
                         self.spawn_list = []
                         self.show_bonus_menu = True
+                        self.show_build_menu = False
             self.draw()
                 # End of if not pause block
         pygame.quit()
@@ -427,9 +563,61 @@ class Game:
         """
         return spr.y
 
+    def build_bonus_menu(self):
+        u = 0
+
+        self.bonus_options = []
+        self.bonus_menu.buttons = []
+        while u < 5:
+            # 75% chance to get basic item
+            roll = random.random()
+            if roll > 0.90:
+                key, action_item = random.choice(list(self.action_list3.items()))
+            elif roll > 0.75:
+                key, action_item = random.choice(list(self.action_list2.items()))
+            else:
+                key, action_item = random.choice(list(self.action_list.items()))
+
+            if key not in self.bonus_options:
+                print(roll, key)
+                self.bonus_options.append(key)
+                self.bonus_menu.add_btn(key, action_item["Description"], action_item["modifier"], action_item["pictogram"], action_item["color"], action_item["background_color"])
+                u += 1
+
+    def apply_bonuses_to_towers(self):
+        for tower in self.attack_towers:
+            tower.clear_modifiers()
+            for bonus in self.applied_bonuses:
+
+                if bonus == "ATK_1":
+                    tower.mod_damage += self.action_list[bonus]["modifier"]
+                if bonus == "ATK_2":
+                    tower.mod_damage += self.action_list2[bonus]["modifier"]
+                if bonus == "CRITC_1":
+                    tower.mod_crit_chance += self.action_list[bonus]["modifier"]
+
+                if bonus == "CRITD_1":
+                    tower.mod_crit_damage += tower.crit_damage * \
+                                             self.action_list2[bonus]["modifier"]
+                if bonus == "SPEED_1":
+                    tower.mod_attack_speed += tower.attack_speed * self.action_list[bonus]["modifier"]
+                if bonus == "SPEED_2":
+                    tower.mod_attack_speed += tower.attack_speed * self.action_list2[bonus]["modifier"]
+                if bonus == "SPEED_3":
+                    tower.mod_attack_speed += tower.attack_speed * self.action_list3[bonus]["modifier"]
+                if bonus == "ACC_1":
+                    tower.mod_accuracy += self.action_list[bonus]["modifier"]
+                if bonus == "BULSP_1":
+                    tower.mod_projectile_speed += tower.projectile_speed * \
+                                             self.action_list[bonus]["modifier"]
+                if bonus == "RANGE_1":
+                    tower.mod_attack_range += tower.range * \
+                                             self.action_list[bonus]["modifier"]
+
+            tower.print_modifiers()
+
     def add_tower(self, name):
         x, y = pygame.mouse.get_pos()
-        print("ding", name)
         tower_opt_list = {"buy_minigun": MinigunTower(x, y), "buy_obstacle": Obstacle(x, y)}
 
         # if name == "buy_minigun":
@@ -461,7 +649,9 @@ class Game:
         else:
             for path in self.paths:
                 self.base_map.draw_path(self.win, path)
-        self.menu.draw(self.win)
+
+        if self.show_build_menu:
+            self.menu.draw(self.win)
 
 
 

@@ -8,14 +8,14 @@ class Projectile:
     """
     Abstract class for projectiles
     """
-    def __init__(self, x, y, target_x, target_y, target):
+    def __init__(self, x, y, target_x, target_y, target, speed):
         self.x = x
         self.y = y
         self.target_x = target_x
         self.target_y = target_y
         self.width = 0
         self.height = 0
-        self.speed_increase = 1
+        self.speed_increase = speed
         self.boundary = 10
         self.img = projectile_image
         self.target = target
