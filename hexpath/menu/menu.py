@@ -219,7 +219,6 @@ class BonusPickerMenu:
             item_p = item_p - 5
             item_h = self.height / 2 - 30
             item_s = 2
-        print(pictogram)
         self.buttons.append(BonusMenuButton(action, name, bonus, pictogram, color, bcolor, item_w, item_h, item_p, item_s))
 
     def get_clicked(self, X, Y):
