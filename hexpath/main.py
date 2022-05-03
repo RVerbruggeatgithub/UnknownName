@@ -234,6 +234,7 @@ class Game:
 
         self.enemies_removed = 0
         self.paths = []
+        self.move_tower = False
         # mark hexes of spawn points as not passable
 
         # only use this when building a path
@@ -318,6 +319,7 @@ class Game:
                     if event.type == pygame.QUIT:
                         run = False
                     if event.type == pygame.MOUSEBUTTONUP:
+                        self.move_tower = False
                         if self.play_pause_button.click(mouse_pos[0], mouse_pos[1]):
                             self.pause = not (self.pause)
                             self.play_pause_button.toggle()
@@ -331,6 +333,29 @@ class Game:
                                 # if map_location.collide(mouse_pos[0], mouse_pos[1]):
                                 if map_location.click(mouse_pos[0], mouse_pos[1]):
                                     clicked_location = map_location
+                            # moving tower, left click tower to move it.
+                            for tw in (self.attack_towers + self.obstacles):
+                                if tw.click(mouse_pos[0], mouse_pos[1]):
+                                    """
+                                    Moving tower on left click
+                                    1. move tower into self.moving_object
+                                    2. add 1 tower count to tower[type]
+                                    3. remove tower from tower list (is this needed?)
+                                    4. Toggle hex, update paths 
+                                    """
+                                    sel_tower = tw.ico_name
+                                    self.add_tower(tw.ico_name)
+                                    self.move_tower = True
+                                    for button in self.menu.buttons:
+                                        if button.name == sel_tower:
+                                            button.update_quantity(1)
+                                    if tw in self.attack_towers:
+                                        self.attack_towers.remove(tw)
+                                    else:
+                                        self.obstacles.remove(tw)
+                                    self.selected_hex = clicked_location
+                                    self.selected_hex.toggle_passable()
+
 
                         if self.show_bonus_menu:
                             self.show_build_menu = False
@@ -379,7 +404,7 @@ class Game:
                            """
                                         # if found, update self.paths[num] with new path
                                         # self.enemy_spawn_points
-                        if self.moving_object:
+                        if self.moving_object and not self.move_tower:
 
                             if event.button == 1:
                                 allowed = True
@@ -434,7 +459,6 @@ class Game:
                                             # how do we update the button quantity?
                                             # self.menu.buttons.name
                                             for button in self.menu.buttons:
-                                                print("=>", button.name, self.moving_object.ico_name)
                                                 if button.name == self.moving_object.ico_name:
                                                     button.update_quantity(-1)
                                             if (self.moving_object.name in attack_tower_names):
@@ -579,7 +603,6 @@ class Game:
                 key, action_item = random.choice(list(self.action_list.items()))
 
             if key not in self.bonus_options:
-                print(roll, key)
                 self.bonus_options.append(key)
                 self.bonus_menu.add_btn(key, action_item["Description"], action_item["modifier"], action_item["pictogram"], action_item["color"], action_item["background_color"])
                 u += 1
