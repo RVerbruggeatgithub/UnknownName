@@ -70,7 +70,7 @@ class Game:
             "SPEED_1" : {"Description": "Attack Speed + 10%", "modifier" : 0.1, "pictogram" : pictogram_attack_speed, "color" : (255, 255, 255, 200), "background_color" : (255, 255, 255 ,255) },
             "RANGE_1": {"Description": "Attack Range + 5%", "modifier": 0.05, "pictogram": pictogram_attack_speed,
                       "color": (255, 255, 255, 200), "background_color": (255, 255, 255, 255)},
-            "BRANGE_1": {"Description": "Blast Range + 5%", "modifier": 0.05, "pictogram": pictogram_attack_speed,
+            "RADIUS_1": {"Description": "Damage Radius + 5%", "modifier": 0.05, "pictogram": pictogram_attack_speed,
                       "color": (255, 255, 255, 200), "background_color": (255, 255, 255, 255)},
             "CRITC_1": {"Description": "Crit Chance + 5%", "modifier": 0.05, "pictogram": pictogram_attack_speed,
                       "color": (255, 255, 255, 200), "background_color": (255, 255, 255, 255)},
