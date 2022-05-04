@@ -13,6 +13,7 @@ from enemies.squaremon import *
 from towers.miniguntower import MinigunTower
 from towers.obstacle import Obstacle
 from objects.portal import Portal
+from objects.city import City
 
 pygame.display.init()
 pygame.display.set_mode((500, 500), pygame.RESIZABLE)
@@ -70,7 +71,7 @@ class Game:
             "SPEED_1" : {"Description": "Attack Speed + 10%", "modifier" : 0.1, "pictogram" : pictogram_attack_speed, "color" : (255, 255, 255, 200), "background_color" : (255, 255, 255 ,255) },
             "RANGE_1": {"Description": "Attack Range + 5%", "modifier": 0.05, "pictogram": pictogram_attack_speed,
                       "color": (255, 255, 255, 200), "background_color": (255, 255, 255, 255)},
-            "RADIUS_1": {"Description": "Damage Radius + 5%", "modifier": 0.05, "pictogram": pictogram_attack_speed,
+            "RADIUS_1": {"Description": "Splash Radius +5%", "modifier": 0.05, "pictogram": pictogram_attack_speed,
                       "color": (255, 255, 255, 200), "background_color": (255, 255, 255, 255)},
             "CRITC_1": {"Description": "Crit Chance + 5%", "modifier": 0.05, "pictogram": pictogram_attack_speed,
                       "color": (255, 255, 255, 200), "background_color": (255, 255, 255, 255)},
@@ -85,11 +86,13 @@ class Game:
             "SPEED_2" : {"Description": "Attack Speed + 20 %", "modifier" : 0.2, "pictogram" : pictogram_attack_speed, "color" : (0, 32, 255, 200), "background_color" : (0, 32, 255,255) },
             "RANGE_2": {"Description": "Attack Range + 10%", "modifier": 0.1, "pictogram": pictogram_attack_speed,
                       "color": (0, 32, 255, 200), "background_color": (0, 32, 255, 255)},
-            "BRANGE_2": {"Description": "Blast Range + 10%", "modifier": 0.1, "pictogram": pictogram_attack_speed,
+            "RADIUS_2": {"Description": "Splash Radius + 10%", "modifier": 0.1, "pictogram": pictogram_attack_speed,
                       "color": (0, 32, 255, 200), "background_color": (0, 32, 255, 255)},
             "OBSTACLE_1": {"Description": "Obstacle +1", "modifier": 1, "pictogram": pictogram_attack_speed,
                          "color": (0, 32, 255, 200), "background_color": (0, 32, 255, 255)},
             "CRITD_1": {"Description": "Crit Damage + 50%", "modifier": 0.50, "pictogram": pictogram_attack_speed,
+                        "color": (255, 255, 255, 200), "background_color": (255, 255, 255, 255)},
+            "SHIELD_1": {"Description": "Protect cities +1", "modifier": 1.00, "pictogram": pictogram_attack_speed,
                         "color": (255, 255, 255, 200), "background_color": (255, 255, 255, 255)},
         }
 
@@ -117,6 +120,12 @@ class Game:
         self.portals = []
         for enemy_spawn_point in self.enemy_spawn_points:
             self.portals.append(Portal(enemy_spawn_point["source"][0], enemy_spawn_point["source"][1]))
+
+        self.cities = []
+        for enemy_spawn_point in self.enemy_spawn_points:
+            self.cities.append(City(enemy_spawn_point["destination"][0], enemy_spawn_point["destination"][1]))
+
+
         self.waves = [
                 [{"type": "Squaremon", "count": 1, "interval": 0.8}],
                 [{"type": "Squaremon", "count": 2, "interval": 0.8}],
@@ -636,6 +645,9 @@ class Game:
                 if bonus == "RANGE_1":
                     tower.mod_attack_range += tower.range * \
                                              self.action_list[bonus]["modifier"]
+                if bonus == "RADIUS_1":
+                    tower.mod_max_splash_range += tower.max_splash_range *\
+                                              self.action_list[bonus]["modifier"]
 
             tower.print_modifiers()
 
@@ -673,6 +685,9 @@ class Game:
             for path in self.paths:
                 self.base_map.draw_path(self.win, path)
 
+        for city in self.cities:
+            city.draw(self.win)
+
         if self.show_build_menu:
             self.menu.draw(self.win)
 
@@ -698,6 +713,16 @@ class Game:
 
         if self.show_bonus_menu:
             self.bonus_menu.draw(self.win)
+
+        # Wave display:
+        surface = pygame.Surface((110, 50), pygame.SRCALPHA, 32)
+        surface.fill((192, 192, 192, 175))
+        small_font= pygame.font.SysFont("segoeuisemilight", 25)
+        rectangle = pygame.Rect(-2,  80, 110, 50)
+        self.win.blit(surface, rectangle)
+        pygame.draw.rect(self.win, (192, 192, 192, 175), rectangle, width=2, border_radius=0)
+        wave = small_font.render("Wave: "+ str(self.wave), 1, (47,79,79))
+        self.win.blit(wave, (10, 90))
 
         pygame.display.update()
 

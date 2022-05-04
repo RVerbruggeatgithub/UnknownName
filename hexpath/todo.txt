@@ -7,9 +7,9 @@ Add Protective Dome, if an enemy escapes, dome protection counter will be reduce
     protective domes are restored next wave. Escaped enemy counter is not.
 Add 4 background / Maps
 Add main menu
-Add RANGE_1: Tower attack radius (probably need to reduce initial from 300 to 200)
-Add RADIUS_1: Damage radius of projectiles
+Add SHIELD_1: For each shield, protects from one incoming enemy
 
-Fixes:
+Fixes needed:
 Prevent resizing of enemies when changing directions
+if bonus menu is up, don't allow towers to be clicked
 
