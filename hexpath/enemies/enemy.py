@@ -60,9 +60,8 @@ class Enemy:
         surface = pygame.Surface((200, 200), pygame.SRCALPHA, 32)
         pygame.draw.circle(surface, (0, 0, 0, 94), (32, (32 + shadow_radius / 2)), shadow_radius, 0)
         win.blit(surface, (self.x - 32, self.y - 32))
-
+        self.img = pygame.transform.scale(self.img, (self.width * self.size, self.height * self.size))
         self.img = pygame.transform.rotate(self.img, (self.angle+90))
-        self.img =pygame.transform.scale(self.img, (self.width * self.size, self.height * self.size))
         win.blit(self.img, (self.x - self.img.get_width()/2, self.y - self.img.get_height()/2))
         self.draw_health_bar(win)
 

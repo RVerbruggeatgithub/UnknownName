@@ -1,7 +1,6 @@
 -- To do list --
 
 Features:
-Add wave counter
 Add Escaped enemy counter and limit
 Add Protective Dome, if an enemy escapes, dome protection counter will be reduced by 1, if at 0, escaped enemy counter will increase.
     protective domes are restored next wave. Escaped enemy counter is not.
@@ -10,5 +9,5 @@ Add main menu
 Add SHIELD_1: For each shield, protects from one incoming enemy
 
 Fixes needed:
-Prevent resizing of enemies when changing directions
+
 
