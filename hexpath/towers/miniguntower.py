@@ -10,14 +10,14 @@ import random
 
 pygame.init()
 # bullet_hole = pygame.transform.scale(load_image("resources", "bullet_hole.png").convert_alpha(), (10, 10))
-minigun_sound = pygame.mixer.Sound(os.path.join("resources", "minigun.mp3"))
+minigun_sound = pygame.mixer.Sound(os.path.join("resources", "plop.mp3"))
 
 
 # load tower images
 turret_imgs = []
-for x in range(1, 4):
+for x in range(1, 6):
     turret_imgs.append(pygame.transform.scale(
-        pygame.image.load(os.path.join("resources", "minigun_" +str(x) + ".png")).convert_alpha(), (50, 50)))
+        pygame.image.load(os.path.join("resources", "canon_" +str(x) + ".png")).convert_alpha(), (50, 50)))
 
 
 
@@ -27,7 +27,7 @@ class MinigunTower(Tower):
         self.turret_image = turret_imgs[0]
         self.turret_imgs = turret_imgs
         self.tower_count = 0
-        self.range = 300
+        self.range = 175
         self.original_range = self.range
         self.delay = self.attack_speed = 5  # lower is slower
         self.crit_chance = 0.05
@@ -218,7 +218,7 @@ class MinigunTower(Tower):
             death_.set_volume(0.1)
             death_.play()
             if not self.enable_double_fire:
-                self.projectiles.append(Bullet(self.x, self.y, enemy.x, enemy.y, enemy, (self.projectile_speed + self.mod_projectile_speed)))
+                self.projectiles.append(Bullet(self.x, self.y, enemy.x, enemy.y, enemy, (self.projectile_speed + self.mod_projectile_speed), self.mod_projectile_size))
             else:
                 spawn_x_mod_a = random.randint(1, 30) - 15
                 spawn_y_mod_a = random.randint(1, 30) - 15

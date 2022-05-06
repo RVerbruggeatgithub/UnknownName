@@ -11,5 +11,4 @@ Add SHIELD_1: For each shield, protects from one incoming enemy
 
 Fixes needed:
 Prevent resizing of enemies when changing directions
-if bonus menu is up, don't allow towers to be clicked
 

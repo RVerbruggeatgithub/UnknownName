@@ -56,6 +56,7 @@ class Tower:
         self.mod_projectile_speed = 0
         self.mod_attack_speed = 0
         self.mod_attack_range = 0
+        self.mod_projectile_size = 0
 
     def draw(self, win):
         """
@@ -78,9 +79,11 @@ class Tower:
         self.mod_max_splash_range = 0
         self.mod_projectile_speed = 0
         self.mod_attack_speed = 0
+        self.mod_attack_range = 0
+        self.mod_projectile_size = 0
 
     def print_modifiers(self):
-        print ("mod_crit_chance:", self.mod_crit_chance, "mod_crit_damage", self.mod_crit_damage, "mod_damage", self.mod_damage, "mod_accuracy", self.mod_accuracy, "mod_max_splash_range", self.mod_max_splash_range, "mod_projectile_speed", self.mod_projectile_speed, "mod_attack_speed", self.mod_attack_speed, "mod_attack_range", self.mod_attack_range)
+        print ("mod_crit_chance:", self.mod_crit_chance, "mod_crit_damage", self.mod_crit_damage, "mod_damage", self.mod_damage, "mod_accuracy", self.mod_accuracy, "mod_max_splash_range", self.mod_max_splash_range, "mod_projectile_speed", self.mod_projectile_speed, "mod_attack_speed", self.mod_attack_speed, "mod_attack_range", self.mod_attack_range, "mod_projectile_size", self.mod_projectile_size)
 
     def draw_tower_menu(self, win):
         if self.selected:

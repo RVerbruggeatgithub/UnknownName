@@ -6,14 +6,45 @@ from .enemy import Enemy
 from functions.functions import *
 # from items.gold import Gold
 # from items.metal import Metal
-imgs = []
+Squaremon_imgs = []
 for x in range(4):
     add_str = str(x)
     img = pygame.transform.scale(
         load_image("resources", "squaremon_" + add_str + ".png"),
         (50, 50))
-    imgs.append(pygame.transform.rotozoom(img, 90 * -1, 1))
+    Squaremon_imgs.append(pygame.transform.rotozoom(img, 90 * -1, 1))
 
+SquaremonGreen_img = []
+for x in range(4):
+    add_str = str(x)
+    img = pygame.transform.scale(
+        load_image("resources", "squaremon_green_" + add_str + ".png"),
+        (50, 50))
+    SquaremonGreen_img.append(pygame.transform.rotozoom(img, 90 * -1, 1))
+
+trippet_img = []
+for x in range(5):
+    add_str = str(x)
+    img = pygame.transform.scale(
+        load_image("resources", "trippet_" + add_str + ".png"),
+        (50, 50))
+    trippet_img.append(pygame.transform.rotozoom(img, 90 * -1, 1))
+
+yolkee_img = []
+for x in range(4):
+    add_str = str(x)
+    img = pygame.transform.scale(
+        load_image("resources", "yolkee_" + add_str + ".png"),
+        (50, 50))
+    yolkee_img.append(pygame.transform.rotozoom(img, 90 * -1, 1))
+
+juju_img = []
+for x in range(4):
+    add_str = str(x)
+    img = pygame.transform.scale(
+        load_image("resources", "juju_" + add_str + ".png"),
+        (50, 50))
+    juju_img.append(pygame.transform.rotozoom(img, 90 * -1, 1))
 
 
 pygame.init()
@@ -32,21 +63,29 @@ class Squaremon(Enemy):
         # self.droppable_items = [Gold(self.x, self.y, 1, 8), Gold(self.x, self.y, 5, 15)]
 
     def load_image(self):
-        imgs = []
-        for t in range(4):
-            t_str = str(t)
-            img = pygame.transform.scale(
-                load_image("resources", "squaremon_" + t_str + ".png"),
-                (50, 50))
-            imgs.append(pygame.transform.rotozoom(img, 90 * -1, 1))
-        return imgs
+        return Squaremon_imgs
+
+class SquaremonElite(Enemy):
+    def __init__(self, path):
+        super().__init__(path)
+        self.name = "SquaremonBoss"
+        self.max_health = 250
+        self.health = self.max_health
+        self.imgs = self.load_image()
+        self.speed_increase = 1.6
+        self.size = 0.7
+        self.boundary = (1 * self.speed_increase)
+        # self.droppable_items = [Gold(self.x, self.y, 1, 8), Gold(self.x, self.y, 5, 15)]
+
+    def load_image(self):
+        return Squaremon_imgs
 
 
 class SquaremonGreen(Enemy):
     def __init__(self, path):
         super().__init__(path)
         self.name = "SquaremonGreen"
-        self.max_health = 30
+        self.max_health = 35
         self.health = self.max_health
         self.imgs = self.load_image()
         self.speed_increase = 0.7
@@ -56,11 +95,65 @@ class SquaremonGreen(Enemy):
         #imgs[:]
 
     def load_image(self):
-        imgs = []
-        for t in range(4):
-            t_str = str(t)
-            img = pygame.transform.scale(
-                load_image("resources", "squaremon_green_" + t_str + ".png"),
-                (50, 50))
-            imgs.append(pygame.transform.rotozoom(img, 90 * -1, 1))
-        return imgs
+        return SquaremonGreen_img
+
+class SquaremonGreenElite(Enemy):
+    def __init__(self, path):
+        super().__init__(path)
+        self.name = "SquaremonGreenElite"
+        self.max_health = 400
+        self.health = self.max_health
+        self.imgs = self.load_image()
+        self.speed_increase = 0.6
+        self.size = 0.7
+        self.boundary = (2 * self.speed_increase)
+        # self.droppable_items = [Gold(self.x, self.y, 1, 8), Gold(self.x, self.y, 5, 15)]
+        #imgs[:]
+
+    def load_image(self):
+        return SquaremonGreen_img
+
+class Trippet(Enemy):
+    def __init__(self, path):
+        super().__init__(path)
+        self.name = "Trippet"
+        self.max_health = 75
+        self.health = self.max_health
+        self.imgs = self.load_image()
+        self.speed_increase = 1.5
+        self.size = 0.8
+        self.boundary = (1 * self.speed_increase)
+        # self.droppable_items = [Gold(self.x, self.y, 1, 8), Gold(self.x, self.y, 5, 15)]
+
+    def load_image(self):
+        return trippet_img
+
+class Yolkee(Enemy):
+    def __init__(self, path):
+        super().__init__(path)
+        self.name = "Yolkee"
+        self.max_health = 125
+        self.health = self.max_health
+        self.imgs = self.load_image()
+        self.speed_increase = 1.4
+        self.size = 0.7
+        self.boundary = (1 * self.speed_increase)
+        # self.droppable_items = [Gold(self.x, self.y, 1, 8), Gold(self.x, self.y, 5, 15)]
+
+    def load_image(self):
+        return yolkee_img
+
+class Juju(Enemy):
+    def __init__(self, path):
+        super().__init__(path)
+        self.name = "Juju"
+        self.max_health = 200
+        self.health = self.max_health
+        self.imgs = self.load_image()
+        self.speed_increase = 0.8
+        self.size = 0.6
+        self.boundary = (1 * self.speed_increase)
+        # self.droppable_items = [Gold(self.x, self.y, 1, 8), Gold(self.x, self.y, 5, 15)]
+
+    def load_image(self):
+        return juju_img

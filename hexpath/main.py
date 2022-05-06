@@ -108,24 +108,15 @@ class Game:
         self.bonus_options = []
         self.applied_bonuses = []
         self.build_bonus_menu()
-
-
-
-        self.show_bonus_menu = True
-        self.show_build_menu = False
+        self.show_bonus_menu = False
+        self.show_build_menu = True
         self.enemy_spawn_points = [
             {"source": [250, 396.41016151377545], "destination": [900, 396.41016151377545]},
-            {"source": [750, 223.20508075688772], "destination": [450, 656.217782649107]}
+
         ]
+        # {"source": [750, 223.20508075688772], "destination": [450, 656.217782649107]}
         self.portals = []
-        for enemy_spawn_point in self.enemy_spawn_points:
-            self.portals.append(Portal(enemy_spawn_point["source"][0], enemy_spawn_point["source"][1]))
-
         self.cities = []
-        for enemy_spawn_point in self.enemy_spawn_points:
-            self.cities.append(City(enemy_spawn_point["destination"][0], enemy_spawn_point["destination"][1]))
-
-
         self.waves = [
                 [{"type": "Squaremon", "count": 1, "interval": 0.8}],
                 [{"type": "Squaremon", "count": 2, "interval": 0.8}],
@@ -133,127 +124,39 @@ class Game:
                 [{"type": "Squaremon", "count" : 5, "interval": 0.6}],
                 [{"type": "Squaremon", "count": 7, "interval": 0.6}],
                 [{"type": "Squaremon", "count": 8, "interval": 0.6}],
-                [{"type": "Squaremon", "count": 10, "interval": 0.6}],
-                [{"type": "Squaremon", "count" : 4, "interval": 0.5},{"type": "SquaremonGreen", "count" : 1, "interval": 0.5}],
+                [{"type": "Squaremon", "count": 12, "interval": 0.5}],
+                [{"type": "Squaremon", "count" : 6, "interval": 0.5},{"type": "SquaremonGreen", "count" : 1, "interval": 0.5}],
                 [{"type": "Squaremon", "count" : 6, "interval": 4},{"type": "SquaremonGreen", "count" : 2, "interval": 0.5}],
                 [{"type": "Squaremon", "count": 8, "interval": 4},{"type": "SquaremonGreen", "count": 2, "interval": 0.5}],
+                [{"type": "SquaremonElite", "count": 1, "interval": 0.5}],
                 [{"type": "Squaremon", "count": 11, "interval": 0.5},{"type": "SquaremonGreen", "count": 3, "interval": 0.5}],
                 [{"type": "Squaremon", "count": 14, "interval": 4},{"type": "SquaremonGreen", "count": 4, "interval": 0.5}],
                 [{"type": "Squaremon", "count": 16, "interval": 0.5},{"type": "SquaremonGreen", "count": 5, "interval": 0.5}],
                 [{"type": "Squaremon", "count": 16, "interval": 0.5},{"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
                 [{"type": "Squaremon", "count": 18, "interval": 0.5},{"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
             [{"type": "Squaremon", "count": 18, "interval": 0.5},
-             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
-            [{"type": "Squaremon", "count": 18, "interval": 0.5},
-             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
-            [{"type": "Squaremon", "count": 18, "interval": 0.5},
-             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
-            [{"type": "Squaremon", "count": 18, "interval": 0.5},
-             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
-            [{"type": "Squaremon", "count": 18, "interval": 0.5},
-             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
-            [{"type": "Squaremon", "count": 18, "interval": 0.5},
-             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
-            [{"type": "Squaremon", "count": 18, "interval": 0.5},
-             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
-            [{"type": "Squaremon", "count": 18, "interval": 0.5},
-             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
-            [{"type": "Squaremon", "count": 18, "interval": 0.5},
-             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
-            [{"type": "Squaremon", "count": 18, "interval": 0.5},
-             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
-            [{"type": "Squaremon", "count": 18, "interval": 0.5},
-             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
-            [{"type": "Squaremon", "count": 18, "interval": 0.5},
-             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
-            [{"type": "Squaremon", "count": 18, "interval": 0.5},
-             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
-            [{"type": "Squaremon", "count": 18, "interval": 0.5},
-             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
-            [{"type": "Squaremon", "count": 18, "interval": 0.5},
-             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
-            [{"type": "Squaremon", "count": 18, "interval": 0.5},
-             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
-            [{"type": "Squaremon", "count": 18, "interval": 0.5},
-             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
-            [{"type": "Squaremon", "count": 18, "interval": 0.5},
-             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
-            [{"type": "Squaremon", "count": 18, "interval": 0.5},
-             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
-            [{"type": "Squaremon", "count": 18, "interval": 0.5},
-             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
-            [{"type": "Squaremon", "count": 18, "interval": 0.5},
-             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
-            [{"type": "Squaremon", "count": 18, "interval": 0.5},
-             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
-            [{"type": "Squaremon", "count": 18, "interval": 0.5},
-             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
-            [{"type": "Squaremon", "count": 18, "interval": 0.5},
-             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
-            [{"type": "Squaremon", "count": 18, "interval": 0.5},
-             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
-            [{"type": "Squaremon", "count": 18, "interval": 0.5},
-             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
-            [{"type": "Squaremon", "count": 18, "interval": 0.5},
-             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
-            [{"type": "Squaremon", "count": 18, "interval": 0.5},
-             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
-            [{"type": "Squaremon", "count": 18, "interval": 0.5},
-             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
-            [{"type": "Squaremon", "count": 18, "interval": 0.5},
-             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
-            [{"type": "Squaremon", "count": 18, "interval": 0.5},
-             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
-            [{"type": "Squaremon", "count": 18, "interval": 0.5},
-             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
-            [{"type": "Squaremon", "count": 18, "interval": 0.5},
-             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
-            [{"type": "Squaremon", "count": 18, "interval": 0.5},
-             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
-            [{"type": "Squaremon", "count": 18, "interval": 0.5},
-             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
-            [{"type": "Squaremon", "count": 18, "interval": 0.5},
-             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
-            [{"type": "Squaremon", "count": 18, "interval": 0.5},
-             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
-            [{"type": "Squaremon", "count": 18, "interval": 0.5},
-             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
-            [{"type": "Squaremon", "count": 18, "interval": 0.5},
-             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
-            [{"type": "Squaremon", "count": 18, "interval": 0.5},
-             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
-            [{"type": "Squaremon", "count": 18, "interval": 0.5},
-             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
-            [{"type": "Squaremon", "count": 18, "interval": 0.5},
-             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
-            [{"type": "Squaremon", "count": 18, "interval": 0.5},
-             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
-            [{"type": "Squaremon", "count": 18, "interval": 0.5},
-             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
-            [{"type": "SquaremonGreen", "count": 12, "interval": 0.5}],
-            [{"type": "SquaremonGreen", "count": 12, "interval": 0.5}],
-            [{"type": "SquaremonGreen", "count": 12, "interval": 0.5}],
-            [{"type": "SquaremonGreen", "count": 12, "interval": 0.5}],
-            [{"type": "SquaremonGreen", "count": 12, "interval": 0.5}],
-            [{"type": "SquaremonGreen", "count": 12, "interval": 0.5}],
-            [{"type": "SquaremonGreen", "count": 12, "interval": 0.5}],
-            [{"type": "SquaremonGreen", "count": 12, "interval": 0.5}],
-            [{"type": "SquaremonGreen", "count": 12, "interval": 0.5}],
+             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}, {"type": "Trippet", "count": 2, "interval": 0.5}],
+            [{"type": "Squaremon", "count": 22, "interval": 0.5},
+             {"type": "SquaremonGreen", "count": 8, "interval": 0.5}, {"type": "Trippet", "count": 4, "interval": 0.5}],
+            [{"type": "Trippet", "count": 8, "interval": 0.5},
+             {"type": "SquaremonGreen", "count": 12, "interval": 0.5}, {"type": "Yolkee", "count": 2, "interval": 0.5}, {"type": "Trippet", "count": 4, "interval": 0.5}],
+            [{"type": "Trippet", "count": 16, "interval": 1},
+             {"type": "SquaremonGreen", "count": 8, "interval": 0.5}, {"type": "Trippet", "count": 6, "interval": 0.5}, {"type": "Juju", "count": 3, "interval": 0.5}],
+            [{"type": "SquaremonElite", "count": 4, "interval": 1.8}],
+
             ]
 
         self.enemies_removed = 0
         self.paths = []
         self.move_tower = False
-        # mark hexes of spawn points as not passable
 
-        # only use this when building a path
-        # self.hex_map.remove(self.hex_map[10])
-        # build_mode requires pause, pause does NOT require build_mode
 
     def run(self):
         run = True
         clock = pygame.time.Clock()
         for enemy_spawn_point in self.enemy_spawn_points:
+            self.cities.append(City(enemy_spawn_point["destination"][0], enemy_spawn_point["destination"][1]))
+            self.portals.append(Portal(enemy_spawn_point["source"][0], enemy_spawn_point["source"][1]))
             path = self.base_map.find_path(enemy_spawn_point["source"], enemy_spawn_point["destination"])
             self.paths.append(self.base_map.get_path_from_path_data(path))
 
@@ -344,7 +247,7 @@ class Game:
                                     clicked_location = map_location
                             # moving tower, left click tower to move it.
                             for tw in (self.attack_towers + self.obstacles):
-                                if tw.click(mouse_pos[0], mouse_pos[1]):
+                                if tw.click(mouse_pos[0], mouse_pos[1]) and not self.show_bonus_menu:
                                     """
                                     Moving tower on left click
                                     1. move tower into self.moving_object
@@ -524,10 +427,17 @@ class Game:
                         if len(self.spawn_list) == 0:
                             for enemy_wave in enemy_wave_data:
                                 wave_enemy_total += enemy_wave["count"]
+
                                 for _ in itertools.repeat(None, enemy_wave["count"]):
+                                    select_path = random.choice(self.paths)
+                                    generated_path = generate_alternative_path(select_path, 14)
                                     enemies = {
-                                        "Squaremon": Squaremon(random.choice(self.paths)),
-                                        "SquaremonGreen": SquaremonGreen(random.choice(self.paths))
+                                        "Squaremon": Squaremon(generated_path),
+                                        "SquaremonElite": SquaremonElite(generated_path),
+                                        "SquaremonGreen": SquaremonGreen(generated_path),
+                                        "Trippet": Trippet(generated_path),
+                                        "Yolkee": Yolkee(generated_path),
+                                        "Juju": Juju(generated_path),
                                     }
                                     wave_enemy = enemies.get(enemy_wave["type"])
                                     self.spawn_list.append(wave_enemy)
@@ -579,10 +489,14 @@ class Game:
                         self.pause = not self.pause
                         self.play_pause_button.toggle()
                         self.enemies_removed = 0
-                        self.wave += 1
                         self.spawn_list = []
                         self.show_bonus_menu = True
                         self.show_build_menu = False
+                        # add a new path at wave #
+                        if self.wave == 10:
+                            # {"source": [750, 223.20508075688772], "destination": [450, 656.217782649107]}
+                            self.add_enemy_path([750, 223.20508075688772], [450, 656.217782649107])
+                        self.wave += 1
             self.draw()
                 # End of if not pause block
         pygame.quit()
@@ -648,10 +562,56 @@ class Game:
                 if bonus == "RADIUS_1":
                     tower.mod_max_splash_range += tower.max_splash_range *\
                                               self.action_list[bonus]["modifier"]
+                    tower.mod_projectile_size += self.action_list[bonus]["modifier"] * 20
+                if bonus == "RADIUS_2":
+                    tower.mod_max_splash_range += tower.max_splash_range *\
+                                              self.action_list2[bonus]["modifier"]
+                    tower.mod_projectile_size += self.action_list2[bonus]["modifier"] * 20
 
             tower.print_modifiers()
 
+    def add_enemy_path(self, src, destination):
+        """
+        Add a new path to the field, if the new path is blocked, return all towers to inventory
+        and run again.
+        :param src: list of coordinates [x, y]
+        :param destination: list of coordinates [x, y]
+        :return: None
+        """
+        spawn_points =  {"source": src, "destination": destination}
+        path = self.base_map.find_path(spawn_points["source"], spawn_points["destination"])
+
+        if not path:
+            print("Unable to create path, clearing map", path)
+            # return all towers and objects
+            for tw in (self.attack_towers + self.obstacles):
+
+                sel_tower = tw.ico_name
+                self.selected_hex = self.base_map.get_hex_at_location(tw.x, tw.y)
+                for button in self.menu.buttons:
+                    if button.name == sel_tower:
+                        button.update_quantity(1)
+                if tw in self.attack_towers:
+                    self.attack_towers.remove(tw)
+                else:
+                    self.obstacles.remove(tw)
+                self.selected_hex.toggle_passable()
+            self.add_enemy_path(src, destination)
+
+        else:
+            get_path = self.base_map.get_path_from_path_data(path)
+            self.enemy_spawn_points.append(spawn_points)
+            self.cities.append(City(spawn_points["destination"][0], spawn_points["destination"][1]))
+            self.portals.append(Portal(spawn_points["source"][0], spawn_points["source"][1]))
+            self.paths.append(get_path)
+
     def add_tower(self, name):
+        """
+        Create new tower object after clicking on the matching icon in list tower_opt_list and assign it to the
+        tower in moving_object
+        :param name: string, must match one of the options in tower_opt_list
+        :return: None
+        """
         x, y = pygame.mouse.get_pos()
         tower_opt_list = {"buy_minigun": MinigunTower(x, y), "buy_obstacle": Obstacle(x, y)}
 
@@ -715,14 +675,26 @@ class Game:
             self.bonus_menu.draw(self.win)
 
         # Wave display:
-        surface = pygame.Surface((110, 50), pygame.SRCALPHA, 32)
+        surface = pygame.Surface((180, 50), pygame.SRCALPHA, 32)
         surface.fill((192, 192, 192, 175))
-        small_font= pygame.font.SysFont("segoeuisemilight", 25)
-        rectangle = pygame.Rect(-2,  80, 110, 50)
+        med_font= pygame.font.SysFont("segoeuisemilight", 25)
+        small_font = pygame.font.SysFont("segoeuisemilight", 18)
+        rectangle = pygame.Rect(-2,  80, 180, 50)
         self.win.blit(surface, rectangle)
         pygame.draw.rect(self.win, (192, 192, 192, 175), rectangle, width=2, border_radius=0)
-        wave = small_font.render("Wave: "+ str(self.wave), 1, (47,79,79))
-        self.win.blit(wave, (10, 90))
+        wave = med_font.render("Wave: "+ str(self.wave), 1, (47,79,79))
+
+        if self.show_bonus_menu:
+            phase = "Bonus selection phase"
+        elif not self.pause:
+            phase = "Attack phase"
+        else:
+            phase = "Preparation phase"
+
+
+        step = small_font.render(str(phase), 1, (47, 79, 79))
+        self.win.blit(wave, (10, 75))
+        self.win.blit(step, (10, 105))
 
         pygame.display.update()
 

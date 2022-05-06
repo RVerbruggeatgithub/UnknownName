@@ -71,7 +71,7 @@ class Hexmap:
         path = False
         counter = 0
         # how many tries to find path
-        max_attempt = 1
+        max_attempt = 3
         sec_a_hit = sec_b_hit = sec_c_hit = sec_d_hit = sec_e_hit = 0
 
         while not path:
@@ -152,10 +152,11 @@ class Hexmap:
     def get_path(self):
         return self.travel_path
 
-    def find_closest_hex_coords(self, x, y):
+    def find_closest_hex_coords(self, x, y, return_hex=False):
         distance = 999
         spot = [0, 0]
         buildable = False
+        hex = None
         for coordinates in self.map_data:
             hex_spot = coordinates.get_coords()
             cdis = self.get_distance(hex_spot[0], hex_spot[1], x, y)
@@ -163,9 +164,17 @@ class Hexmap:
                 buildable = coordinates.passable
                 spot = [hex_spot[0], hex_spot[1]]
                 distance = cdis
-        return buildable, spot
+                hex = coordinates
+        if return_hex:
+            return hex
+        else:
+            return buildable, spot
 
         # Find closest points to provided x, y
+
+    def get_hex_at_location(self, x, y):
+        return self.find_closest_hex_coords(x, y, True)
+
 
     def get_parent_by_id(self, segments, idx):
         for segment in segments:

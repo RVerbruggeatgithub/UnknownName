@@ -4,15 +4,15 @@ import os
 from functions.functions import *
 from projectiles.projectiles import Projectile
 
-projectile_image = pygame.transform.scale(load_image("resources", "cannonball.png"),(5, 5))
+projectile_image = pygame.transform.scale(load_image("resources", "cannonball.png"),(50, 50))
 
 
 class Bullet(Projectile):
     """
     Abstract class for projectiles
     """
-    def __init__(self, x, y, target_x, target_y, target, speed):
-        super().__init__(x, y, target_x, target_y, target, speed)
+    def __init__(self, x, y, target_x, target_y, target, speed, size):
+        super().__init__(x, y, target_x, target_y, target, speed, size)
         self.x = x
         self.y = y
         self.target_x = target_x
@@ -27,6 +27,8 @@ class Bullet(Projectile):
         self.move_y = 0
         self.set_direction()
         self.delete = False
+        self.base_size = 3
+        self.change_size(size)
 
     def set_target(self, x, y):
         self.target_x = x

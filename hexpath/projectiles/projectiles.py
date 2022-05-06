@@ -8,7 +8,7 @@ class Projectile:
     """
     Abstract class for projectiles
     """
-    def __init__(self, x, y, target_x, target_y, target, speed):
+    def __init__(self, x, y, target_x, target_y, target, speed, size=0):
         self.x = x
         self.y = y
         self.target_x = target_x
@@ -19,6 +19,9 @@ class Projectile:
         self.boundary = 10
         self.img = projectile_image
         self.target = target
+        self.base_size = 3
+        self.change_size(size)
+
 
     def draw(self, win):
         """
@@ -32,6 +35,9 @@ class Projectile:
     def update(self):
         self.target_x = self.target.x
         self.target_y = self.target.y
+
+    def change_size(self, modifier):
+        self.img = pygame.transform.scale(self.img, (self.base_size + modifier, self.base_size + modifier))
 
     def get_distance(self, x, y):
         return math.sqrt((self.x - x) ** 2 + (self.y - y) ** 2)
