@@ -33,7 +33,7 @@ class Enemy:
         self.items = []
         # self.droppable_items = [Gold(self.x, self.y, 3, 10)]
         # max allowed deviation from a node
-        self.boundary = (0.85 * self.speed_increase)
+        self.boundary = (0.93 * self.speed_increase)
         self.death_sequence = []
 
     """
@@ -139,4 +139,12 @@ class Enemy:
         if self.health <= 0:
             # self.generate_item()
             return True
+        return False
+
+    def dead_action(self, enemies=[]):
+        """
+        Action to perform if killed
+        :param enemies: list of enemies
+        :return:
+        """
         return False

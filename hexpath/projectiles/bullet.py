@@ -56,15 +56,15 @@ class Bullet(Projectile):
             win.blit(projectile_img, (self.x-self.img.get_width()//2, self.y-self.img.get_height()//2))
 
     def set_direction(self):
-        delta_x =  self.x - self.target.x
-        delta_y = self.y - self.target.y
+        delta_x =  self.x - self.target_x
+        delta_y = self.y - self.target_y
         distance = math.sqrt(delta_x ** 2 + delta_y ** 2)
         y_mod = -1
         spin = 0
         if 0 < delta_y > 0:
             y_mod = delta_y / abs(delta_y)
             spin = 180
-        slope_angle = point_direction(self.target.x, self.target.y, self.x, self.y, False) * y_mod * 0.0174532925
+        slope_angle = point_direction(self.target_x, self.target_y, self.x, self.y, False) * y_mod * 0.0174532925
         self.move_x = self.speed_increase * -math.cos(slope_angle)
         self.move_y = self.speed_increase * math.sin(slope_angle) * -1 * y_mod
 

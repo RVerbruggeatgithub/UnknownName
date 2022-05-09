@@ -56,7 +56,7 @@ class Hex:
 
     def click(self, x, y):
         distance = math.sqrt((x - self.x)**2 + (y - self.y)**2)
-        if distance <= 25:
+        if distance <= 26:
             return True
         return False
 

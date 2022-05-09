@@ -46,7 +46,7 @@ class Game:
         self.attack_towers = []
         self.obstacles = []
         self.label_collector = []
-        self.menu = buildingMenu(100, self.height - 25, 500, 200)
+        self.menu = buildingMenu(50, self.height - 25, 200, 200)
         self.play_pause_button = PlayPauseButton(play_btn, pause_btn, 129, self.height - 142)
         self.menu.add_configured_btn(self.play_pause_button)
         self.menu.add_btn(ico_minigun, "buy_minigun", "Minigun", 3)
@@ -65,6 +65,7 @@ class Game:
         self.spawn_list = []
         # Should we go through the list of bonuses and apply them to the tower?
         self.update_bonuses = False
+        self.icon_menu = IconMenu(250, self.height - 130, 900, 80)
         self.bonus_menu = BonusPickerMenu(self.win, 5)
         self.action_list = {
             "ATK_1" : {"Description": "Attack Damage + 1", "modifier" : 1, "pictogram" : pictogram_attack_damage, "color" : (255, 255, 255, 200), "background_color" : (255, 255, 255 ,255) },
@@ -129,26 +130,29 @@ class Game:
                 [{"type": "Squaremon", "count" : 6, "interval": 4},{"type": "SquaremonGreen", "count" : 2, "interval": 0.5}],
                 [{"type": "Squaremon", "count": 8, "interval": 4},{"type": "SquaremonGreen", "count": 2, "interval": 0.5}],
                 [{"type": "SquaremonElite", "count": 1, "interval": 0.5}],
+                # wave 11
                 [{"type": "Squaremon", "count": 11, "interval": 0.5},{"type": "SquaremonGreen", "count": 3, "interval": 0.5}],
                 [{"type": "Squaremon", "count": 14, "interval": 4},{"type": "SquaremonGreen", "count": 4, "interval": 0.5}],
                 [{"type": "Squaremon", "count": 16, "interval": 0.5},{"type": "SquaremonGreen", "count": 5, "interval": 0.5}],
                 [{"type": "Squaremon", "count": 16, "interval": 0.5},{"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
                 [{"type": "Squaremon", "count": 18, "interval": 0.5},{"type": "SquaremonGreen", "count": 6, "interval": 0.5}],
-            [{"type": "Squaremon", "count": 18, "interval": 0.5},
-             {"type": "SquaremonGreen", "count": 6, "interval": 0.5}, {"type": "Trippet", "count": 2, "interval": 0.5}],
-            [{"type": "Squaremon", "count": 22, "interval": 0.5},
-             {"type": "SquaremonGreen", "count": 8, "interval": 0.5}, {"type": "Trippet", "count": 4, "interval": 0.5}],
-            [{"type": "Trippet", "count": 8, "interval": 0.5},
-             {"type": "SquaremonGreen", "count": 12, "interval": 0.5}, {"type": "Yolkee", "count": 2, "interval": 0.5}, {"type": "Trippet", "count": 4, "interval": 0.5}],
-            [{"type": "Trippet", "count": 16, "interval": 1},
-             {"type": "SquaremonGreen", "count": 8, "interval": 0.5}, {"type": "Trippet", "count": 6, "interval": 0.5}, {"type": "Juju", "count": 3, "interval": 0.5}],
-            [{"type": "SquaremonElite", "count": 4, "interval": 1.8}],
-
+                [{"type": "Squaremon", "count": 18, "interval": 0.5},{"type": "SquaremonGreen", "count": 6, "interval": 0.5}, {"type": "Trippet", "count": 2, "interval": 0.5}],
+                [{"type": "Squaremon", "count": 22, "interval": 0.5},{"type": "SquaremonGreen", "count": 8, "interval": 0.5}, {"type": "Trippet", "count": 4, "interval": 0.5}],
+                [{"type": "SquaremonGreen", "count": 12, "interval": 0.5}, {"type": "Trippet", "count": 8, "interval": 0.5}],
+                [{"type": "SquaremonGreen", "count": 11, "interval": 0.5}, {"type": "Trippet", "count": 11, "interval": 1}],
+                [{"type": "SquaremonElite", "count": 4, "interval": 1.8}],
+                # wave 21
+                [{"type": "SquaremonGreen", "count": 16, "interval": 1}, {"type": "Trippet", "count": 19, "interval": 2}],
+                [{"type": "Trippet", "count": 25, "interval": 1.8}],
+                [{"type": "Trippet", "count": 35, "interval": 1}],
+                [{"type": "Trippet", "count": 30, "interval": 1}, {"type": "SquaremonElite", "count": 4, "interval": 1.8}],
+                [{"type": "TrippetElite", "count": 6, "interval": 1}]
             ]
 
         self.enemies_removed = 0
         self.paths = []
         self.move_tower = False
+        self.auto_target = True
 
 
     def run(self):
@@ -163,6 +167,9 @@ class Game:
         while run:
 
             mouse_pos = pygame.mouse.get_pos()
+            # need to change the mouse_pos to use hex at location
+            hex_at_mouse_pos = self.base_map.get_hex_at_location(mouse_pos[0], mouse_pos[1])
+            coordinates_of_hex = hex_at_mouse_pos.get_coords()
             to_del = []
             index = 0
 
@@ -178,6 +185,7 @@ class Game:
                     self.selected_hex = None
 
                     if event.type == pygame.MOUSEBUTTONUP:
+                        # REMOVE THE NEXT 4 LINES? use coordinates_of_hex?
                         for map_location in self.base_map.get_map_data():
                             # if map_location.collide(mouse_pos[0], mouse_pos[1]):
                             if map_location.click(mouse_pos[0], mouse_pos[1]):
@@ -196,7 +204,7 @@ class Game:
                         if event.button == 3:
                             if clicked_location is not None:
                                 self.selected_hex = clicked_location
-                                self.selected_hex.toggle_passable()
+                                self.selected_hex.passable = True
                                 self.map_update_required = True
 
                 if self.start[0] == 0 and self.start[1] == 0 and self.end[0] == 0 and self.end[
@@ -209,11 +217,12 @@ class Game:
                         valid_area, spot = self.base_map.find_closest_hex_coords(mouse_pos[0], mouse_pos[1])
                         self.moving_object.move(spot[0], spot[1])
                     else:
-                        self.moving_object.move(mouse_pos[0], mouse_pos[1])
+                        self.moving_object.move(coordinates_of_hex[0], coordinates_of_hex[1])
                     # tower_list = self.attack_towers[:] + self.support_towers[:]
                     tower_list = self.attack_towers[:]
                     collide = False
-                    if valid_area:
+                    # if valid_area:
+                    if hex_at_mouse_pos.passable:
                         self.moving_object.place_color = (0, 0, 255, 100)
                     else:
                         self.moving_object.place_color = (255, 0, 0, 100)
@@ -241,13 +250,10 @@ class Game:
                                 print("unpaused")
                             self.play_pause_button.paused = self.pause
                         if self.wave_complete:
-                            for map_location in self.base_map.get_map_data():
-                                # if map_location.collide(mouse_pos[0], mouse_pos[1]):
-                                if map_location.click(mouse_pos[0], mouse_pos[1]):
-                                    clicked_location = map_location
+
                             # moving tower, left click tower to move it.
                             for tw in (self.attack_towers + self.obstacles):
-                                if tw.click(mouse_pos[0], mouse_pos[1]) and not self.show_bonus_menu:
+                                if tw.click(coordinates_of_hex[0], coordinates_of_hex[1]) and not self.show_bonus_menu:
                                     """
                                     Moving tower on left click
                                     1. move tower into self.moving_object
@@ -255,6 +261,7 @@ class Game:
                                     3. remove tower from tower list (is this needed?)
                                     4. Toggle hex, update paths 
                                     """
+                                    print("mouse pos", mouse_pos, tw.get_location(), coordinates_of_hex)
                                     sel_tower = tw.ico_name
                                     self.add_tower(tw.ico_name)
                                     self.move_tower = True
@@ -265,8 +272,8 @@ class Game:
                                         self.attack_towers.remove(tw)
                                     else:
                                         self.obstacles.remove(tw)
-                                    self.selected_hex = clicked_location
-                                    self.selected_hex.toggle_passable()
+                                    hex_at_mouse_pos.passable = True
+                                    print("reached B", hex_at_mouse_pos.x, hex_at_mouse_pos.y)
 
 
                         if self.show_bonus_menu:
@@ -292,32 +299,12 @@ class Game:
                                 else:
                                     self.applied_bonuses.append(bonus_menu_button)
                                 self.update_bonuses = True
+                                self.icon_menu.add_or_update_icon(self.applied_bonuses)
                                 self.show_bonus_menu = False
                                 self.show_build_menu = True
                                 self.build_bonus_menu()
-                        """
-                        if event.button == 3 and self.wave_complete:
-                           if clicked_location is not None:
-                               self.selected_hex = clicked_location
-                               # self.map_update_required = True
-                               # if self.selected_hex
-                               self.selected_hex.toggle_passable()
-                               for num, path in enumerate(self.paths):
-                                   if self.selected_hex.get_coords() in path:
-                                       # find path
-                                       enemy_spawn_point = self.enemy_spawn_points[num]
-                                       new_path = self.base_map.find_path(enemy_spawn_point["source"],
-                                                                      enemy_spawn_point["destination"])
-                                       if not new_path:
-                                           print("Cannot place anything here, it will block path")
-                                           self.selected_hex.toggle_passable()
-                                       else:
-                                           self.paths[num] = self.base_map.get_path_from_path_data(new_path)
-                           """
-                                        # if found, update self.paths[num] with new path
-                                        # self.enemy_spawn_points
-                        if self.moving_object and not self.move_tower:
 
+                        if self.moving_object and not self.move_tower:
                             if event.button == 1:
                                 allowed = True
                                 hit = False
@@ -330,44 +317,42 @@ class Game:
                                 if allowed:
                                     # clicked_location = None
                                     if (self.moving_object.name in attack_tower_names or self.moving_object.name in obstacles) and self.wave_complete:
-
                                         allow_build = True
-                                        # self.menu.update_tower_quantity(len(self.attack_towers))
-                                        for map_location in self.base_map.get_map_data():
-                                            if map_location.click(mouse_pos[0], mouse_pos[1]):
-                                                clicked_location = map_location
-                                                if clicked_location is not None:
-                                                    self.selected_hex = clicked_location
-                                                    self.selected_hex.toggle_passable()
-                                                    # Check if and see if clicked coordinates are in any paths
-                                                    for num, path in enumerate(self.paths):
-                                                        # coordinates are found in path, check if we can create a new path
-                                                        if self.selected_hex.get_coords() in path:
-                                                            # find path
-                                                            enemy_spawn_point = self.enemy_spawn_points[num]
-                                                            new_path = self.base_map.find_path(enemy_spawn_point["source"],
-                                                                                               enemy_spawn_point["destination"])
-                                                            # couldn't create a new path, the path will get broken if we allow building at coordinates
-                                                            if not new_path:
-                                                                print("Cannot place anything here, it will block path")
-                                                                self.selected_hex.toggle_passable()
-                                                                allow_build = False
-                                                            # found new path, next: ensure that the coordinates aren't a spawn point
-                                                            else:
-                                                                update_path = self.base_map.get_path_from_path_data(
-                                                                    new_path)
-                                                                # ensure that the coordinates aren't a spawn point
-                                                                if clicked_location.get_coords() in update_path:
-                                                                    print("Cannot place anything here, it will block path")
-                                                                    self.selected_hex.toggle_passable()
-                                                                    allow_build = False
-                                                                else:
-                                                                    allow_build = True
-                                                                    self.paths[num] = update_path
+                                        hex_at_mouse_pos.passable = False
+                                        print("conditions for A are met")
+                                        # Check if and see if clicked coordinates are in any paths
+                                        for num, path in enumerate(self.paths):
+                                            # coordinates are found in path, check if we can create a new path
+                                            if hex_at_mouse_pos.get_coords() in path:
+                                                # find path
+                                                enemy_spawn_point = self.enemy_spawn_points[num]
+                                                new_path = self.base_map.find_path(enemy_spawn_point["source"],
+                                                                                   enemy_spawn_point["destination"])
+                                                # couldn't create a new path, the path will get broken if we allow building at coordinates
+                                                if not new_path:
+                                                    print("Cannot place anything here, it will block path")
+                                                    hex_at_mouse_pos.passable = True
+                                                    print("conditions for A are no longer")
+                                                    allow_build = False
+                                                # found new path, next: ensure that the coordinates aren't a spawn point
+                                                else:
+                                                    update_path = self.base_map.get_path_from_path_data(
+                                                        new_path)
+                                                    # ensure that the coordinates aren't a spawn point
+                                                    if hex_at_mouse_pos.get_coords() in update_path:
+                                                        print("Cannot place anything here, it will block path")
+                                                        hex_at_mouse_pos.passable = True
+                                                        print("conditions for A are met again")
+                                                        allow_build = False
+                                                    else:
+                                                        allow_build = True
+                                                        self.paths[num] = update_path
 
                                         # self.money -= self.moving_object.price[0]
                                         if allow_build:
                                             self.moving_object.place_structure()
+                                            location = self.moving_object.get_location()
+                                            hex_at_mouse_pos.passable = False
                                             # how do we update the button quantity?
                                             # self.menu.buttons.name
                                             for button in self.menu.buttons:
@@ -410,7 +395,6 @@ class Game:
                                             tw.selected = False
 
                 if not self.pause:
-
                     if self.update_bonuses:
                         self.apply_bonuses_to_towers()
                         self.update_bonuses = False
@@ -420,10 +404,6 @@ class Game:
                         self.wave_complete = False
                         enemy_wave_data = self.waves[self.wave]
                         wave_enemy_total = 0
-
-                        temp_counter = 0
-                        loop_timer = 0
-
                         if len(self.spawn_list) == 0:
                             for enemy_wave in enemy_wave_data:
                                 wave_enemy_total += enemy_wave["count"]
@@ -436,6 +416,7 @@ class Game:
                                         "SquaremonElite": SquaremonElite(generated_path),
                                         "SquaremonGreen": SquaremonGreen(generated_path),
                                         "Trippet": Trippet(generated_path),
+                                        "TrippetElite": TrippetElite(generated_path),
                                         "Yolkee": Yolkee(generated_path),
                                         "Juju": Juju(generated_path),
                                     }
@@ -452,21 +433,16 @@ class Game:
                             self.enemies.append(self.spawn_list[self.enemy_counter])
                             self.enemy_counter += 1  # The index variable
 
-
-
-                        """
-                        if time.time() - self.timer > spawn_interval and self.enemy_counter < self.wave_enemy_total:
-                            loop_timer = time.time()
-                            self.enemies.append(wave_enemy)
-                            self.enemy_counter += 1
-                        """
-                        # if rtimer - self.timer % spawn_interval == 0:
-                        #    print("spawn")
-
-
                     for enemy in self.enemies:
                         enemy.move()
                         if enemy.path_pos >= len(enemy.path) - 1 or enemy.health <= 0:
+                            if enemy.health <= 0:
+                                enemies_count_prev = len(self.enemies)
+                                enemy.dead_action(self.enemies)
+                                enemies_count_next = len(self.enemies)
+                                count_dif =  enemies_count_next - enemies_count_prev
+                                self.wave_enemy_total += count_dif
+                                self.enemy_counter += count_dif
                             to_del.append(enemy)
 
                     for enemy in to_del:
@@ -477,7 +453,7 @@ class Game:
 
                     for tower in self.attack_towers:
                         # item dropping here..
-                        list_of_labels = tower.find_target(self.enemies)
+                        list_of_labels = tower.find_target(self.enemies, self.auto_target)
                         if list_of_labels is not None:
                             for label in list_of_labels:
                                 self.label_collector.append(label)
@@ -493,7 +469,7 @@ class Game:
                         self.show_bonus_menu = True
                         self.show_build_menu = False
                         # add a new path at wave #
-                        if self.wave == 10:
+                        if self.wave == 0:
                             # {"source": [750, 223.20508075688772], "destination": [450, 656.217782649107]}
                             self.add_enemy_path([750, 223.20508075688772], [450, 656.217782649107])
                         self.wave += 1
@@ -595,7 +571,7 @@ class Game:
                     self.attack_towers.remove(tw)
                 else:
                     self.obstacles.remove(tw)
-                self.selected_hex.toggle_passable()
+                self.selected_hex.passable = True
             self.add_enemy_path(src, destination)
 
         else:
@@ -670,6 +646,8 @@ class Game:
                 label.despawn_timer -= 1
                 if label.despawn_timer <= 0:
                     self.label_collector.remove(label)
+
+        self.icon_menu.draw(self.win)
 
         if self.show_bonus_menu:
             self.bonus_menu.draw(self.win)

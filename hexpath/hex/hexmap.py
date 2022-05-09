@@ -204,6 +204,7 @@ class Hexmap:
             hex_tile.draw(win)
 
     def draw_path(self, win, travel_path):
+        print("Map data size:", len(self.map_data))
         for hex_tile in self.map_data:
 
             hex_tile.color = pygame.Color(75, 139, 59, 80)

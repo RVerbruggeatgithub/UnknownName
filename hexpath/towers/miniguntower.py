@@ -43,7 +43,7 @@ class MinigunTower(Tower):
         self.ico_name = "buy_minigun"
         self.sell_value = [700, 1400, 2800]
         self.price = [1400, "MAX", "MAX"]
-        self.menu.set_tower_details(self)
+        # self.menu.set_tower_details(self)
         self.max_splash_range = 10
         # attack speed, higher is faster. Anything above max_delay (tower()) will be set to 0 delay)
         self.action_sound = minigun_sound
@@ -117,12 +117,14 @@ class MinigunTower(Tower):
         if self.level > 1:
             self.enable_double_fire = True
 
-    def find_target(self, enemies):
+    def find_target(self, enemies, auto_target=True):
         """
         attacks an enemy in the enemy list, modifies the list
         :param enemies: list of enemies
         :return: None
         """
+
+
         labels = []
         if len(self.projectiles) > 0:
             for projectile in self.projectiles:
@@ -176,6 +178,8 @@ class MinigunTower(Tower):
 
         enemy_closest.sort(key=lambda x: x.path_pos)
         enemy_closest = enemy_closest[::-1]
+        if not auto_target:
+            enemy_closest = []
         if len(enemy_closest) > 0:
             first_enemy = enemy_closest[0]
             y_mod = -1
@@ -191,10 +195,18 @@ class MinigunTower(Tower):
                     money = first_enemy.money * 2
                     enemies.remove(first_enemy)
             """
+        elif not auto_target:
+            mouse_pos = pygame.mouse.get_pos()
+            self.turret_angle = point_direction(mouse_pos[0], mouse_pos[1], self.x, self.y)
+            dis = math.sqrt((self.x - mouse_pos[0]) ** 2 + (self.y - mouse_pos[1]) ** 2)
+            if dis < (self.range + self.mod_attack_range):
+                self.attack(enemies, None, mouse_pos)
         else:
             self.turret_image = self.turret_imgs[2]
 
-    def attack(self, enemies, enemy):
+
+
+    def attack(self, enemies, enemy, manual_target=None):
         """
         rotate images here too?
         """
@@ -218,7 +230,12 @@ class MinigunTower(Tower):
             death_.set_volume(0.1)
             death_.play()
             if not self.enable_double_fire:
-                self.projectiles.append(Bullet(self.x, self.y, enemy.x, enemy.y, enemy, (self.projectile_speed + self.mod_projectile_speed), self.mod_projectile_size))
+                if manual_target is None:
+                    self.projectiles.append(Bullet(self.x, self.y, enemy.x, enemy.y, enemy, (self.projectile_speed + self.mod_projectile_speed), self.mod_projectile_size))
+                else:
+                    self.projectiles.append(Bullet(self.x, self.y, manual_target[0], manual_target[1], None,
+                                                   (self.projectile_speed + self.mod_projectile_speed),
+                                                   self.mod_projectile_size))
             else:
                 spawn_x_mod_a = random.randint(1, 30) - 15
                 spawn_y_mod_a = random.randint(1, 30) - 15
@@ -232,3 +249,5 @@ class MinigunTower(Tower):
             self.delay = self.max_delay
 
         return money
+
+

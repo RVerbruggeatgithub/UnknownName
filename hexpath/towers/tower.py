@@ -34,7 +34,7 @@ class Tower:
         # define menu and buttons
         self.menu_bg = menu_bg
         #self.menu = TowerMenu(self, self.x, self.y, 120, 70, self.menu_bg)
-        self.menu = TowerMenu(self.x, self.y - 50, 250, 122, self.menu_bg, self.sell_value)
+        # self.menu = TowerMenu(self.x, self.y - 50, 250, 122, self.menu_bg, self.sell_value)
         self.turret_angle = 0
         self.turret_image = turret_image
         self.tower_base = tower_base
@@ -115,9 +115,14 @@ class Tower:
         """
         #img = self.tower_imgs[self.level - 1]
         img = self.turret_image
-
+        """
         if X <= self.x - img.get_width()//2 + self.width and X >= self.x - img.get_width()//2:
             if Y <= self.y + self.height - img.get_height()//2 and Y >= self.y - img.get_height()//2:
+                return True
+        return False
+        """
+        if X <= self.x - 25 + self.width and X >= self.x - 25:
+            if Y <= self.y + self.height - 25 and Y >= self.y - 25:
                 return True
         return False
 
@@ -148,7 +153,7 @@ class Tower:
         action_sound.play()
         # THIS ISN'T QUITE RIGHT!
         # self.menu.add_btn(upgrade_btn, "Upgrade")
-        self.menu.add_btn(sell_btn, "Sell")
+        # self.menu.add_btn(sell_btn, "Sell")
 
     def upgrade(self):
         """
@@ -187,9 +192,9 @@ class Tower:
         """
         self.x = x
         self.y = y
-        self.menu.x = x
-        self.menu.y = y
-        self.menu.update()
+        # self.menu.x = x
+        # self.menu.y = y
+        # self.menu.update()
 
     def collide(self, otherTower):
         """
@@ -272,10 +277,11 @@ class Tower:
         rect = rotated_image.get_rect(center=pivot_point + rotated_offset)
         return rotated_image, rect  # Return the rotated image
 
-    def find_target(self, enemies):
+    def find_target(self, enemies, auto_target=True):
         """
         Action for when attacking
         :param enemies: enemy
+        :param auto_target: boolean
         :return: Item
         """
 
@@ -285,3 +291,6 @@ class Tower:
         :param enemies: enemy
         :return: Item
         """
+
+    def get_location(self):
+        return [self.x, self.y]

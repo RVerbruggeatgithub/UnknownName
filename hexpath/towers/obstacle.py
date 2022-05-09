@@ -43,7 +43,7 @@ class Obstacle(Tower):
         self.upgrade_bonus_range = [0, 15, 25]
         self.upgrade_bonus_accuracy = [0, 0.05, 0.05]
         self.upgrade_bonus_atk_speed = [0, 4, 5]
-        self.menu.set_tower_details(self)
+        # self.menu.set_tower_details(self)
         # attack speed, higher is faster. Anything above max_delay (tower()) will be set to 0 delay)
         self.attack_speed = 16
         # bullet hole image

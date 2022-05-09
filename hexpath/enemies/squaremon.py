@@ -59,7 +59,7 @@ class Squaremon(Enemy):
         self.imgs = self.load_image()
         self.speed_increase = 1.8
         self.size = 0.6
-        self.boundary = (1 * self.speed_increase)
+        self.boundary = 2
         # self.droppable_items = [Gold(self.x, self.y, 1, 8), Gold(self.x, self.y, 5, 15)]
 
     def load_image(self):
@@ -74,7 +74,7 @@ class SquaremonElite(Enemy):
         self.imgs = self.load_image()
         self.speed_increase = 1.6
         self.size = 0.7
-        self.boundary = (1 * self.speed_increase)
+        self.boundary = 2
         # self.droppable_items = [Gold(self.x, self.y, 1, 8), Gold(self.x, self.y, 5, 15)]
 
     def load_image(self):
@@ -90,7 +90,7 @@ class SquaremonGreen(Enemy):
         self.imgs = self.load_image()
         self.speed_increase = 0.7
         self.size = 0.5
-        self.boundary = (2 * self.speed_increase)
+        self.boundary = 2
         # self.droppable_items = [Gold(self.x, self.y, 1, 8), Gold(self.x, self.y, 5, 15)]
         #imgs[:]
 
@@ -106,7 +106,7 @@ class SquaremonGreenElite(Enemy):
         self.imgs = self.load_image()
         self.speed_increase = 0.6
         self.size = 0.7
-        self.boundary = (2 * self.speed_increase)
+        self.boundary = 2
         # self.droppable_items = [Gold(self.x, self.y, 1, 8), Gold(self.x, self.y, 5, 15)]
         #imgs[:]
 
@@ -121,12 +121,34 @@ class Trippet(Enemy):
         self.health = self.max_health
         self.imgs = self.load_image()
         self.speed_increase = 1.5
-        self.size = 0.8
-        self.boundary = (1 * self.speed_increase)
+        self.size = 0.7
+        self.boundary = 2
         # self.droppable_items = [Gold(self.x, self.y, 1, 8), Gold(self.x, self.y, 5, 15)]
 
     def load_image(self):
         return trippet_img
+
+class TrippetElite(Enemy):
+    def __init__(self, path):
+        super().__init__(path)
+        self.name = "Trippet"
+        self.max_health = 200
+        self.health = self.max_health
+        self.imgs = self.load_image()
+        self.speed_increase = 1.3
+        self.size = 1
+        self.boundary = 2
+        self.spawn_count = 5
+        # self.droppable_items = [Gold(self.x, self.y, 1, 8), Gold(self.x, self.y, 5, 15)]
+
+    def load_image(self):
+        return trippet_img
+
+    def dead_action(self, enemies):
+        path = self.path[self.path_pos:]
+        for i in range(self.spawn_count):
+            generated_path = generate_alternative_path(path, 14)
+            enemies.append(Trippet(generated_path))
 
 class Yolkee(Enemy):
     def __init__(self, path):
@@ -137,7 +159,7 @@ class Yolkee(Enemy):
         self.imgs = self.load_image()
         self.speed_increase = 1.4
         self.size = 0.7
-        self.boundary = (1 * self.speed_increase)
+        self.boundary = 2
         # self.droppable_items = [Gold(self.x, self.y, 1, 8), Gold(self.x, self.y, 5, 15)]
 
     def load_image(self):
@@ -152,7 +174,7 @@ class Juju(Enemy):
         self.imgs = self.load_image()
         self.speed_increase = 0.8
         self.size = 0.6
-        self.boundary = (1 * self.speed_increase)
+        self.boundary = 2
         # self.droppable_items = [Gold(self.x, self.y, 1, 8), Gold(self.x, self.y, 5, 15)]
 
     def load_image(self):

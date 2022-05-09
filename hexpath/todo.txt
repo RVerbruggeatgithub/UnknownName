@@ -9,5 +9,6 @@ Add main menu
 Add SHIELD_1: For each shield, protects from one incoming enemy
 
 Fixes needed:
-
+Selecting a tower too close to edge allows to tower to placed without blocking the path. removing the tower toggles the hex to blocked.
+If enemy is too far off path it will not make it to the portal but keeps wandering.
 

@@ -33,8 +33,9 @@ class Projectile:
         win.blit(img, (self.x-img.get_width()//2, self.y-img.get_height()//2))
 
     def update(self):
-        self.target_x = self.target.x
-        self.target_y = self.target.y
+        if self.target is not None:
+            self.target_x = self.target.x
+            self.target_y = self.target.y
 
     def change_size(self, modifier):
         self.img = pygame.transform.scale(self.img, (self.base_size + modifier, self.base_size + modifier))

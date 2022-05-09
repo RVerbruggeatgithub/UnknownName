@@ -7,13 +7,15 @@ pygame.display.set_mode((1500, 800))
 ico_background_image = pygame.transform.scale(load_image("resources", "button_empty.png").convert_alpha(), (64,64))
 # upgrade_btn = pygame.transform.scale(load_image("resources", "button_upgrade.png").convert_alpha(), (32, 32))
 sell_btn = pygame.transform.scale(load_image("resources", "button_sell.png").convert_alpha(), (32, 32))
+pictogram_attack_speed = pictogram_attack_damage = pygame.transform.scale(load_image("resources", "base_square.png").convert_alpha(), (50, 50))
 
 class Button:
     """
     Button class for menu objects
     """
-    def __init__(self, menu, img, name, x, y):
+    def __init__(self, menu, img, name, x, y, title=None):
         self.name = name
+        self.title = title
         self.img = img
         self.menu = menu
         self.width = self.img.get_width()
@@ -43,6 +45,10 @@ class Button:
         :return: None
         """
         win.blit(self.img, (self.x + self.x_adj, self.y + self.y_adj))
+        if self.title is not None:
+            small_font = pygame.font.SysFont("segoeuisemilight", 10)
+            title = small_font.render(str(self.name) +":"+ str(self.title), 1, (255, 255, 255))
+            win.blit(title, (self.x + self.img.get_width() / 2 - title.get_width() / 2 + 2, self.y + self.img.get_height() / 2 + 10))
 
     def update(self):
         """
@@ -76,7 +82,6 @@ class BuildMenuIcon(Button):
         small_font = pygame.font.SysFont("segoeuisemilight", 10)
         title = small_font.render(self.fullname, 1, (255, 255, 255))
         qty = small_font.render("QTY:" + str(self.quantity), 1, (255, 255, 255))
-
         win.blit(self.img, (self.x, self.y))
         win.blit(title, (self.x + self.img.get_width()/2 - title.get_width()/2 + 2, self.y + self.img.get_height()/2 + 10))
         win.blit(qty, (self.x + self.img.get_width() / 2 - title.get_width() / 2 + 2, self.y + self.img.get_height() / 2 + 30))
@@ -257,7 +262,7 @@ class Menu:
     menu
 
     """
-    def __init__(self, x, y, width, height, menu_bg, sell_value):
+    def __init__(self, x, y, width, height, menu_bg, sell_value=0):
         self.x = x
         self.y = y
         self.width = width
@@ -316,71 +321,47 @@ class Menu:
             item.draw(win)
 
 
-class TowerMenu(Menu):
+class IconMenu(Menu):
     """
     menu for holding items
     """
-    def __init__(self, x, y, width, height, menu_bg, sell_value):
-        super().__init__(x, y, width, height, menu_bg, sell_value)
-        self.buttons = []
-        self.item_cost = 0
-        self.tower = None
-        self.item_sale_value = 0
-        self.item_upgrade_cost = 0
+    def __init__(self, x, y, width, height, menu_bg=None):
+        super().__init__(x, y, width, height, menu_bg)
+        self.icons = []
         self.width = width
         self.height = height
         self.x = x
         self.y = y
-        self.items = 0
 
-    def add_btn(self, img, name):
+
+    def add_or_update_icon(self, bonus_list):
+        # nope
+        updated = False
+        self.icons = []
+        self.items = 0
+        for bonus in bonus_list:
+            sel_bonus = bonus.split("_", 1)[0]
+            counter = bonus.split("_", 1)[1]
+            for icon in self.icons:
+                if icon.name == sel_bonus:
+                    updated = True
+                    icon.title = int(icon.title) + int(counter)
+            if not updated:
+                self.add_icon(sel_bonus, counter)
+            updated = False
+
+    def add_icon(self, name, title):
         """
         adds buttons to menu
         :param img: surface
         :param name: str
+        :param title: str
         :return: None
         """
-        button = Button(self, img, name, self.x + (self.items * 32) + 50, self.y - self.height + 10)
-        self.buttons.append(button)
+        img = pictogram_attack_speed
+        button = Button(self, img, name, self.x + (self.items * 51) + 20, self.y + 10, title)
+        self.icons.append(button)
         self.items += 1
-
-    def set_tower_details(self, tower):
-        self.tower = tower
-
-
-    def get_items_upgrade(self):
-        """
-        gets sales value of tower
-        :return: int
-        """
-        return self.tower[self.tower.level]
-
-    def get_item_cost(self):
-        """
-        gets cost of upgrade to next level
-        :return: int
-        """
-        return self.tower.price[self.tower.level - 1]
-
-    def adjust_menu_location(self, win, x, y):
-        """
-        if the menu falls outside of the window, adjust self.x and self.y to make the window fully visible.
-        :param win: surface
-        :return: None
-        """
-        x_adj = 0
-        y_adj = 0
-        max_w, max_h = win.get_size()
-        if x < 5:
-            x_adj = int(0-x) + 5
-        if y < 5:
-            y_adj = int(0-y) + 5
-
-
-
-        if x > (max_w - self.width -5):
-            x_adj = ((x + self.width + 5) - max_w) * -1
-        return x_adj, y_adj
 
     def draw(self, win):
         """
@@ -388,51 +369,16 @@ class TowerMenu(Menu):
         :param win: surface
         :return: None
         """
-        #self.bg = pygame.transform.scale(self.bg, (self.width, self.height))
-        #win.blit(self.bg, (self.x - self.width/2, self.y-120))
-        star_str = "⭐"
-
         border_color = (0, 49, 83, 155)
         background_color = (44, 56, 99, 90)
         surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA, 32)
         surface.fill(background_color)
-
-        # check if the menu is still inside of map
-        rect_x = int(self.x - (self.width/2))
-        rect_y = int(self.y-120)
-        x_adj, y_adj = self.adjust_menu_location(win, rect_x, rect_y)
-        self.x_adj, self.y_adj = x_adj, y_adj
-
-        rectangle = pygame.Rect(int(self.x - (self.width/2)) + x_adj, int(self.y-120) + y_adj, self.width, self.height)
-        # rectangle = pygame.Rect(int(adj_x), int(adj_y), self.width, self.height)
+        rectangle = pygame.Rect(int(self.x), int(self.y), self.width, self.height)
         win.blit(surface, rectangle)
         pygame.draw.rect(win, border_color, rectangle, width=2, border_radius=6)
 
-        tower_title = self.small_font.render(self.tower.name, 1, (255, 255, 255))
-        win.blit(tower_title, (self.x - self.width/2 + 15 + x_adj, self.y - 110 + y_adj))
-
-        # for i in range(self.tower.level):
-        #    win.blit(star, ((self.x - self.width/2 + (i * star.get_width() + 15)) + x_adj, (self.y - 93) + y_adj))
-        for item in self.buttons:
-            item.x_adj = x_adj
-            item.y_adj = y_adj
-            item.draw(win)
-            tower = self.tower
-            upgrade_string = "Upgrade: $"+ str(tower.price[tower.level - 1])
-            if tower.price[tower.level - 1] == "MAX":
-                upgrade_string = "(Upgrade: " + str(tower.price[tower.level - 1])
-            #win.blit(star, (item.x + item.width + 5, item.y+12))
-            text = self.small_font.render(upgrade_string + ", sell value: $" + str(tower.sell_value[tower.level - 1]) + ")", 1, (255,255,255))
-            win.blit(text, (self.x - self.width/2 + 15 + x_adj, item.y + item.width + 4 + y_adj))
-        tower_info = []
-        tower_info.append(["Damage", tower.damage, tower.get_next_level_info(tower.upgrade_bonus_dmg)])
-        tower_info.append(["Attack Speed", tower.attack_speed, tower.get_next_level_info(tower.upgrade_bonus_atk_speed)])
-        tower_info.append(["Attack Range", tower.range, tower.get_next_level_info(tower.upgrade_bonus_range)])
-        tower_info.append(["Accuracy", int(tower.accuracy*100)/100, tower.get_next_level_info(tower.upgrade_bonus_accuracy)])
-
-        for idx, details in enumerate(tower_info):
-            detail = self.small_font.render((str(details[0]) +":"+ str(details[1])+" ("+ str(details[2])+")"), 1, (255, 255, 255))
-            win.blit(detail, (self.x - self.width / 2 + 15  + x_adj, item.y + 50 + 14*idx  + y_adj))
+        for icon in self.icons:
+            icon.draw(win)
 
 class buildingMenu(Menu):
     """
