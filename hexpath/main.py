@@ -46,8 +46,8 @@ class Game:
         self.attack_towers = []
         self.obstacles = []
         self.label_collector = []
-        self.menu = buildingMenu(50, self.height - 25, 200, 200)
-        self.play_pause_button = PlayPauseButton(play_btn, pause_btn, 129, self.height - 142)
+        self.menu = buildingMenu(25, self.height - 10, 225, 80)
+        self.play_pause_button = PlayPauseButton(play_btn, pause_btn, 40, self.height - 110)
         self.menu.add_configured_btn(self.play_pause_button)
         self.menu.add_btn(ico_minigun, "buy_minigun", "Minigun", 3)
         self.menu.add_btn(ico_obstruction, "buy_obstacle", "Obstacle", 5)
@@ -65,7 +65,7 @@ class Game:
         self.spawn_list = []
         # Should we go through the list of bonuses and apply them to the tower?
         self.update_bonuses = False
-        self.icon_menu = IconMenu(250, self.height - 130, 900, 80)
+        self.icon_menu = IconMenu(250, self.height - 130, 925, 80)
         self.bonus_menu = BonusPickerMenu(self.win, 5)
         self.action_list = {
             "ATK_1" : {"Description": "Attack Damage + 1", "modifier" : 1, "pictogram" : pictogram_attack_damage, "color" : (255, 255, 255, 200), "background_color" : (255, 255, 255 ,255) },
@@ -472,6 +472,9 @@ class Game:
                         if self.wave == 0:
                             # {"source": [750, 223.20508075688772], "destination": [450, 656.217782649107]}
                             self.add_enemy_path([750, 223.20508075688772], [450, 656.217782649107])
+                        if self.wave == 1:
+                            # {"source": [750, 223.20508075688772], "destination": [450, 656.217782649107]}
+                            self.add_enemy_path([450, 656.217782649107], [750, 223.20508075688772])
                         self.wave += 1
             self.draw()
                 # End of if not pause block
@@ -615,11 +618,12 @@ class Game:
         for portal in self.portals:
             portal.draw(self.win)
 
-        if self.build_mode:
-            self.base_map.draw(self.win)
-        else:
+        self.base_map.clear_paths()
+        if not self.build_mode:
+
             for path in self.paths:
-                self.base_map.draw_path(self.win, path)
+                self.base_map.set_path(path)
+        self.base_map.draw(self.win)
 
         for city in self.cities:
             city.draw(self.win)

@@ -2,13 +2,13 @@
 
 Features:
 Add Escaped enemy counter and limit
-Add Protective Dome, if an enemy escapes, dome protection counter will be reduced by 1, if at 0, escaped enemy counter will increase.
+Add Protective Dome/ Shield, if an enemy escapes, dome protection counter will be reduced by 1, if at 0, escaped enemy counter will increase.
     protective domes are restored next wave. Escaped enemy counter is not.
 Add 4 background / Maps
 Add main menu
-Add SHIELD_1: For each shield, protects from one incoming enemy
+Add toggle switch for auto/manual tower ?
 
 Fixes needed:
-Selecting a tower too close to edge allows to tower to placed without blocking the path. removing the tower toggles the hex to blocked.
-If enemy is too far off path it will not make it to the portal but keeps wandering.
+Looks like hexmap gets drawn twice when there is two paths.
+
 

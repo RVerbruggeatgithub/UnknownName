@@ -405,9 +405,9 @@ class buildingMenu(Menu):
         :return: None
         """
 
-        btn_x = self.x + (self.items)*68 - 40
+        btn_x = self.x + (self.items)*68
         self.items += 1
-        btn_y = self.y-60
+        btn_y = self.y-110
         self.buttons.append(BuildMenuIcon(img, name, fullname, btn_x, btn_y, quantity))
 
     def get_item_quantity(self, name):

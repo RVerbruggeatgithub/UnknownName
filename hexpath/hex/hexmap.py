@@ -192,24 +192,15 @@ class Hexmap:
             return_data.append([data["x"], data["y"]])
         return return_data
 
+    def clear_paths(self):
+        for hex_tile in self.map_data:
+            hex_tile.color = pygame.Color(75, 139, 59, 80)
+
     def draw(self, win):
         for hex_tile in self.map_data:
-
-            hex_tile.color = pygame.Color(75, 139, 59, 80)
-            if hex_tile.get_coords() in self.travel_path:
-                hex_tile.color = pygame.Color(80, 10, 121, 80)
-            if not hex_tile.passable:
-                hex_tile.color = pygame.Color(115, 115, 211, 80)
-
             hex_tile.draw(win)
 
-    def draw_path(self, win, travel_path):
-        print("Map data size:", len(self.map_data))
+    def set_path(self, travel_path):
         for hex_tile in self.map_data:
-
-            hex_tile.color = pygame.Color(75, 139, 59, 80)
             if hex_tile.get_coords() in travel_path:
                 hex_tile.color = pygame.Color(80, 10, 121, 80)
-            if not hex_tile.passable:
-                hex_tile.color = pygame.Color(115, 115, 211, 80)
-            hex_tile.draw(win)
