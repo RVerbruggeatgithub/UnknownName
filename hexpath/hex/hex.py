@@ -61,4 +61,6 @@ class Hex:
         return False
 
     def draw(self, win):
+        if not self.passable:
+            self.color = (0, 10, 121, 80)
         self.draw_polygon_alpha(win, self.color, self.hex([self.x, self.y]))
