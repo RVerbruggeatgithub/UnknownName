@@ -17,14 +17,24 @@ from objects.city import City
 
 pygame.display.init()
 pygame.display.set_mode((500, 500), pygame.RESIZABLE)
-background_image = load_image("resources", "heusden.png")
+background_image = load_image("resources", "porro_village.png")
 play_btn = pygame.transform.scale(load_image("resources", "button_play.png").convert_alpha(), (32, 32))
 pause_btn = pygame.transform.scale(load_image("resources", "button_pause.png").convert_alpha(), (32, 32))
 ico_minigun = pygame.transform.scale(load_image("resources", "ico_minigun.png").convert_alpha(), (50, 50))
 ico_obstruction = pygame.transform.scale(load_image("resources", "ico_obstruction.png").convert_alpha(), (50, 50))
 attack_tower_names = ["Minigun Tower"]
 obstacles = ["Obstacle"]
-pictogram_attack_speed = pictogram_attack_damage = pygame.transform.scale(load_image("resources", "base_square.png").convert_alpha(), (150, 150))
+pictogram_attack_speed = pygame.transform.scale(load_image("resources", "icon_atk_speed.png").convert_alpha(), (150, 150))
+pictogram_attack_damage = pygame.transform.scale(load_image("resources", "icon_atk_damage.png").convert_alpha(), (150, 150))
+pictogram_accuracy = pygame.transform.scale(load_image("resources", "icon_accuracy.png").convert_alpha(), (150, 150))
+pictogram_attack_range = pygame.transform.scale(load_image("resources", "icon_atk_range.png").convert_alpha(), (150, 150))
+pictogram_crit_chance = pygame.transform.scale(load_image("resources", "icon_crit_chance.png").convert_alpha(), (150, 150))
+pictogram_crit_damage = pygame.transform.scale(load_image("resources", "icon_crit_damage.png").convert_alpha(), (150, 150))
+pictogram_projectile_size = pygame.transform.scale(load_image("resources", "icon_projectile_size.png").convert_alpha(), (150, 150))
+pictogram_projectile_speed = pygame.transform.scale(load_image("resources", "icon_projectile_speed.png").convert_alpha(), (150, 150))
+pictogram_splash_range = pygame.transform.scale(load_image("resources", "icon_splash_range.png").convert_alpha(), (150, 150))
+pictogram_not_implemented = pygame.transform.scale(load_image("resources", "icon_not_implemented.png").convert_alpha(), (150, 150))
+pictogram_shield = pygame.transform.scale(load_image("resources", "icon_shield.png").convert_alpha(), (150, 150))
 
 
 class Game:
@@ -35,7 +45,11 @@ class Game:
         self.pause = True
         self.timer = 0
         self.bg = pygame.transform.scale(background_image, (self.width, self.height))
-        self.base_map = Hexmap(self.width, self.height - 100)
+
+        hexmap_data = [[400, 136.60254037844385], [450, 136.60254037844385], [650, 136.60254037844385], [700, 136.60254037844385], [750, 136.60254037844385], [275, 179.9038105676658], [375, 179.9038105676658], [425, 179.9038105676658], [475, 179.9038105676658], [525, 179.9038105676658], [575, 179.9038105676658], [625, 179.9038105676658], [675, 179.9038105676658], [725, 179.9038105676658], [775, 179.9038105676658], [825, 179.9038105676658], [250, 223.20508075688772], [300, 223.20508075688772], [350, 223.20508075688772], [400, 223.20508075688772], [450, 223.20508075688772], [500, 223.20508075688772], [550, 223.20508075688772], [600, 223.20508075688772], [650, 223.20508075688772], [700, 223.20508075688772], [850, 223.20508075688772], [900, 223.20508075688772], [950, 223.20508075688772], [1000, 223.20508075688772], [1050, 223.20508075688772], [175, 266.50635094610965], [225, 266.50635094610965], [275, 266.50635094610965], [325, 266.50635094610965], [375, 266.50635094610965], [425, 266.50635094610965], [725, 266.50635094610965], [825, 266.50635094610965], [875, 266.50635094610965], [925, 266.50635094610965], [975, 266.50635094610965], [1025, 266.50635094610965], [200, 309.8076211353316], [250, 309.8076211353316], [300, 309.8076211353316], [350, 309.8076211353316], [400, 309.8076211353316], [450, 309.8076211353316], [650, 309.8076211353316], [700, 309.8076211353316], [750, 309.8076211353316], [800, 309.8076211353316], [850, 309.8076211353316], [900, 309.8076211353316], [950, 309.8076211353316], [1000, 309.8076211353316], [1050, 309.8076211353316], [175, 353.1088913245535], [225, 353.1088913245535], [275, 353.1088913245535], [325, 353.1088913245535], [475, 353.1088913245535], [525, 353.1088913245535], [575, 353.1088913245535], [625, 353.1088913245535], [675, 353.1088913245535], [875, 353.1088913245535], [925, 353.1088913245535], [975, 353.1088913245535], [1025, 353.1088913245535], [1075, 353.1088913245535], [100, 396.41016151377545], [150, 396.41016151377545], [200, 396.41016151377545], [250, 396.41016151377545], [300, 396.41016151377545], [350, 396.41016151377545], [450, 396.41016151377545], [500, 396.41016151377545], [550, 396.41016151377545], [600, 396.41016151377545], [650, 396.41016151377545], [850, 396.41016151377545], [900, 396.41016151377545], [950, 396.41016151377545], [1000, 396.41016151377545], [1050, 396.41016151377545], [125, 439.7114317029974], [175, 439.7114317029974], [225, 439.7114317029974], [275, 439.7114317029974], [325, 439.7114317029974], [475, 439.7114317029974], [525, 439.7114317029974], [575, 439.7114317029974], [625, 439.7114317029974], [675, 439.7114317029974], [725, 439.7114317029974], [775, 439.7114317029974], [825, 439.7114317029974], [875, 439.7114317029974], [925, 439.7114317029974], [975, 439.7114317029974], [1025, 439.7114317029974], [1075, 439.7114317029974], [100, 483.0127018922193], [150, 483.0127018922193], [200, 483.0127018922193], [250, 483.0127018922193], [300, 483.0127018922193], [350, 483.0127018922193], [450, 483.0127018922193], [750, 483.0127018922193], [800, 483.0127018922193], [850, 483.0127018922193], [900, 483.0127018922193], [950, 483.0127018922193], [1000, 483.0127018922193], [1050, 483.0127018922193], [1100, 483.0127018922193], [125, 526.3139720814413], [175, 526.3139720814413], [225, 526.3139720814413], [275, 526.3139720814413], [325, 526.3139720814413], [375, 526.3139720814413], [425, 526.3139720814413], [475, 526.3139720814413], [725, 526.3139720814413], [775, 526.3139720814413], [825, 526.3139720814413], [875, 526.3139720814413], [925, 526.3139720814413], [975, 526.3139720814413], [1025, 526.3139720814413], [1075, 526.3139720814413], [100, 569.6152422706632], [150, 569.6152422706632], [200, 569.6152422706632], [250, 569.6152422706632], [300, 569.6152422706632], [350, 569.6152422706632], [400, 569.6152422706632], [450, 569.6152422706632], [500, 569.6152422706632], [550, 569.6152422706632], [600, 569.6152422706632], [650, 569.6152422706632], [700, 569.6152422706632], [750, 569.6152422706632], [800, 569.6152422706632], [850, 569.6152422706632], [900, 569.6152422706632], [950, 569.6152422706632], [1000, 569.6152422706632], [1050, 569.6152422706632], [1100, 569.6152422706632], [175, 612.9165124598851], [225, 612.9165124598851], [275, 612.9165124598851], [325, 612.9165124598851], [375, 612.9165124598851], [425, 612.9165124598851], [475, 612.9165124598851], [525, 612.9165124598851], [575, 612.9165124598851], [625, 612.9165124598851], [675, 612.9165124598851], [725, 612.9165124598851], [775, 612.9165124598851], [825, 612.9165124598851], [875, 612.9165124598851], [925, 612.9165124598851], [975, 612.9165124598851], [250, 656.217782649107], [300, 656.217782649107], [350, 656.217782649107], [400, 656.217782649107], [450, 656.217782649107], [500, 656.217782649107], [550, 656.217782649107], [600, 656.217782649107], [650, 656.217782649107], [700, 656.217782649107], [750, 656.217782649107], [800, 656.217782649107], [850, 656.217782649107], [900, 656.217782649107], [950, 656.217782649107], [375, 699.519052838329], [425, 699.519052838329], [475, 699.519052838329], [525, 699.519052838329], [575, 699.519052838329], [625, 699.519052838329], [675, 699.519052838329], [725, 699.519052838329], [775, 699.519052838329], [825, 699.519052838329], [875, 699.519052838329], [925, 699.519052838329], [400, 742.8203230275509], [450, 742.8203230275509], [500, 742.8203230275509], [550, 742.8203230275509], [600, 742.8203230275509], [650, 742.8203230275509], [700, 742.8203230275509], [800, 742.8203230275509], [850, 742.8203230275509]]
+
+        # remove hexmap_data param to use full map
+        self.base_map = Hexmap(self.width, self.height - 100, hexmap_data)
         self.start = self.end = [0, 0]
         self.set_start = False
         self.target_hex_num = 208
@@ -63,46 +77,49 @@ class Game:
         self.tower_no_clip = False
         self.wave_enemy_total = 0
         self.spawn_list = []
+        self.spawned_from_spawn_list_counter = 0
         # Should we go through the list of bonuses and apply them to the tower?
         self.update_bonuses = False
         self.icon_menu = IconMenu(250, self.height - 130, 925, 80)
         self.bonus_menu = BonusPickerMenu(self.win, 5)
         self.action_list = {
-            "ATK_1" : {"Description": "Attack Damage + 1", "modifier" : 1, "pictogram" : pictogram_attack_damage, "color" : (255, 255, 255, 200), "background_color" : (255, 255, 255 ,255) },
-            "SPEED_1" : {"Description": "Attack Speed + 10%", "modifier" : 0.1, "pictogram" : pictogram_attack_speed, "color" : (255, 255, 255, 200), "background_color" : (255, 255, 255 ,255) },
-            "RANGE_1": {"Description": "Attack Range + 5%", "modifier": 0.05, "pictogram": pictogram_attack_speed,
+            "ATK_1" : {"Description": "Attack Damage + 1", "modifier" : 1, "pictogram" : pictogram_attack_damage,
+                       "color" : (255, 255, 255, 200), "background_color" : (255, 255, 255 ,255) },
+            "SPEED_1" : {"Description": "Attack Speed + 10%", "modifier" : 0.1, "pictogram" : pictogram_attack_speed,
+                         "color" : (255, 255, 255, 200), "background_color" : (255, 255, 255 ,255) },
+            "RANGE_1": {"Description": "Attack Range + 5%", "modifier": 0.05, "pictogram": pictogram_attack_range,
                       "color": (255, 255, 255, 200), "background_color": (255, 255, 255, 255)},
-            "RADIUS_1": {"Description": "Splash Radius +5%", "modifier": 0.05, "pictogram": pictogram_attack_speed,
+            "RADIUS_1": {"Description": "Splash Radius +5%", "modifier": 0.05, "pictogram": pictogram_splash_range,
                       "color": (255, 255, 255, 200), "background_color": (255, 255, 255, 255)},
-            "CRITC_1": {"Description": "Crit Chance + 5%", "modifier": 0.05, "pictogram": pictogram_attack_speed,
+            "CRITC_1": {"Description": "Crit Chance + 5%", "modifier": 0.05, "pictogram": pictogram_crit_chance,
                       "color": (255, 255, 255, 200), "background_color": (255, 255, 255, 255)},
-            "ACC_1": {"Description": "Accuracy + 5%", "modifier": 0.05, "pictogram": pictogram_attack_speed,
+            "ACC_1": {"Description": "Accuracy + 5%", "modifier": 0.05, "pictogram": pictogram_accuracy,
                         "color": (255, 255, 255, 200), "background_color": (255, 255, 255, 255)},
-            "BULSP_1": {"Description": "Projectile speed + 8%", "modifier": 0.08, "pictogram": pictogram_attack_speed,
+            "BULSP_1": {"Description": "Projectile speed + 8%", "modifier": 0.08, "pictogram": pictogram_projectile_speed,
                       "color": (255, 255, 255, 200), "background_color": (255, 255, 255, 255)},
         }
-
         self.action_list2 = {
             "ATK_2" : {"Description": "Attack Damage + 2", "modifier" : 2, "pictogram" : pictogram_attack_damage, "color" : (0, 32, 255, 200), "background_color" : (0, 32, 255,255) },
             "SPEED_2" : {"Description": "Attack Speed + 20 %", "modifier" : 0.2, "pictogram" : pictogram_attack_speed, "color" : (0, 32, 255, 200), "background_color" : (0, 32, 255,255) },
-            "RANGE_2": {"Description": "Attack Range + 10%", "modifier": 0.1, "pictogram": pictogram_attack_speed,
+            "RANGE_2": {"Description": "Attack Range + 10%", "modifier": 0.1, "pictogram": pictogram_attack_range,
                       "color": (0, 32, 255, 200), "background_color": (0, 32, 255, 255)},
-            "RADIUS_2": {"Description": "Splash Radius + 10%", "modifier": 0.1, "pictogram": pictogram_attack_speed,
+            "RADIUS_2": {"Description": "Splash Radius + 10%", "modifier": 0.1, "pictogram": pictogram_splash_range,
                       "color": (0, 32, 255, 200), "background_color": (0, 32, 255, 255)},
-            "OBSTACLE_1": {"Description": "Obstacle +1", "modifier": 1, "pictogram": pictogram_attack_speed,
+            "OBSTACLE_1": {"Description": "Obstacle +1", "modifier": 1, "pictogram": pictogram_not_implemented,
                          "color": (0, 32, 255, 200), "background_color": (0, 32, 255, 255)},
-            "CRITD_1": {"Description": "Crit Damage + 50%", "modifier": 0.50, "pictogram": pictogram_attack_speed,
-                        "color": (255, 255, 255, 200), "background_color": (255, 255, 255, 255)},
-            "SHIELD_1": {"Description": "Protect cities +1", "modifier": 1.00, "pictogram": pictogram_attack_speed,
-                        "color": (255, 255, 255, 200), "background_color": (255, 255, 255, 255)},
+            "CRITD_1": {"Description": "Crit Damage + 50%", "modifier": 0.50, "pictogram": pictogram_crit_damage,
+                        "color": (0, 32, 255, 200), "background_color": (255, 255, 255, 255)},
+            "SHIELD_1": {"Description": "Protect cities +1", "modifier": 1.00, "pictogram": pictogram_shield,
+                        "color": (0, 32, 255, 200), "background_color": (255, 255, 255, 255)},
         }
-
         self.action_list3 = {
-            "TOWER_1": {"Description": "Tower! +1", "modifier": 1, "pictogram": pictogram_attack_speed,
+            "ATK_3": {"Description": "Attack Damage + 3", "modifier": 3, "pictogram": pictogram_attack_damage,
+                      "color": (0, 32, 255, 200), "background_color": (0, 32, 255, 255)},
+            "TOWER_1": {"Description": "Tower! +1", "modifier": 1, "pictogram": pictogram_not_implemented,
                         "color": (221,160,221, 200), "background_color": (221,160,221, 255)},
             "SPEED_3": {"Description": "Attack Speed + 30%", "modifier": 0.3, "pictogram": pictogram_attack_speed,
                         "color": (221,160,221, 200), "background_color": (221,160,221, 255)},
-            "OBSTACLE_2": {"Description": "Obstacle +2", "modifier": 2, "pictogram": pictogram_attack_speed,
+            "OBSTACLE_2": {"Description": "Obstacle +2", "modifier": 2, "pictogram": pictogram_not_implemented,
                          "color": (221,160,221, 200), "background_color": (0, 32, 255, 255)},
         }
 
@@ -112,22 +129,21 @@ class Game:
         self.show_bonus_menu = False
         self.show_build_menu = True
         self.enemy_spawn_points = [
-            {"source": [250, 396.41016151377545], "destination": [900, 396.41016151377545]},
-
+            {"source": [575, 699.519052838329], "destination": [600, 396.41016151377545]},
         ]
         # {"source": [750, 223.20508075688772], "destination": [450, 656.217782649107]}
         self.portals = []
         self.cities = []
         self.waves = [
-                [{"type": "Squaremon", "count": 1, "interval": 0.8}],
+                [{"type": "Squaremon", "count": 1, "interval": 0.5}],
                 [{"type": "Squaremon", "count": 2, "interval": 0.8}],
-                [{"type": "Squaremon", "count": 3, "interval": 0.8}],
-                [{"type": "Squaremon", "count" : 5, "interval": 0.6}],
-                [{"type": "Squaremon", "count": 7, "interval": 0.6}],
+                [{"type": "Squaremon", "count": 3, "interval": 1.0}],
+                [{"type": "Squaremon", "count" : 5, "interval": 0.7}],
+                [{"type": "Squaremon", "count": 7, "interval": 0.5}],
                 [{"type": "Squaremon", "count": 8, "interval": 0.6}],
-                [{"type": "Squaremon", "count": 12, "interval": 0.5}],
-                [{"type": "Squaremon", "count" : 6, "interval": 0.5},{"type": "SquaremonGreen", "count" : 1, "interval": 0.5}],
-                [{"type": "Squaremon", "count" : 6, "interval": 4},{"type": "SquaremonGreen", "count" : 2, "interval": 0.5}],
+                [{"type": "Squaremon", "count": 10, "interval": 0.8}],
+                [{"type": "Squaremon", "count" : 6, "interval": 0.5},{"type": "SquaremonGreen", "count" : 2, "interval": 0.5}],
+                [{"type": "Squaremon", "count" : 6, "interval": 4},{"type": "SquaremonGreen", "count" : 3, "interval": 0.5}],
                 [{"type": "Squaremon", "count": 8, "interval": 4},{"type": "SquaremonGreen", "count": 2, "interval": 0.5}],
                 [{"type": "SquaremonElite", "count": 1, "interval": 0.5}],
                 # wave 11
@@ -141,18 +157,67 @@ class Game:
                 [{"type": "SquaremonGreen", "count": 12, "interval": 0.5}, {"type": "Trippet", "count": 8, "interval": 0.5}],
                 [{"type": "SquaremonGreen", "count": 11, "interval": 0.5}, {"type": "Trippet", "count": 11, "interval": 1}],
                 [{"type": "SquaremonElite", "count": 4, "interval": 1.8}],
-                # wave 21
                 [{"type": "SquaremonGreen", "count": 16, "interval": 1}, {"type": "Trippet", "count": 19, "interval": 2}],
+                # wave 21:
                 [{"type": "Trippet", "count": 25, "interval": 1.8}],
                 [{"type": "Trippet", "count": 35, "interval": 1}],
-                [{"type": "Trippet", "count": 30, "interval": 1}, {"type": "SquaremonElite", "count": 4, "interval": 1.8}],
-                [{"type": "TrippetElite", "count": 6, "interval": 1}]
+                [{"type": "Trippet", "count": 28, "interval": 1}, {"type": "SquaremonElite", "count": 3, "interval": 1.8}],
+                [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+                [{"type": "Trippet", "count": 40, "interval": 3}, {"type": "SquaremonGreenElite", "count": 4, "interval": 1}],
+                [{"type": "SquaremonGreen", "count": 16, "interval": 1}, {"type": "TrippetElite", "count": 8,"interval": 2}],
+                [{"type": "Yolkee", "count": 10, "interval": 2}, {"type": "Trippet", "count": 30, "interval": 1}],
+                [{"type": "Yolkee", "count": 15, "interval": 2}, {"type": "Trippet", "count": 22, "interval": 1}],
+                [{"type": "Trippet", "count": 50, "interval": 4}, {"type": "TrippetElite", "count": 50, "interval": 4}],
+                [{"type": "Yolkee", "count": 18, "interval": 1.5}, {"type": "Trippet", "count": 30, "interval": 1}],
+                [{"type": "Yolkee", "count": 18, "interval": 1.5}, {"type": "Trippet", "count": 30, "interval": 1}],
+                #wave 31:
+                [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+                [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+                [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+                [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+                [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+                [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+                [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+                [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+                [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+                [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+                [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+                [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+                [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+                [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+                [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+                [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+                [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+                [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+                [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+                [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+                [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+                [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+                [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+                [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+                [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+                [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+                [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+                [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+                [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+                [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+                [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+                [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+                [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+                [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+                [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+                [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+                [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+                [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+                [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+                [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
             ]
 
         self.enemies_removed = 0
         self.paths = []
         self.move_tower = False
         self.auto_target = True
+        self.interval = 500
 
 
     def run(self):
@@ -191,7 +256,9 @@ class Game:
                             if map_location.click(mouse_pos[0], mouse_pos[1]):
                                 clicked_location = map_location
                         if event.button == 1:
+                            tiles = []
                             if clicked_location is not None:
+                                clicked_location.toggle_passable()
                                 if not self.set_start:
                                     self.start = [clicked_location.x, clicked_location.y]
                                     self.set_start = True
@@ -200,6 +267,10 @@ class Game:
                                     self.set_start = False
                                     self.map_update_required = True
                                     print(self.start, self.end)
+                            for map_location in self.base_map.get_map_data():
+                                if map_location.passable:
+                                    tiles.append([map_location.x, map_location.y])
+                            print(tiles)
 
                         if event.button == 3:
                             if clicked_location is not None:
@@ -222,10 +293,7 @@ class Game:
                     tower_list = self.attack_towers[:]
                     collide = False
                     # if valid_area:
-                    if hex_at_mouse_pos.passable:
-                        self.moving_object.place_color = (0, 0, 255, 100)
-                    else:
-                        self.moving_object.place_color = (255, 0, 0, 100)
+
 
                     for tower in tower_list:
                         if tower.collide(self.moving_object) and valid_area:
@@ -246,6 +314,7 @@ class Game:
                             self.play_pause_button.toggle()
                             if self.pause:
                                 print("paused")
+                                print("DEBUG:", "Enemy counter:", self.enemy_counter,  "Wave:", self.wave,  "Spawn list:", self.spawn_list,  "Enemies removed:", self.enemies_removed,  "Wave total:", self.wave_enemy_total, "spawn_list size", len(self.spawn_list), "Spawned counter:", self.spawned_from_spawn_list_counter)
                             else:
                                 print("unpaused")
                             self.play_pause_button.paused = self.pause
@@ -273,7 +342,14 @@ class Game:
                                     else:
                                         self.obstacles.remove(tw)
                                     hex_at_mouse_pos.passable = True
-                                    print("reached B", hex_at_mouse_pos.x, hex_at_mouse_pos.y)
+                                    # update path?
+                                    for num, path in enumerate(self.paths):
+                                        # coordinates are found in path, check if we can create a new path
+                                        enemy_spawn_point = self.enemy_spawn_points[num]
+                                        new_path = self.base_map.update_path(enemy_spawn_point["source"],
+                                                                           enemy_spawn_point["destination"])
+                                        self.paths[num] = new_path
+                                    print("reached B need to update path..", new_path, hex_at_mouse_pos.x, hex_at_mouse_pos.y)
 
 
                         if self.show_bonus_menu:
@@ -360,7 +436,6 @@ class Game:
                                                     button.update_quantity(-1)
                                             if (self.moving_object.name in attack_tower_names):
                                                 self.attack_towers.append(self.moving_object)
-
                                             else:
                                                 self.obstacles.append(self.moving_object)
                                             self.moving_object.moving = False
@@ -385,6 +460,7 @@ class Game:
                                             sales_value = self.selected_tower.get_sales_value()
                                             self.money += sales_value # need to change this
                                             self.attack_towers.remove(self.selected_tower)
+                                            # update my path?
 
                                 if not btn_clicked:
                                     for tw in self.attack_towers:
@@ -410,28 +486,36 @@ class Game:
 
                                 for _ in itertools.repeat(None, enemy_wave["count"]):
                                     select_path = random.choice(self.paths)
-                                    generated_path = generate_alternative_path(select_path, 14)
+                                    generated_path, deviation = generate_alternative_path(select_path, 14)
                                     enemies = {
                                         "Squaremon": Squaremon(generated_path),
                                         "SquaremonElite": SquaremonElite(generated_path),
                                         "SquaremonGreen": SquaremonGreen(generated_path),
+                                        "SquaremonGreenElite": SquaremonGreenElite(generated_path),
                                         "Trippet": Trippet(generated_path),
                                         "TrippetElite": TrippetElite(generated_path),
                                         "Yolkee": Yolkee(generated_path),
                                         "Juju": Juju(generated_path),
                                     }
                                     wave_enemy = enemies.get(enemy_wave["type"])
-                                    self.spawn_list.append(wave_enemy)
+                                    wave_enemy.set_deviation(deviation)
+                                    interval = enemy_wave["interval"] * 1000
+                                    self.spawn_list.append([wave_enemy, interval])
 
                             self.wave_enemy_total = wave_enemy_total
                             random.shuffle(self.spawn_list)
                         timestamp = pygame.time.get_ticks()
 
-                        if timestamp - self.timer >= 500 and self.enemy_counter < self.wave_enemy_total:  # lastTimeStamp is the variable storing time and replace 500 with another integer that works well
+                        if timestamp - self.timer >= self.interval and len(self.spawn_list) > self.spawned_from_spawn_list_counter:  # lastTimeStamp is the variable storing time and replace 500 with another integer that works well
                             # get the enemy with the number value from the index variable
-                            self.timer = timestamp  # resets the time stamp
-                            self.enemies.append(self.spawn_list[self.enemy_counter])
-                            self.enemy_counter += 1  # The index variable
+                            try:
+                                self.timer = timestamp  # resets the time stamp
+                                self.enemies.append(self.spawn_list[self.spawned_from_spawn_list_counter][0])
+                                self.interval = self.spawn_list[self.spawned_from_spawn_list_counter][1]
+                                self.spawned_from_spawn_list_counter += 1
+                                self.enemy_counter += 1  # The index variable
+                            except IndexError:
+                                print("list index out of range. Requested index:", self.enemy_counter, "In:", self.spawn_list[0], "is outside of range!")
 
                     for enemy in self.enemies:
                         enemy.move()
@@ -468,14 +552,18 @@ class Game:
                         self.spawn_list = []
                         self.show_bonus_menu = True
                         self.show_build_menu = False
+                        self.spawned_from_spawn_list_counter = 0
                         # add a new path at wave #
-                        if self.wave == 0:
+                        if self.wave == 25:
+                            """
+                            [1075, 439.7114317029974][600, 396.41016151377545]
+                            [750, 136.60254037844385][600, 396.41016151377545]
+                            [200, 396.41016151377545][600, 396.41016151377545]
+                            """
                             # {"source": [750, 223.20508075688772], "destination": [450, 656.217782649107]}
-                            self.add_enemy_path([750, 223.20508075688772], [450, 656.217782649107])
-                        if self.wave == 1:
-                            # {"source": [750, 223.20508075688772], "destination": [450, 656.217782649107]}
-                            self.add_enemy_path([450, 656.217782649107], [750, 223.20508075688772])
+                            self.add_enemy_path([750, 136.60254037844385], [600, 396.41016151377545])
                         self.wave += 1
+                        print("Next wave:", self.wave)
             self.draw()
                 # End of if not pause block
         pygame.quit()
@@ -518,6 +606,8 @@ class Game:
                     tower.mod_damage += self.action_list[bonus]["modifier"]
                 if bonus == "ATK_2":
                     tower.mod_damage += self.action_list2[bonus]["modifier"]
+                if bonus == "ATK_3":
+                    tower.mod_damage += self.action_list3[bonus]["modifier"]
                 if bonus == "CRITC_1":
                     tower.mod_crit_chance += self.action_list[bonus]["modifier"]
 
@@ -601,8 +691,8 @@ class Game:
             print(str(e) + "Invalid name")
 
     def draw(self):
-        # self.win.blit(self.bg, (0, 0))
-        self.win.fill([255,255,255])
+        self.win.blit(self.bg, (0, 0))
+        # self.win.fill([255,255,255])
 
         if self.moving_object:
             # , pygame.SRCALPHA, 32
@@ -618,12 +708,13 @@ class Game:
         for portal in self.portals:
             portal.draw(self.win)
 
-        self.base_map.clear_paths()
-        if not self.build_mode:
+        if self.pause:
+            self.base_map.clear_paths()
+            if not self.build_mode:
 
-            for path in self.paths:
-                self.base_map.set_path(path)
-        self.base_map.draw(self.win)
+                for path in self.paths:
+                    self.base_map.set_path(path)
+            self.base_map.draw(self.win)
 
         for city in self.cities:
             city.draw(self.win)
