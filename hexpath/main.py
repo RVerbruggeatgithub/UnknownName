@@ -218,6 +218,30 @@ class Game:
         self.move_tower = False
         self.auto_target = True
         self.interval = 500
+        """
+        Main menu stuff:
+        """
+        self.start_menu = Menu(25, 25, self.width - 50, self.height - 50, None)
+        frame_width = 400
+        frame_height = 600
+        self.start_menu.add_frame((self.width//2 - frame_width//2), 80, frame_width, frame_height, (100,150,225, 100), (0,0,0, 0))
+        self.start_menu.add_plain_button("TEST", "sub text", (self.width//2 - frame_width//2 + frame_width*0.1), 100, frame_width*0.8, 50, (100,150,225, 100))
+
+    def main_menu(self):
+        # draw the main menu
+        main_menu_is_open= True
+        while main_menu_is_open:
+            mouse_pos = pygame.mouse.get_pos()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    main_menu_is_open = False
+                if event.type == pygame.MOUSEBUTTONUP:
+                    for button in self.start_menu.buttons:
+                        if button.click(mouse_pos[0], mouse_pos[1]):
+                            main_menu_is_open = False
+                            self.run()
+            self.draw_main_menu()
+        pygame.quit()
 
 
     def run(self):
@@ -690,6 +714,12 @@ class Game:
         except Exception as e:
             print(str(e) + "Invalid name")
 
+    def draw_main_menu(self):
+        self.win.fill([255, 255, 255])
+        self.start_menu.draw(self.win)
+        pygame.display.update()
+
+
     def draw(self):
         self.win.blit(self.bg, (0, 0))
         # self.win.fill([255,255,255])
@@ -772,4 +802,5 @@ class Game:
         pygame.display.update()
 
 g = Game()
-g.run()
+g.main_menu()
+#g.run()

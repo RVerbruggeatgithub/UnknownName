@@ -68,6 +68,55 @@ class Button:
         self.x = self.menu.x - 50
         self.y = self.menu.y - 110
 
+class PlainButton():
+    """
+    Button class for menu objects
+    """
+    def __init__(self, button_text, button_sub_text, x, y, width, height, text_color=(100,50,77, 250), bg_color=(100,50,77, 150), border_color=(100,50,77, 250)):
+        self.button_text = button_text
+        self.button_sub_text = button_sub_text
+        self.width = width
+        self.height = height
+        self.x = x
+        self.y = y
+        self.text_color = text_color
+        self.bg_color = bg_color
+        self.border_color = border_color
+
+    def click(self, X, Y):
+        """
+        returns if the positon has collided with the menu
+        :param X: int
+        :param Y: int
+        :return: bool
+        """
+        if X <= self.x + self.width and X >= self.x:
+            if Y <= self.y + self.height and Y >= self.y :
+                return True
+        return False
+
+
+    def draw(self, win):
+        """
+        draws the button image
+        :param win: surface
+        :return: None
+        """
+        rectangle = pygame.Rect(int(self.x), int(self.y), self.width, self.height)
+        surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA, 32)
+        surface.fill(self.bg_color)
+        win.blit(surface, rectangle)
+        pygame.draw.rect(win, self.border_color, rectangle, width=2, border_radius=6)
+
+        if self.button_text is not None:
+            reg_font = pygame.font.SysFont("segoeuisemilight", 16)
+            btn_txt = reg_font.render(str(self.button_text), 1, self.text_color)
+            win.blit(btn_txt, (self.x + self.width//2 - btn_txt.get_width()//2, self.y))
+        if self.button_sub_text is not None:
+            small_font = pygame.font.SysFont("segoeuisemilight", 14)
+            btn_sub_txt = small_font.render(str(self.button_sub_text), 1, self.text_color)
+            win.blit(btn_sub_txt, (self.x + self.width//2 - btn_sub_txt.get_width()//2, self.y + 25))
+
 class BuildMenuIcon(Button):
     def __init__(self, img, name, fullname, x, y, quantity):
         self.img = img
@@ -266,6 +315,30 @@ class BonusPickerMenu:
             item.draw(win)
 
 
+class Frame:
+    """
+    Frame class for frame objects
+    """
+    def __init__(self, x, y, width, height, color, bgcolor):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.color = color
+        self.border_color = bgcolor
+
+    def draw(self, win):
+        """
+        draws the button image
+        :param win: surface
+        :return: None
+        """
+        rectangle = pygame.Rect(int(self.x), int(self.y), self.width, self.height)
+        surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA, 32)
+        surface.fill(self.color)
+        win.blit(surface, rectangle)
+        pygame.draw.rect(win, self.border_color, rectangle, width=2, border_radius=6)
+
 
 class Menu:
     """
@@ -280,6 +353,7 @@ class Menu:
         self.font = pygame.font.SysFont("segoeuisemilight", 25)
         self.small_font = pygame.font.SysFont("segoeuisemilight", 10)
         self.bg = menu_bg
+        self.frames = []
         self.buttons = []
         self.items = 0
         self.x_adj = 0
@@ -294,6 +368,12 @@ class Menu:
         """
         self.buttons.append(Button(self, img, name, self.x + (self.items * 32) + 50, self.y - self.height + 10))
         self.items += 1
+
+    def add_plain_button(self, button_text, button_sub_text, x, y, width, height, text_color):
+        self.buttons.append(PlainButton(button_text, button_sub_text, x, y, width, height, text_color))
+
+    def add_frame(self, x, y, width, height, color, bgcolor):
+        self.frames.append(Frame(x, y, width, height, color, bgcolor))
 
     def add_configured_btn(self, configured_button):
         self.items += 1
@@ -326,9 +406,19 @@ class Menu:
         :param win: surface
         :return: None
         """
-        win.blit(self.bg, (self.x - self.width/2, self.y-120))
-        for item in self.buttons:
-            item.draw(win)
+        border_color = (0, 49, 83, 155)
+        background_color = (44, 56, 99, 90)
+        surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA, 32)
+        surface.fill(background_color)
+        rectangle = pygame.Rect(int(self.x), int(self.y), self.width, self.height)
+        win.blit(surface, rectangle)
+        pygame.draw.rect(win, border_color, rectangle, width=2, border_radius=6)
+
+        for frame in self.frames:
+            frame.draw(win)
+
+        for button in self.buttons:
+            button.draw(win)
 
 
 class IconMenu(Menu):
