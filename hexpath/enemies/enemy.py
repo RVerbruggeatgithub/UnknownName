@@ -35,6 +35,7 @@ class Enemy:
         # max allowed deviation from a node
         self.boundary = (0.93 * self.speed_increase)
         self.death_sequence = []
+        self.deviation = [0, 0]
 
     """
     def generate_item(self):
@@ -103,8 +104,10 @@ class Enemy:
 
         if self.animation_count >= len(self.imgs):
             self.animation_count = 0
-
-        x1, y1 = self.path[self.path_pos]
+        try:
+            x1, y1 = self.path[self.path_pos]
+        except ValueError:
+            print("Too many values to unpack in:", self.path[self.path_pos], "at path_pos:", self.path_pos, "in:", self.path)
         if self.path_pos + 1 >= len(self.path):
             return
         else:
@@ -123,9 +126,12 @@ class Enemy:
         self.angle = point_direction(x1, y1, x2, y2, False) * -1
         self.x = self.x + new_move_x
         self.y = self.y + new_move_y
-
+        #  self.deviation[0]  self.deviation[1]
+        mod_boundery = 0
+        if self.path_pos == len(self.path):
+            mod_boundery = math.sqrt(self.deviation[0] ** 2 + self.deviation[1] ** 2)
         enemy_distance_to_next_hop = math.sqrt((self.x - x2)**2 + (self.y - y2)**2)
-        if (-self.boundary <= enemy_distance_to_next_hop <= self.boundary):
+        if (-self.boundary - mod_boundery <= enemy_distance_to_next_hop <= self.boundary + mod_boundery):
             self.travelled_path.append(enemy_distance_to_next_hop)
             self.path_pos += 1
 
@@ -140,6 +146,14 @@ class Enemy:
             # self.generate_item()
             return True
         return False
+
+    def set_deviation(self, deviation):
+        """
+        Sets the deviation used to generate individual paths
+        :param deviation: list [x, y] coordinates
+        :return: None
+        """
+        self.deviation = deviation
 
     def dead_action(self, enemies=[]):
         """
