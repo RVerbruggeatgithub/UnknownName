@@ -7,7 +7,17 @@ pygame.display.set_mode((1500, 800))
 ico_background_image = pygame.transform.scale(load_image("resources", "button_empty.png").convert_alpha(), (64,64))
 # upgrade_btn = pygame.transform.scale(load_image("resources", "button_upgrade.png").convert_alpha(), (32, 32))
 sell_btn = pygame.transform.scale(load_image("resources", "button_sell.png").convert_alpha(), (32, 32))
-pictogram_attack_speed = pictogram_attack_damage = pygame.transform.scale(load_image("resources", "base_square.png").convert_alpha(), (50, 50))
+pictogram_attack_speed = pygame.transform.scale(load_image("resources", "icon_atk_speed.png").convert_alpha(), (50, 50))
+pictogram_attack_damage = pygame.transform.scale(load_image("resources", "icon_atk_damage.png").convert_alpha(), (50, 50))
+pictogram_accuracy = pygame.transform.scale(load_image("resources", "icon_accuracy.png").convert_alpha(), (50, 50))
+pictogram_attack_range = pygame.transform.scale(load_image("resources", "icon_atk_range.png").convert_alpha(), (50, 50))
+pictogram_crit_chance = pygame.transform.scale(load_image("resources", "icon_crit_chance.png").convert_alpha(), (50, 50))
+pictogram_crit_damage = pygame.transform.scale(load_image("resources", "icon_crit_damage.png").convert_alpha(), (50, 50))
+pictogram_projectile_size = pygame.transform.scale(load_image("resources", "icon_projectile_size.png").convert_alpha(), (50, 50))
+pictogram_projectile_speed = pygame.transform.scale(load_image("resources", "icon_projectile_speed.png").convert_alpha(), (50, 50))
+pictogram_splash_range = pygame.transform.scale(load_image("resources", "icon_splash_range.png").convert_alpha(), (50, 50))
+pictogram_not_implemented = pygame.transform.scale(load_image("resources", "icon_not_implemented.png").convert_alpha(), (50, 50))
+pictogram_shield = pygame.transform.scale(load_image("resources", "icon_shield.png").convert_alpha(), (50, 50))
 
 class Button:
     """
@@ -359,7 +369,18 @@ class IconMenu(Menu):
         :return: None
         """
         img = pictogram_attack_speed
-        button = Button(self, img, name, self.x + (self.items * 51) + 20, self.y + 10, title)
+        icon_map = {
+            "SPEED": pictogram_attack_speed,
+            "ATK" : pictogram_attack_damage,
+            "ACC": pictogram_accuracy,
+            "RANGE": pictogram_attack_range,
+            "CRITC": pictogram_crit_chance,
+            "CRITD": pictogram_crit_damage,
+            "BULSP": pictogram_projectile_speed,
+            "RADIUS": pictogram_splash_range,
+            "SHIELD": pictogram_shield
+        }
+        button = Button(self, icon_map[name], name, self.x + (self.items * 51) + 20, self.y + 10, title)
         self.icons.append(button)
         self.items += 1
 

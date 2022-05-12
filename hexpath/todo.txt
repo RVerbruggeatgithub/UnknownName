@@ -9,6 +9,14 @@ Add main menu
 Add toggle switch for auto/manual tower ?
 
 Fixes needed:
-Looks like hexmap gets drawn twice when there is two paths.
+
+
+
+Fixed:
+near main.py:450 self.enemy_counter gets modified due to enemy spawned upon death of TrippetElite.
+This shouldn't happen as it is being used as an index. This will also cause the round not terminate.
+Update path upon removing a tower
+Enemies with a high deviation in path end up getting lost near last few nodes. Maybe capture the deviation and add it to the boundery limit? (see wave 29 yolkee)
+
 
 
