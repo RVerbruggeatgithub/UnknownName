@@ -12,18 +12,13 @@ obstacle = pygame.transform.scale(load_image("resources", "obstruction.png").con
 minigun_sound = pygame.mixer.Sound(os.path.join("resources", "minigun.mp3"))
 
 
-# load tower images
-turret_imgs = []
-for x in range(1, 4):
-    turret_imgs.append(pygame.transform.scale(
-        pygame.image.load(os.path.join("resources", "minigun_" +str(x) + ".png")).convert_alpha(), (50, 50)))
 
 
 class Obstacle(Tower):
     def __init__(self, x,y):
         super().__init__(x, y)
-        self.turret_image = turret_imgs[0]
-        self.turret_imgs = turret_imgs
+        # self.turret_image = turret_imgs[0]
+        # self.turret_imgs = turret_imgs
         self.tower_base = obstacle
         self.tower_count = 0
         self.range = 25
