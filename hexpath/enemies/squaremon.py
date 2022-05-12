@@ -88,7 +88,7 @@ class SquaremonGreen(Enemy):
         self.max_health = 35
         self.health = self.max_health
         self.imgs = self.load_image()
-        self.speed_increase = 0.7
+        self.speed_increase = 0.85
         self.size = 0.5
         self.boundary = 2
         # self.droppable_items = [Gold(self.x, self.y, 1, 8), Gold(self.x, self.y, 5, 15)]
@@ -147,14 +147,16 @@ class TrippetElite(Enemy):
     def dead_action(self, enemies):
         path = self.path[self.path_pos:]
         for i in range(self.spawn_count):
-            generated_path = generate_alternative_path(path, 14)
-            enemies.append(Trippet(generated_path))
+            generated_path, deviation = generate_alternative_path(path, 14)
+            new_enemy = Trippet(generated_path)
+            new_enemy.deviation = deviation
+            enemies.append(new_enemy)
 
 class Yolkee(Enemy):
     def __init__(self, path):
         super().__init__(path)
         self.name = "Yolkee"
-        self.max_health = 125
+        self.max_health = 250
         self.health = self.max_health
         self.imgs = self.load_image()
         self.speed_increase = 1.4
@@ -169,10 +171,10 @@ class Juju(Enemy):
     def __init__(self, path):
         super().__init__(path)
         self.name = "Juju"
-        self.max_health = 200
+        self.max_health = 400
         self.health = self.max_health
         self.imgs = self.load_image()
-        self.speed_increase = 0.8
+        self.speed_increase = 1.1
         self.size = 0.6
         self.boundary = 2
         # self.droppable_items = [Gold(self.x, self.y, 1, 8), Gold(self.x, self.y, 5, 15)]
