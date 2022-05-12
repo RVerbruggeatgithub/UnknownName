@@ -135,13 +135,38 @@ class MinigunTower(Tower):
                     for enemy in enemies:
                         check_distance = projectile.get_distance(enemy.x, enemy.y)
                         if check_distance <= (self.max_splash_range + self.mod_max_splash_range):
-                            if random.random() < (self.accuracy + self.mod_accuracy):
+                            """
+                            Base accuracy remains at 50% BUT after mod_accuracy is calculated based on hill function
+                            f(h) = 1/2; what is y when x = 25? (half the maximum mod_accuracy, since 50 is max 
+                            (50 accuracy + 50 mod_accuracy = 100%)
+                            
+                            100% accuracy cannot be reached.
+                            10x accuracy bonus will give a total of 76.316 total accuracy (linear this would be 75)
+                            20x accuracy bonus will give a total of 84.483 total accuracy (linear this would be 100)
+                            40x accuracy bonus will give a total of 90.816 total accuracy (linear would still be 100)
+                            """
+                            calculated_accuracy = (self.mod_accuracy * 100)/((self.mod_accuracy * 100)+45)
+                            # mod_accuracy does not add linear
+                            acc_adj = ((self.accuracy * 100) + calculated_accuracy * 50) / 100
+                            if random.random() < acc_adj:
                                 # The closer the unit to the source 'explosion' the more damage.
                                 projectile.delete = True
                                 resulting_damage = self.damage + self.mod_damage
                                 color = (255, 0, 0)
                                 label_font_size = 14
-                                if random.random() < (self.crit_chance + self.mod_crit_chance):
+                                """
+                                Base crit remains at 5% BUT after mod_crit is calculated based on hill function
+                                f(h) = 1/2; what is y when x = 25? (half the maximum mod_accuracy, since 65 is max 
+                                (5 base crit + 60 mod_crit = 65%)
+
+                                100% crit chance cannot be reached, max is < 65%
+                                10x crit chance bonus will give a total of 28 (linear this would be 55)
+                                20x crit chance bonus will give a total of 41 total accuracy (linear this would be ~100)
+                                40x crit chance bonus will give a total of 48.5 total accuracy (linear would still be 100)
+                                """
+                                calculated_crit_chance = (self.mod_crit_chance * 100) / ((self.mod_crit_chance * 100) + 60)
+                                crit_adj = ((self.crit_chance * 100) + calculated_crit_chance * 50) / 100
+                                if random.random() < crit_adj:
                                     resulting_damage = resulting_damage * (self.crit_damage + self.mod_crit_damage)
                                     color = (255,215,0)
                                     label_font_size = 18

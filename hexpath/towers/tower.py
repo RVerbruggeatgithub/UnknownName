@@ -5,7 +5,7 @@ import math
 from functions.functions import *
 import random
 
-menu_bg = pygame.transform.scale(load_image("resources", "tower_menu.png").convert_alpha(), (120, 70))
+# menu_bg = pygame.transform.scale(load_image("resources", "tower_menu.png").convert_alpha(), (120, 70))
 turret_image = pygame.transform.scale(load_image("resources", "rocket.png"),(50, 50))
 tower_base = pygame.transform.scale(load_image("resources", "tower_base.png").convert_alpha(), (50, 50))
 structure_placement_sound = pygame.mixer.Sound(os.path.join("resources", "structure_placement.mp3"))
@@ -32,7 +32,7 @@ class Tower:
         self.ico_name = "buy_default_tower"
         self.accuracy = 0.5
         # define menu and buttons
-        self.menu_bg = menu_bg
+        # self.menu_bg = menu_bg
         #self.menu = TowerMenu(self, self.x, self.y, 120, 70, self.menu_bg)
         # self.menu = TowerMenu(self.x, self.y - 50, 250, 122, self.menu_bg, self.sell_value)
         self.turret_angle = 0
