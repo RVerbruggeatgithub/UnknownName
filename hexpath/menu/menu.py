@@ -109,9 +109,16 @@ class PlainButton():
         pygame.draw.rect(win, self.border_color, rectangle, width=2, border_radius=6)
 
         if self.button_text is not None:
-            reg_font = pygame.font.SysFont("segoeuisemilight", 16)
+
+            if self.button_sub_text is None:
+                reg_font = pygame.font.SysFont("segoeuisemilight", 26)
+                y_adj = 5
+            else:
+                reg_font = pygame.font.SysFont("segoeuisemilight", 16)
+                y_adj = 0
             btn_txt = reg_font.render(str(self.button_text), 1, self.text_color)
-            win.blit(btn_txt, (self.x + self.width//2 - btn_txt.get_width()//2, self.y))
+            win.blit(btn_txt, (self.x + self.width//2 - btn_txt.get_width()//2, self.y + y_adj))
+
         if self.button_sub_text is not None:
             small_font = pygame.font.SysFont("segoeuisemilight", 14)
             btn_sub_txt = small_font.render(str(self.button_sub_text), 1, self.text_color)
@@ -337,7 +344,7 @@ class Frame:
         surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA, 32)
         surface.fill(self.color)
         win.blit(surface, rectangle)
-        pygame.draw.rect(win, self.border_color, rectangle, width=2, border_radius=6)
+        pygame.draw.rect(win, self.border_color, rectangle, width=2, border_radius=0)
 
 
 class Menu:
@@ -412,7 +419,7 @@ class Menu:
         surface.fill(background_color)
         rectangle = pygame.Rect(int(self.x), int(self.y), self.width, self.height)
         win.blit(surface, rectangle)
-        pygame.draw.rect(win, border_color, rectangle, width=2, border_radius=6)
+        pygame.draw.rect(win, border_color, rectangle, width=1, border_radius=0)
 
         for frame in self.frames:
             frame.draw(win)

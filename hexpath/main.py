@@ -225,20 +225,20 @@ class Game:
         frame_width = 400
         frame_height = 600
         self.start_menu.add_frame((self.width//2 - frame_width//2), 80, frame_width, frame_height, (100,150,225, 100), (0,0,0, 0))
-        self.start_menu.add_plain_button("TEST", "sub text", (self.width//2 - frame_width//2 + frame_width*0.1), 100, frame_width*0.8, 50, (100,150,225, 100))
+        self.start_menu.add_plain_button("New Game", None, (self.width//2 - frame_width//2 + frame_width*0.1), 250, frame_width*0.8, 50, (0,0,0, 100))
+        self.show_start_menu = True
 
     def main_menu(self):
         # draw the main menu
-        main_menu_is_open= True
-        while main_menu_is_open:
+        while self.show_start_menu:
             mouse_pos = pygame.mouse.get_pos()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    main_menu_is_open = False
+                    self.show_start_menu = False
                 if event.type == pygame.MOUSEBUTTONUP:
                     for button in self.start_menu.buttons:
                         if button.click(mouse_pos[0], mouse_pos[1]):
-                            main_menu_is_open = False
+                            self.show_start_menu = False
                             self.run()
             self.draw_main_menu()
         pygame.quit()
@@ -338,7 +338,6 @@ class Game:
                             self.play_pause_button.toggle()
                             if self.pause:
                                 print("paused")
-                                print("DEBUG:", "Enemy counter:", self.enemy_counter,  "Wave:", self.wave,  "Spawn list:", self.spawn_list,  "Enemies removed:", self.enemies_removed,  "Wave total:", self.wave_enemy_total, "spawn_list size", len(self.spawn_list), "Spawned counter:", self.spawned_from_spawn_list_counter)
                             else:
                                 print("unpaused")
                             self.play_pause_button.paused = self.pause
@@ -590,7 +589,7 @@ class Game:
                         print("Next wave:", self.wave)
             self.draw()
                 # End of if not pause block
-        pygame.quit()
+        # pygame.quit()
 
 
     def sort_by_y(self, spr):
@@ -798,7 +797,6 @@ class Game:
         step = small_font.render(str(phase), 1, (47, 79, 79))
         self.win.blit(wave, (10, 75))
         self.win.blit(step, (10, 105))
-
         pygame.display.update()
 
 g = Game()
