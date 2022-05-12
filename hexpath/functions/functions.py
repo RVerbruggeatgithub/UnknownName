@@ -24,4 +24,4 @@ def generate_alternative_path(path, max_deviation):
     new_path = []
     for segment in path:
         new_path.append((segment[0]+x_deviation, segment[1]+y_deviation))
-    return new_path
+    return new_path, [x_deviation, y_deviation]
