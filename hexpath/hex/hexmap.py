@@ -9,6 +9,8 @@ class Hexmap:
         self.map_data = []
         if map_data is None:
             self.map_data = self.generate_full_map()
+        else:
+            self.map_data = self.generate_map_data_from_hexmap(map_data)
         self.travel_path = []
 
     def generate_full_map(self):
@@ -32,6 +34,11 @@ class Hexmap:
             row += 1
         return self.map_data
 
+    def generate_map_data_from_hexmap(self, hex_map):
+        map_data = []
+        for coordinates in hex_map:
+            map_data.append(Hex(coordinates[0], coordinates[1]))
+        return map_data
 
     def update_path(self, source, destination):
         """
@@ -45,7 +52,7 @@ class Hexmap:
             return False
         else:
             self.travel_path = self.get_path_from_path_data(tmp_)
-            return True
+            return self.travel_path
 
     def set_map_data(self, map_data):
         self.map_data = map_data
@@ -80,6 +87,7 @@ class Hexmap:
 
             if counter > max_attempt:
                 path = True
+                print("Unable to find path!", nodes)
                 return False
 
             # look at the first children:
