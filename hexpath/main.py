@@ -221,26 +221,50 @@ class Game:
         """
         Main menu stuff:
         """
+        self.show_main_menu = True
         self.start_menu = Menu(25, 25, self.width - 50, self.height - 50, None)
         frame_width = 400
         frame_height = 600
         self.start_menu.add_frame((self.width//2 - frame_width//2), 80, frame_width, frame_height, (100,150,225, 100), (0,0,0, 0))
         self.start_menu.add_plain_button("New Game", None, (self.width//2 - frame_width//2 + frame_width*0.1), 250, frame_width*0.8, 50, (0,0,0, 100))
+        self.start_menu.add_plain_button("Help", None, (self.width // 2 - frame_width // 2 + frame_width * 0.1),
+                                         325, frame_width * 0.8, 50, (0, 0, 0, 100))
         self.show_start_menu = True
+        self.help_menu = Menu(25, 25, self.width - 50, self.height - 50, None)
+        self.show_help_menu = False
+        self.help_menu.add_frame((self.width//2 - 400), 80, 800, frame_height, (100,150,225, 100), (0,0,0, 0))
+        self.help_menu.add_plain_button("Back", None, (self.width//2 - 400) + 725, 100, 65, 50, (0,0,0, 100))
+
 
     def main_menu(self):
         # draw the main menu
-        while self.show_start_menu:
-            mouse_pos = pygame.mouse.get_pos()
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    self.show_start_menu = False
-                if event.type == pygame.MOUSEBUTTONUP:
-                    for button in self.start_menu.buttons:
-                        if button.click(mouse_pos[0], mouse_pos[1]):
-                            self.show_start_menu = False
-                            self.run()
-            self.draw_main_menu()
+        while self.show_main_menu:
+            if self.show_start_menu:
+                mouse_pos = pygame.mouse.get_pos()
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        self.show_main_menu = False
+                    if event.type == pygame.MOUSEBUTTONUP:
+                        for button in self.start_menu.buttons:
+                            if button.click(mouse_pos[0], mouse_pos[1]) and button.button_text == "New Game":
+                                self.run()
+                            if button.click(mouse_pos[0], mouse_pos[1]) and button.button_text == "Help":
+                                self.show_start_menu = False
+                                self.show_help_menu = True
+                self.draw_current_menu(self.start_menu)
+
+            if self.show_help_menu:
+                mouse_pos = pygame.mouse.get_pos()
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        self.show_main_menu = False
+                    if event.type == pygame.MOUSEBUTTONUP:
+                        for button in self.help_menu.buttons:
+                            if button.click(mouse_pos[0], mouse_pos[1]) and button.button_text == "Back":
+                                self.show_help_menu = False
+                                self.show_start_menu = True
+                self.draw_current_menu(self.help_menu)
+
         pygame.quit()
 
 
@@ -713,9 +737,9 @@ class Game:
         except Exception as e:
             print(str(e) + "Invalid name")
 
-    def draw_main_menu(self):
+    def draw_current_menu(self, current_menu):
         self.win.fill([255, 255, 255])
-        self.start_menu.draw(self.win)
+        current_menu.draw(self.win)
         pygame.display.update()
 
 
