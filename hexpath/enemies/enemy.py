@@ -1,9 +1,5 @@
-import pygame
-import math
-import os
-from functions.functions import *
-# from items.gold import Gold
-import random
+from objects.labels import *
+
 
 class Enemy:
     def __init__(self, path):
@@ -36,6 +32,15 @@ class Enemy:
         self.boundary = (0.93 * self.speed_increase)
         self.death_sequence = []
         self.deviation = [0, 0]
+        self.resist_splash_range = 0
+        self.dodge_rate = 0
+        # reduces chances of getting crit hit on this enemy
+        self.crit_resist_rate = 0
+        # reduces crit damage taken
+        self.crit_resist = 0
+        self.item_drop = []
+        self.item_drop_rate = 0
+
 
     """
     def generate_item(self):
@@ -43,6 +48,15 @@ class Enemy:
         item_t.update_location(self.x, self.y)
         self.items.append(item_t)
     """
+    
+    def move_action(self, target, params=None):
+        """
+        Action(s) to perform when moving
+        :param target: list of one or multiple targets the move_action is performed on
+        :param params: list of parameters
+        :return:
+        """
+        return False
 
     def draw(self, win):
         """
@@ -145,6 +159,8 @@ class Enemy:
         if self.health <= 0:
             # self.generate_item()
             return True
+        if self.health > self.max_health:
+            self.health = self.max_health
         return False
 
     def set_deviation(self, deviation):
@@ -154,6 +170,9 @@ class Enemy:
         :return: None
         """
         self.deviation = deviation
+
+    def get_distance(self, x, y):
+        return math.sqrt((self.x - x) ** 2 + (self.y - y) ** 2)
 
     def dead_action(self, enemies=[]):
         """
