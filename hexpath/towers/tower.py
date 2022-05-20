@@ -8,6 +8,7 @@ import random
 # menu_bg = pygame.transform.scale(load_image("resources", "tower_menu.png").convert_alpha(), (120, 70))
 turret_image = pygame.transform.scale(load_image("resources", "rocket.png"),(50, 50))
 tower_base = pygame.transform.scale(load_image("resources", "tower_base.png").convert_alpha(), (50, 50))
+pygame.mixer.pre_init(44100, 16, 2, 4096)
 structure_placement_sound = pygame.mixer.Sound(os.path.join("resources", "structure_placement.mp3"))
 
 
