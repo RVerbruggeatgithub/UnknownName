@@ -17,7 +17,7 @@ pictogram_projectile_size = pygame.transform.scale(load_image("resources", "icon
 pictogram_projectile_speed = pygame.transform.scale(load_image("resources", "icon_projectile_speed.png").convert_alpha(), (50, 50))
 pictogram_splash_range = pygame.transform.scale(load_image("resources", "icon_splash_range.png").convert_alpha(), (50, 50))
 pictogram_not_implemented = pygame.transform.scale(load_image("resources", "icon_not_implemented.png").convert_alpha(), (50, 50))
-pictogram_shield = pygame.transform.scale(load_image("resources", "icon_shield.png").convert_alpha(), (50, 50))
+pictogram_shield = pygame.transform.scale(load_image("resources", "icon_shield.png").convert_alpha(), (35, 35))
 
 class Button:
     """
@@ -67,6 +67,11 @@ class Button:
         """
         self.x = self.menu.x - 50
         self.y = self.menu.y - 110
+
+    def update_x_y(self, x, y):
+        self.x = x
+        self.y = y
+
 
 class PlainButton():
     """
@@ -255,6 +260,141 @@ class BonusMenuButton(Button):
         win.blit(name, (self.x + self.width/2 - name.get_width()/2 + 2, self.y + self.height/2 + 40))
         win.blit(bonus, (self.x + self.width / 2 - bonus.get_width() / 2 + 2, self.y + self.height / 2 + 60))
 
+class RouletteMenuButton(Button):
+    """
+    Button class for menu objects
+    """
+    def __init__(self, action, name, bonus, pictogram, color, bcolor, radius):
+        self.name = name
+        self.action = action
+        self.img = None
+        self.x = 0
+        self.y = 0
+        self.width = 0
+        self.pictogram = pictogram
+        self.width = self.pictogram.get_width()
+        self.height = self.pictogram.get_height()
+        self.height = 0
+        self.color = color
+        self.border_color = bcolor
+        self.bonus = bonus
+        self.radius = radius
+
+    def click(self, X, Y):
+        """
+        returns if the positon has collided with the menu
+        :param X: int
+        :param Y: int
+        :return: bool
+        """
+        delta_x =  (self.x + self.radius) - X
+        delta_y = (self.y + self.radius) - Y
+        distance = math.sqrt(delta_x ** 2 + delta_y ** 2)
+        if distance < self.radius:
+            return True
+        return False
+
+    def draw(self, win, pos):
+        """
+        draws the button image
+        :param win: surface
+        :return: None
+        """
+
+        small_font= pygame.font.SysFont("segoeuisemilight", 16)
+
+
+        name = small_font.render(self.name, 1, (120, 120, 120))
+
+        # mid = self.x + self.width / 2 - self.pictogram.get_width()/2
+        win.blit(self.pictogram, pos)
+        win.blit(name, (self.x + self.width/2 - name.get_width()/2 + 2, self.y + self.height/2 + 95))
+        # win.blit(bonus, (self.x + self.width / 2 - bonus.get_width() / 2 + 2, self.y + self.height / 2 + 60))
+
+class RouletteMenu:
+
+    def __init__(self, win, items):
+        max_w, max_h = win.get_size()
+        self.width = max_w
+        self.height = max_h
+        # max items per line
+        self.items = items
+        self.max_items = 10
+        self.font = pygame.font.SysFont("segoeuisemilight", 25)
+        self.small_font = pygame.font.SysFont("segoeuisemilight", 10)
+        # self.bg = menu_bg
+        self.buttons = []
+        self.bonus_text = ""
+
+
+    def add_btn(self, action, name, bonus, pictogram, color, bcolor, radius=25):
+        self.buttons.append(RouletteMenuButton(action, name, bonus, pictogram, color, bcolor, radius))
+
+    def on_hover_over(self, X, Y):
+        for btn in self.buttons:
+            if btn.click(X, Y):
+                self.bonus_text = btn.name
+                return True
+        self.bonus_text = ""
+        return False
+
+
+    def get_clicked(self, X, Y):
+        """
+        return the clicked item from the menu
+        :param X: int
+        :param Y: int
+        :return: str
+        """
+        for btn in self.buttons:
+            if btn.click(X, Y):
+                return btn.action
+        return None
+
+
+    def draw(self, win):
+        """
+        draws btns and menu bg
+        :param win: surface
+        :return: None
+        """
+        radius = 300
+        border_color = (0, 49, 83, 200)
+        background_color = (44, 56, 99, 255)
+        max_w, max_h = win.get_size()
+        position = (max_w//2, max_h//2)
+        win.fill([66, 66, 66])
+
+        pygame.draw.circle(win, border_color, position, radius, 20)
+        pygame.draw.circle(win, (255, 255, 255, 255), position, radius-4, 12)
+        y_mod = -1
+        required_angle = 360 // len(self.buttons)
+
+        title = self.font.render(str(self.bonus_text), 1, (255, 255, 255))
+        header = self.font.render(str("Select bonus to apply:"), 1, (122, 122, 122))
+        win.blit(header, (self.width // 2 - header.get_width() // 2, self.height // 2 - header.get_height() // 2 - 28))
+        win.blit(title, (self.width//2 - title.get_width()// 2, self.height//2 - title.get_height() // 2))
+
+
+        for ct, item in enumerate(self.buttons):
+
+            button_range = item.radius
+            angle = required_angle * ct * 0.0174532925
+            x_adj = radius * math.sin(angle) * -1
+            y_adj = radius * -math.cos(angle)
+            t_pos = (max_w//2 + x_adj, max_h//2 + y_adj)
+            u_pos = (t_pos[0] - button_range, t_pos[1] - button_range)
+            item.update_x_y(u_pos[0], u_pos[1])
+
+
+
+            surface = pygame.Surface((button_range*2, button_range*2), pygame.SRCALPHA, 32)
+            pygame.draw.circle(surface, item.border_color, (button_range, button_range), button_range, 0)
+            # pygame.draw.circle(surface, (50, 50, 50, 255), (range // 2, range // 2), range // 2, 0)
+            win.blit(surface, u_pos)
+
+            pygame.draw.circle(win, item.color, t_pos, button_range, 4)
+            item.draw(win, u_pos)
 
 
 class BonusPickerMenu:
