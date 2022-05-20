@@ -26,7 +26,7 @@ class Label:
         self.name = "label"
         self.pickup_sound = None
         # how long does the item stay on the field until despawned? devide time by ticker to get time in seconds.
-        self.despawn_timer = 30
+        self.despawn_timer = 20
 
     def draw(self, win):
 
