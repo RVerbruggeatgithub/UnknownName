@@ -28,7 +28,8 @@ class Bullet(Projectile):
         self.set_direction()
         self.delete = False
         self.base_size = 3
-        self.change_size(size)
+        self.modifier = size
+        # self.change_size(size)
 
     def set_target(self, x, y):
         self.target_x = x
@@ -50,10 +51,14 @@ class Bullet(Projectile):
             self.delete = True
 
         if not self.delete:
-            pivot_point = [self.x, self.y]
-            offset = pygame.math.Vector2(0, 70)
-            projectile_img, rect = self.rotate(self.angle, offset, pivot_point)
-            win.blit(projectile_img, (self.x-self.img.get_width()//2, self.y-self.img.get_height()//2))
+            range = self.base_size + self.modifier
+            surface = pygame.Surface((range, range), pygame.SRCALPHA, 32)
+            pygame.draw.circle(surface, (50, 50, 50, 255), (range//2, range//2), range//2, 0)
+            win.blit(surface, (self.x - range//2, self.y - range//2))
+            # pivot_point = [self.x, self.y]
+            # offset = pygame.math.Vector2(0, 70)
+            # projectile_img, rect = self.rotate(self.angle, offset, pivot_point)
+            # win.blit(projectile_img, (self.x-self.img.get_width()//2, self.y-self.img.get_height()//2))
 
     def set_direction(self):
         delta_x =  self.x - self.target_x
