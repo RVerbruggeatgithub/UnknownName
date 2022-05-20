@@ -1,40 +1,36 @@
 import itertools
-
-import pygame
-import os
-import time
-import math
-from functions.functions import *
-from hex.hex import Hex
 from hex.hexmap import Hexmap
-from menu.menu import *
-import random
 from enemies.squaremon import *
 from towers.miniguntower import MinigunTower
 from towers.obstacle import Obstacle
 from objects.portal import Portal
 from objects.city import City
+from objects.items import *
 
 pygame.display.init()
 pygame.display.set_mode((500, 500), pygame.RESIZABLE)
+pygame.event.set_allowed([pygame.QUIT, pygame.MOUSEBUTTONUP, pygame.MOUSEBUTTONDOWN])
+
 background_image = load_image("resources", "porro_village.png")
 play_btn = pygame.transform.scale(load_image("resources", "button_play.png").convert_alpha(), (32, 32))
 pause_btn = pygame.transform.scale(load_image("resources", "button_pause.png").convert_alpha(), (32, 32))
+reg_speed = pygame.transform.scale(load_image("resources", "button_reg_speed.png").convert_alpha(), (32, 32))
+high_speed = pygame.transform.scale(load_image("resources", "button_hi_speed.png").convert_alpha(), (32, 32))
 ico_minigun = pygame.transform.scale(load_image("resources", "ico_minigun.png").convert_alpha(), (50, 50))
 ico_obstruction = pygame.transform.scale(load_image("resources", "ico_obstruction.png").convert_alpha(), (50, 50))
 attack_tower_names = ["Minigun Tower"]
 obstacles = ["Obstacle"]
-pictogram_attack_speed = pygame.transform.scale(load_image("resources", "icon_atk_speed.png").convert_alpha(), (150, 150))
-pictogram_attack_damage = pygame.transform.scale(load_image("resources", "icon_atk_damage.png").convert_alpha(), (150, 150))
-pictogram_accuracy = pygame.transform.scale(load_image("resources", "icon_accuracy.png").convert_alpha(), (150, 150))
-pictogram_attack_range = pygame.transform.scale(load_image("resources", "icon_atk_range.png").convert_alpha(), (150, 150))
-pictogram_crit_chance = pygame.transform.scale(load_image("resources", "icon_crit_chance.png").convert_alpha(), (150, 150))
-pictogram_crit_damage = pygame.transform.scale(load_image("resources", "icon_crit_damage.png").convert_alpha(), (150, 150))
-pictogram_projectile_size = pygame.transform.scale(load_image("resources", "icon_projectile_size.png").convert_alpha(), (150, 150))
-pictogram_projectile_speed = pygame.transform.scale(load_image("resources", "icon_projectile_speed.png").convert_alpha(), (150, 150))
-pictogram_splash_range = pygame.transform.scale(load_image("resources", "icon_splash_range.png").convert_alpha(), (150, 150))
-pictogram_not_implemented = pygame.transform.scale(load_image("resources", "icon_not_implemented.png").convert_alpha(), (150, 150))
-pictogram_shield = pygame.transform.scale(load_image("resources", "icon_shield.png").convert_alpha(), (150, 150))
+pictogram_attack_speed = pygame.transform.scale(load_image("resources", "icon_atk_speed.png").convert_alpha(), (100, 100))
+pictogram_attack_damage = pygame.transform.scale(load_image("resources", "icon_atk_damage.png").convert_alpha(), (100, 100))
+pictogram_accuracy = pygame.transform.scale(load_image("resources", "icon_accuracy.png").convert_alpha(), (100, 100))
+pictogram_attack_range = pygame.transform.scale(load_image("resources", "icon_atk_range.png").convert_alpha(), (100, 100))
+pictogram_crit_chance = pygame.transform.scale(load_image("resources", "icon_crit_chance.png").convert_alpha(), (100, 100))
+pictogram_crit_damage = pygame.transform.scale(load_image("resources", "icon_crit_damage.png").convert_alpha(), (100, 100))
+pictogram_projectile_size = pygame.transform.scale(load_image("resources", "icon_projectile_size.png").convert_alpha(), (100, 100))
+pictogram_projectile_speed = pygame.transform.scale(load_image("resources", "icon_projectile_speed.png").convert_alpha(), (100, 100))
+pictogram_splash_range = pygame.transform.scale(load_image("resources", "icon_splash_range.png").convert_alpha(), (100, 100))
+pictogram_not_implemented = pygame.transform.scale(load_image("resources", "icon_not_implemented.png").convert_alpha(), (100, 100))
+pictogram_shield = pygame.transform.scale(load_image("resources", "icon_shield.png").convert_alpha(), (100, 100))
 
 
 class Game:
@@ -81,13 +77,13 @@ class Game:
         # Should we go through the list of bonuses and apply them to the tower?
         self.update_bonuses = False
         self.icon_menu = IconMenu(250, self.height - 130, 925, 80)
-        self.bonus_menu = BonusPickerMenu(self.win, 5)
+        self.bonus_menu = RouletteMenu(self.win, 8) # BonusPickerMenu(self.win, 5)
         self.action_list = {
             "ATK_1" : {"Description": "Attack Damage + 1", "modifier" : 1, "pictogram" : pictogram_attack_damage,
                        "color" : (255, 255, 255, 200), "background_color" : (255, 255, 255 ,255) },
             "SPEED_1" : {"Description": "Attack Speed + 10%", "modifier" : 0.1, "pictogram" : pictogram_attack_speed,
                          "color" : (255, 255, 255, 200), "background_color" : (255, 255, 255 ,255) },
-            "RANGE_1": {"Description": "Attack Range + 5%", "modifier": 0.05, "pictogram": pictogram_attack_range,
+            "RANGE_1": {"Description": "Attack Range + 8%", "modifier": 0.08, "pictogram": pictogram_attack_range,
                       "color": (255, 255, 255, 200), "background_color": (255, 255, 255, 255)},
             "RADIUS_1": {"Description": "Splash Radius +5%", "modifier": 0.05, "pictogram": pictogram_splash_range,
                       "color": (255, 255, 255, 200), "background_color": (255, 255, 255, 255)},
@@ -95,32 +91,32 @@ class Game:
                       "color": (255, 255, 255, 200), "background_color": (255, 255, 255, 255)},
             "ACC_1": {"Description": "Accuracy + 5%", "modifier": 0.05, "pictogram": pictogram_accuracy,
                         "color": (255, 255, 255, 200), "background_color": (255, 255, 255, 255)},
-            "BULSP_1": {"Description": "Projectile speed + 8%", "modifier": 0.08, "pictogram": pictogram_projectile_speed,
+            "BULSP_1": {"Description": "Projectile speed + 10%", "modifier": 0.1, "pictogram": pictogram_projectile_speed,
                       "color": (255, 255, 255, 200), "background_color": (255, 255, 255, 255)},
         }
         self.action_list2 = {
             "ATK_2" : {"Description": "Attack Damage + 2", "modifier" : 2, "pictogram" : pictogram_attack_damage, "color" : (0, 32, 255, 200), "background_color" : (0, 32, 255,255) },
             "SPEED_2" : {"Description": "Attack Speed + 20 %", "modifier" : 0.2, "pictogram" : pictogram_attack_speed, "color" : (0, 32, 255, 200), "background_color" : (0, 32, 255,255) },
-            "RANGE_2": {"Description": "Attack Range + 10%", "modifier": 0.1, "pictogram": pictogram_attack_range,
+            "RANGE_2": {"Description": "Attack Range + 16%", "modifier": 0.16, "pictogram": pictogram_attack_range,
                       "color": (0, 32, 255, 200), "background_color": (0, 32, 255, 255)},
             "RADIUS_2": {"Description": "Splash Radius + 10%", "modifier": 0.1, "pictogram": pictogram_splash_range,
                       "color": (0, 32, 255, 200), "background_color": (0, 32, 255, 255)},
             "OBSTACLE_1": {"Description": "Obstacle +1", "modifier": 1, "pictogram": pictogram_not_implemented,
                          "color": (0, 32, 255, 200), "background_color": (0, 32, 255, 255)},
             "CRITD_1": {"Description": "Crit Damage + 50%", "modifier": 0.50, "pictogram": pictogram_crit_damage,
-                        "color": (0, 32, 255, 200), "background_color": (255, 255, 255, 255)},
+                        "color": (0, 32, 255, 200), "background_color": (0, 32, 255, 255)},
             "SHIELD_1": {"Description": "Protect cities +1", "modifier": 1.00, "pictogram": pictogram_shield,
-                        "color": (0, 32, 255, 200), "background_color": (255, 255, 255, 255)},
+                        "color": (0, 32, 255, 200), "background_color": (0, 32, 255, 255)},
         }
         self.action_list3 = {
             "ATK_3": {"Description": "Attack Damage + 3", "modifier": 3, "pictogram": pictogram_attack_damage,
-                      "color": (0, 32, 255, 200), "background_color": (0, 32, 255, 255)},
+                      "color": (221,160,221, 200), "background_color": (221,160,221, 255)},
             "TOWER_1": {"Description": "Tower! +1", "modifier": 1, "pictogram": pictogram_not_implemented,
                         "color": (221,160,221, 200), "background_color": (221,160,221, 255)},
             "SPEED_3": {"Description": "Attack Speed + 30%", "modifier": 0.3, "pictogram": pictogram_attack_speed,
                         "color": (221,160,221, 200), "background_color": (221,160,221, 255)},
             "OBSTACLE_2": {"Description": "Obstacle +2", "modifier": 2, "pictogram": pictogram_not_implemented,
-                         "color": (221,160,221, 200), "background_color": (0, 32, 255, 255)},
+                         "color": (221,160,221, 200), "background_color": (221,160,221, 255)},
         }
 
         self.bonus_options = []
@@ -135,7 +131,7 @@ class Game:
         self.portals = []
         self.cities = []
         self.waves = [
-                [{"type": "Squaremon", "count": 1, "interval": 0.5}],
+                [{"type": "Squaremon", "count": 1, "interval": 0.8}],
                 [{"type": "Squaremon", "count": 2, "interval": 0.8}],
                 [{"type": "Squaremon", "count": 3, "interval": 1.0}],
                 [{"type": "Squaremon", "count" : 5, "interval": 0.7}],
@@ -211,6 +207,46 @@ class Game:
                 [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
                 [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
                 [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+            [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+            [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+            [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+            [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+            [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+            [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+            [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+            [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+            [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+            [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+            [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+            [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+            [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+            [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+            [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+            [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+            [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+            [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+            [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+            [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+            [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+            [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+            [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+            [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+            [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+            [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+            [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+            [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+            [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+            [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+            [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+            [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+            [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+            [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+            [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+            [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+            [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+            [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+            [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+            [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
             ]
 
         self.enemies_removed = 0
@@ -234,6 +270,9 @@ class Game:
         self.show_help_menu = False
         self.help_menu.add_frame((self.width//2 - 400), 80, 800, frame_height, (100,150,225, 100), (0,0,0, 0))
         self.help_menu.add_plain_button("Back", None, (self.width//2 - 400) + 725, 100, 65, 50, (0,0,0, 100))
+        self.game_speed = 20
+        self.items_list = []
+        self.gems = 0
 
 
     def main_menu(self):
@@ -251,7 +290,7 @@ class Game:
                             if button.click(mouse_pos[0], mouse_pos[1]) and button.button_text == "Help":
                                 self.show_start_menu = False
                                 self.show_help_menu = True
-                self.draw_current_menu(self.start_menu)
+                draw_menu = self.start_menu
 
             if self.show_help_menu:
                 mouse_pos = pygame.mouse.get_pos()
@@ -263,7 +302,8 @@ class Game:
                             if button.click(mouse_pos[0], mouse_pos[1]) and button.button_text == "Back":
                                 self.show_help_menu = False
                                 self.show_start_menu = True
-                self.draw_current_menu(self.help_menu)
+                draw_menu = self.help_menu
+            self.draw_current_menu(draw_menu)
 
         pygame.quit()
 
@@ -271,6 +311,7 @@ class Game:
     def run(self):
         run = True
         clock = pygame.time.Clock()
+
         for enemy_spawn_point in self.enemy_spawn_points:
             self.cities.append(City(enemy_spawn_point["destination"][0], enemy_spawn_point["destination"][1]))
             self.portals.append(Portal(enemy_spawn_point["source"][0], enemy_spawn_point["source"][1]))
@@ -278,7 +319,7 @@ class Game:
             self.paths.append(self.base_map.get_path_from_path_data(path))
 
         while run:
-
+            clock.tick(self.game_speed)
             mouse_pos = pygame.mouse.get_pos()
             # need to change the mouse_pos to use hex at location
             hex_at_mouse_pos = self.base_map.get_hex_at_location(mouse_pos[0], mouse_pos[1])
@@ -355,6 +396,18 @@ class Game:
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         run = False
+                    for item in self.items_list:
+                        if item.collide(mouse_pos[0], mouse_pos[1]):
+                            quantity = 0
+                            if item.name == "Gem":
+                                quantity = item.pickup()
+                                self.gems += quantity
+                            # self.counter_list.append(Counter(quantity, item.x, item.y))
+                            self.items_list.remove(item)
+                    if event.type == pygame.MOUSEMOTION:
+                        if self.show_bonus_menu:
+                            self.bonus_menu.on_hover_over(mouse_pos[0], mouse_pos[1])
+
                     if event.type == pygame.MOUSEBUTTONUP:
                         self.move_tower = False
                         if self.play_pause_button.click(mouse_pos[0], mouse_pos[1]):
@@ -533,7 +586,7 @@ class Game:
 
                                 for _ in itertools.repeat(None, enemy_wave["count"]):
                                     select_path = random.choice(self.paths)
-                                    generated_path, deviation = generate_alternative_path(select_path, 14)
+                                    generated_path, deviation = generate_alternative_path(select_path, 8)
                                     enemies = {
                                         "Squaremon": Squaremon(generated_path),
                                         "SquaremonElite": SquaremonElite(generated_path),
@@ -566,6 +619,7 @@ class Game:
 
                     for enemy in self.enemies:
                         enemy.move()
+                        enemy.move_action(self.enemies, self.label_collector)
                         if enemy.path_pos >= len(enemy.path) - 1 or enemy.health <= 0:
                             if enemy.health <= 0:
                                 enemies_count_prev = len(self.enemies)
@@ -580,10 +634,17 @@ class Game:
                         # self.gate_health -= enemy.gate_damage
                         # print(d.travelled_path)
                         self.enemies_removed += 1
+                        # item dropping here..
+                        if len(enemy.item_drop) > 0 and enemy.item_drop_rate > 0 and enemy.health <= 0:
+                            for item in enemy.item_drop:
+                                if random.random() < enemy.item_drop_rate:
+                                    new_item = Item(enemy.x, enemy.y, 1, 1)
+                                    new_item.play_pickup_sound()
+                                    self.items_list = [*self.items_list, new_item]
                         self.enemies.remove(enemy)
 
                     for tower in self.attack_towers:
-                        # item dropping here..
+
                         list_of_labels = tower.find_target(self.enemies, self.auto_target)
                         if list_of_labels is not None:
                             for label in list_of_labels:
@@ -641,7 +702,7 @@ class Game:
 
             if key not in self.bonus_options:
                 self.bonus_options.append(key)
-                self.bonus_menu.add_btn(key, action_item["Description"], action_item["modifier"], action_item["pictogram"], action_item["color"], action_item["background_color"])
+                self.bonus_menu.add_btn(key, action_item["Description"], action_item["modifier"], action_item["pictogram"], action_item["color"], action_item["background_color"], 50)
                 u += 1
 
     def apply_bonuses_to_towers(self):
@@ -675,6 +736,9 @@ class Game:
                 if bonus == "RANGE_1":
                     tower.mod_attack_range += tower.range * \
                                              self.action_list[bonus]["modifier"]
+                if bonus == "RANGE_2":
+                    tower.mod_attack_range += tower.range * \
+                                             self.action_list2[bonus]["modifier"]
                 if bonus == "RADIUS_1":
                     tower.mod_max_splash_range += tower.max_splash_range *\
                                               self.action_list[bonus]["modifier"]
@@ -730,7 +794,6 @@ class Game:
         """
         x, y = pygame.mouse.get_pos()
         tower_opt_list = {"buy_minigun": MinigunTower(x, y), "buy_obstacle": Obstacle(x, y)}
-
         # if name == "buy_minigun":
         try:
             self.moving_object = tower_opt_list[name]
@@ -745,17 +808,8 @@ class Game:
 
     def draw(self):
         self.win.blit(self.bg, (0, 0))
-        # self.win.fill([255,255,255])
 
-        if self.moving_object:
-            # , pygame.SRCALPHA, 32
-            green_color = pygame.Color(75, 139, 59, 80)
-            # for buildable_area in self.buildable_areas:
-            #    self.draw_polygon_alpha(self.win, green_color, buildable_area)
-            # pygame.draw.polygon(self.win, green_color, self.buildable_areas, width=0)
-
-            for tower in self.attack_towers:
-                tower.draw_placement(self.win)
+        if len(self.attack_towers) == 0 and self.moving_object:
             self.moving_object.draw_placement(self.win)
 
         for portal in self.portals:
@@ -769,21 +823,24 @@ class Game:
                     self.base_map.set_path(path)
             self.base_map.draw(self.win)
 
-        for city in self.cities:
-            city.draw(self.win)
+        if len(self.items_list) > 0:
+            for item in self.items_list:
+                item.draw(self.win)
+                item.despawn_timer -= 1
+                if item.despawn_timer <= 0:
+                    self.items_list.remove(item)
+
+        for tower in self.attack_towers:
+            tower.draw(self.win)
+            if self.moving_object:
+                self.moving_object.draw_placement(self.win)
 
         if self.show_build_menu:
             self.menu.draw(self.win)
 
-
-
-        for tower in self.attack_towers:
-            tower.draw(self.win)
-
         for obstacle in self.obstacles:
             obstacle.draw(self.win)
-        # for inode in self.tmp_nodes:
-        #    pygame.draw.circle(self.win, (225, 255, 0), (inode["x"], inode["y"]), 5, 0)
+
         enemies = self.enemies
         for enemy in sorted(enemies, key=self.sort_by_y):
             enemy.draw(self.win)
@@ -795,11 +852,10 @@ class Game:
                 if label.despawn_timer <= 0:
                     self.label_collector.remove(label)
 
-        self.icon_menu.draw(self.win)
-
         if self.show_bonus_menu:
             self.bonus_menu.draw(self.win)
 
+        self.icon_menu.draw(self.win)
         # Wave display:
         surface = pygame.Surface((180, 50), pygame.SRCALPHA, 32)
         surface.fill((192, 192, 192, 175))
@@ -809,6 +865,16 @@ class Game:
         self.win.blit(surface, rectangle)
         pygame.draw.rect(self.win, (192, 192, 192, 175), rectangle, width=2, border_radius=0)
         wave = med_font.render("Wave: "+ str(self.wave), 1, (47,79,79))
+
+        #Gem display:
+        surface = pygame.Surface((180, 50), pygame.SRCALPHA, 32)
+        surface.fill((192, 192, 192, 175))
+        med_font= pygame.font.SysFont("segoeuisemilight", 25)
+        small_font = pygame.font.SysFont("segoeuisemilight", 18)
+        rectangle = pygame.Rect(-2,  160, 180, 50)
+        self.win.blit(surface, rectangle)
+        pygame.draw.rect(self.win, (192, 192, 192, 175), rectangle, width=2, border_radius=0)
+        gems = med_font.render("Gems: "+ str(self.gems), 1, (47,79,79))
 
         if self.show_bonus_menu:
             phase = "Bonus selection phase"
@@ -821,6 +887,8 @@ class Game:
         step = small_font.render(str(phase), 1, (47, 79, 79))
         self.win.blit(wave, (10, 75))
         self.win.blit(step, (10, 105))
+
+        self.win.blit(gems, (10, 165))
         pygame.display.update()
 
 g = Game()
