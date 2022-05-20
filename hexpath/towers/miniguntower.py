@@ -8,8 +8,10 @@ from projectiles.bullet import *
 from objects.labels import *
 import random
 
+pygame.mixer.pre_init(44100, 16, 2, 4096)
 pygame.init()
 # bullet_hole = pygame.transform.scale(load_image("resources", "bullet_hole.png").convert_alpha(), (10, 10))
+
 minigun_sound = pygame.mixer.Sound(os.path.join("resources", "plop.mp3"))
 
 
@@ -123,8 +125,6 @@ class MinigunTower(Tower):
         :param enemies: list of enemies
         :return: None
         """
-
-
         labels = []
         if len(self.projectiles) > 0:
             for projectile in self.projectiles:
@@ -134,7 +134,7 @@ class MinigunTower(Tower):
                     # get all enemies in range of explosion projectile.explosion_range
                     for enemy in enemies:
                         check_distance = projectile.get_distance(enemy.x, enemy.y)
-                        if check_distance <= (self.max_splash_range + self.mod_max_splash_range):
+                        if check_distance <= (self.max_splash_range + self.mod_max_splash_range - enemy.resist_splash_range):
                             """
                             Base accuracy remains at 50% BUT after mod_accuracy is calculated based on hill function
                             f(h) = 1/2; what is y when x = 25? (half the maximum mod_accuracy, since 50 is max 
@@ -148,7 +148,7 @@ class MinigunTower(Tower):
                             calculated_accuracy = (self.mod_accuracy * 100)/((self.mod_accuracy * 100)+45)
                             # mod_accuracy does not add linear
                             acc_adj = ((self.accuracy * 100) + calculated_accuracy * 50) / 100
-                            if random.random() < acc_adj:
+                            if random.random() < acc_adj - enemy.dodge_rate:
                                 # The closer the unit to the source 'explosion' the more damage.
                                 projectile.delete = True
                                 resulting_damage = self.damage + self.mod_damage
@@ -166,8 +166,12 @@ class MinigunTower(Tower):
                                 """
                                 calculated_crit_chance = (self.mod_crit_chance * 100) / ((self.mod_crit_chance * 100) + 60)
                                 crit_adj = ((self.crit_chance * 100) + calculated_crit_chance * 50) / 100
-                                if random.random() < crit_adj:
-                                    resulting_damage = resulting_damage * (self.crit_damage + self.mod_crit_damage)
+
+                                resulting_damage = int((self.damage + self.mod_damage)  * (1+(random.random() * 25) / 100))
+
+                                if random.random() < crit_adj - enemy.crit_resist_rate:
+                                    resulting_damage = int(resulting_damage + resulting_damage * (random.random() * 50 - 25) / 100)
+                                    resulting_damage = resulting_damage * (self.crit_damage + self.mod_crit_damage - enemy.crit_resist)
                                     color = (255,215,0)
                                     label_font_size = 18
                                 resulting_damage = int(resulting_damage)
@@ -183,7 +187,7 @@ class MinigunTower(Tower):
                                     # enemies.remove(enemy)
                             else:
                                 label_font_size = 14
-                                labels.append(Label(enemy.x, enemy.y, "MISS", (66, 66, 66), label_font_size))
+                                labels.append(Label(enemy.x, enemy.y, "DODGED", (66, 66, 66), label_font_size))
                         # add
                     self.projectiles.remove(projectile)
                     return labels
@@ -251,6 +255,7 @@ class MinigunTower(Tower):
                 channel.play(action_sound)
 
             """
+
             death_ = pygame.mixer.Sound(self.action_sound)
             death_.set_volume(0.1)
             death_.play()
