@@ -1,11 +1,7 @@
-import os
-
-import pygame
-
+from objects.labels import *
 from .enemy import Enemy
 from functions.functions import *
-# from items.gold import Gold
-# from items.metal import Metal
+
 Squaremon_imgs = []
 for x in range(4):
     add_str = str(x)
@@ -58,8 +54,10 @@ class Squaremon(Enemy):
         self.health = self.max_health
         self.imgs = self.load_image()
         self.speed_increase = 1.8
-        self.size = 0.6
+        self.size = 0.3
         self.boundary = 2
+        self.item_drop = [1]
+        self.item_drop_rate = 0.02
         # self.droppable_items = [Gold(self.x, self.y, 1, 8), Gold(self.x, self.y, 5, 15)]
 
     def load_image(self):
@@ -73,8 +71,10 @@ class SquaremonElite(Enemy):
         self.health = self.max_health
         self.imgs = self.load_image()
         self.speed_increase = 1.6
-        self.size = 0.7
+        self.size = 0.35
         self.boundary = 2
+        self.item_drop = [1,1,1]
+        self.item_drop_rate = 0.08
         # self.droppable_items = [Gold(self.x, self.y, 1, 8), Gold(self.x, self.y, 5, 15)]
 
     def load_image(self):
@@ -89,8 +89,10 @@ class SquaremonGreen(Enemy):
         self.health = self.max_health
         self.imgs = self.load_image()
         self.speed_increase = 0.85
-        self.size = 0.5
+        self.size = 0.25
         self.boundary = 2
+        self.item_drop = [1]
+        self.item_drop_rate = 0.03
         # self.droppable_items = [Gold(self.x, self.y, 1, 8), Gold(self.x, self.y, 5, 15)]
         #imgs[:]
 
@@ -105,8 +107,10 @@ class SquaremonGreenElite(Enemy):
         self.health = self.max_health
         self.imgs = self.load_image()
         self.speed_increase = 0.6
-        self.size = 0.7
+        self.size = 0.35
         self.boundary = 2
+        self.item_drop = [1,1,1,1,1]
+        self.item_drop_rate = 0.09
         # self.droppable_items = [Gold(self.x, self.y, 1, 8), Gold(self.x, self.y, 5, 15)]
         #imgs[:]
 
@@ -121,8 +125,10 @@ class Trippet(Enemy):
         self.health = self.max_health
         self.imgs = self.load_image()
         self.speed_increase = 1.5
-        self.size = 0.7
+        self.size = 0.35
         self.boundary = 2
+        self.item_drop = [1,1]
+        self.item_drop_rate = 0.06
         # self.droppable_items = [Gold(self.x, self.y, 1, 8), Gold(self.x, self.y, 5, 15)]
 
     def load_image(self):
@@ -136,9 +142,11 @@ class TrippetElite(Enemy):
         self.health = self.max_health
         self.imgs = self.load_image()
         self.speed_increase = 1.3
-        self.size = 1
+        self.size = 0.5
         self.boundary = 2
         self.spawn_count = 5
+        self.item_drop = [1,1,1,1]
+        self.item_drop_rate = 0.16
         # self.droppable_items = [Gold(self.x, self.y, 1, 8), Gold(self.x, self.y, 5, 15)]
 
     def load_image(self):
@@ -147,7 +155,7 @@ class TrippetElite(Enemy):
     def dead_action(self, enemies):
         path = self.path[self.path_pos:]
         for i in range(self.spawn_count):
-            generated_path, deviation = generate_alternative_path(path, 14)
+            generated_path, deviation = generate_alternative_path(path, 8)
             new_enemy = Trippet(generated_path)
             new_enemy.deviation = deviation
             enemies.append(new_enemy)
@@ -160,8 +168,10 @@ class Yolkee(Enemy):
         self.health = self.max_health
         self.imgs = self.load_image()
         self.speed_increase = 1.4
-        self.size = 0.7
+        self.size = 0.35
         self.boundary = 2
+        self.item_drop = [1]
+        self.item_drop_rate = 0.15
         # self.droppable_items = [Gold(self.x, self.y, 1, 8), Gold(self.x, self.y, 5, 15)]
 
     def load_image(self):
@@ -174,10 +184,67 @@ class Juju(Enemy):
         self.max_health = 400
         self.health = self.max_health
         self.imgs = self.load_image()
-        self.speed_increase = 1.1
-        self.size = 0.6
+        self.speed_increase = 1
+        self.size = 0.3
         self.boundary = 2
+        self.item_drop = [1]
+        self.item_drop_rate = 0.12
+        self.max_heal_timer = self.heal_timer = 46
+        self.heal_amount = 10
+        self.heal_range = 50
         # self.droppable_items = [Gold(self.x, self.y, 1, 8), Gold(self.x, self.y, 5, 15)]
 
     def load_image(self):
         return juju_img
+
+    def move_action(self, target, params=[]):
+        """
+        Action(s) to perform when moving
+        :param target: list of one or multiple targets the move_action is performed on
+        :param params: list of additional parameters
+        :return:
+        """
+        if self.heal_timer > 1:
+            self.heal_timer -= 1
+
+        if self.heal_timer == 1:
+            self.heal_timer = self.max_heal_timer
+            for enemy in target:
+                if enemy.get_distance(self.x, self.y) <= self.heal_range:
+                    enemy.hit(-self.heal_amount)
+                    params.append(Label(enemy.x, enemy.y, "+"+str(self.heal_amount), (144,238,144), 16))
+        return False
+
+    def draw(self, win):
+        """
+        Draws the enemy with the given images
+        :param win: surface
+        :return: None
+        """
+        """
+        for dot in self.path:
+            pygame.draw.circle(win, (255,0,255), dot, 10, 0)
+        """
+
+        self.img = self.imgs[self.animation_count]
+        # Draw shadow
+        shadow_radius = self.img.get_width() / 4 * self.size
+        surface = pygame.Surface((200, 200), pygame.SRCALPHA, 32)
+        pygame.draw.circle(surface, (0, 0, 0, 94), (32, (32 + shadow_radius / 2)), shadow_radius, 0)
+        win.blit(surface, (self.x - 32, self.y - 32))
+        if self.heal_timer <= 4 or (self.max_heal_timer - self.heal_timer) < 9:
+            surface = pygame.Surface((self.heal_range * 4, self.heal_range * 4), pygame.SRCALPHA, 32)
+            placement_circle = self.heal_range
+
+            if self.heal_timer <= 3:
+                mod = self.heal_timer
+            else:
+                mod = (self.max_heal_timer - self.heal_timer) + 1
+
+            pygame.draw.circle(surface, (144,238,144, (160/mod)), (placement_circle, placement_circle), placement_circle, 0)
+            win.blit(surface, (self.x - placement_circle, self.y - placement_circle))
+
+        self.img = pygame.transform.scale(self.img, (self.width * self.size, self.height * self.size))
+        self.img = pygame.transform.rotate(self.img, (self.angle+90))
+        win.blit(self.img, (self.x - self.img.get_width()/2, self.y - self.img.get_height()/2))
+        self.draw_health_bar(win)
