@@ -189,7 +189,14 @@ class MinigunTower(Tower):
                                 label_font_size = 14
                                 labels.append(Label(enemy.x, enemy.y, "DODGED", (66, 66, 66), label_font_size))
                         # add
-                    self.projectiles.remove(projectile)
+                    if random.random() < self.pierce_chance and not projectile.force_delete:
+                        projectile.delete = False
+                        projectile.force_move()
+                        print("Piercing!")
+                        # this is causing 'double jeopardy' hitting same enemy multiple times, but only at 100%
+
+                    if  projectile.delete or projectile.force_delete:
+                        self.projectiles.remove(projectile)
                     return labels
 
         self.inRange = False

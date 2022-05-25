@@ -27,6 +27,7 @@ class Bullet(Projectile):
         self.move_y = 0
         self.set_direction()
         self.delete = False
+        self.force_delete = False
         self.base_size = 3
         self.modifier = size
         # self.change_size(size)
@@ -45,12 +46,12 @@ class Bullet(Projectile):
         max_w, max_h = win.get_size()
 
         if self.x < 0 or self.x >= max_w:
-            self.delete = True
+            self.force_delete = True
 
         if self.y < 0 or self.y >= max_h:
-            self.delete = True
+            self.force_delete = True
 
-        if not self.delete:
+        if not self.delete and not self.force_delete:
             range = self.base_size + self.modifier
             surface = pygame.Surface((range, range), pygame.SRCALPHA, 32)
             pygame.draw.circle(surface, (50, 50, 50, 255), (range//2, range//2), range//2, 0)
@@ -91,13 +92,16 @@ class Bullet(Projectile):
             if check_distance < self.boundary:
                 self.delete = True
 
-        if not self.delete:
+        if not self.delete and not self.force_delete:
             self.x = self.x + self.move_x
             self.y = self.y + self.move_y
             return True
         else:
             return False
 
+    def force_move(self):
+        self.x = self.x + self.move_x
+        self.y = self.y + self.move_y
 
     def rotate(self, angle, offset, pivot_point):
         """

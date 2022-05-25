@@ -21,6 +21,8 @@ class Projectile:
         self.target = target
         self.base_size = 3
         self.change_size(size)
+        self.delete = False
+        self.force_delete = False
 
 
     def draw(self, win):
@@ -56,3 +58,7 @@ class Projectile:
         if self.animation_count >= len(self.imgs):
             self.animation_count = 0
         """
+
+    def force_move(self):
+        self.x = self.x + self.move_x
+        self.y = self.y + self.move_y

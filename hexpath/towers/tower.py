@@ -58,6 +58,19 @@ class Tower:
         self.mod_attack_speed = 0
         self.mod_attack_range = 0
         self.mod_projectile_size = 0
+        #specials:
+        self.stun_chance = 0
+        self.stun_duration = 0
+        self.pierce_chance = 0
+        self.poison_chance = 0
+        self.poison_damage = 0
+        # chance to upgrade crit to headshot causing X* damage
+        self.headshot_chance = 0
+        self.headshot_multiplier = 25
+        # split
+        self.split_chance = 0
+        self.split_count = 0
+        self.bonus_xp = 0
 
     def draw(self, win):
         """
