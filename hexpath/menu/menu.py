@@ -17,7 +17,7 @@ pictogram_projectile_size = pygame.transform.scale(load_image("resources", "icon
 pictogram_projectile_speed = pygame.transform.scale(load_image("resources", "icon_projectile_speed.png").convert_alpha(), (50, 50))
 pictogram_splash_range = pygame.transform.scale(load_image("resources", "icon_splash_range.png").convert_alpha(), (50, 50))
 pictogram_not_implemented = pygame.transform.scale(load_image("resources", "icon_not_implemented.png").convert_alpha(), (50, 50))
-pictogram_shield = pygame.transform.scale(load_image("resources", "icon_shield.png").convert_alpha(), (35, 35))
+pictogram_shield = pygame.transform.scale(load_image("resources", "icon_shield.png").convert_alpha(), (50, 50))
 
 class Button:
     """
