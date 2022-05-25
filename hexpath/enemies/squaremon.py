@@ -58,6 +58,7 @@ class Squaremon(Enemy):
         self.boundary = 2
         self.item_drop = [1]
         self.item_drop_rate = 0.02
+        self.xp_value = 1
         # self.droppable_items = [Gold(self.x, self.y, 1, 8), Gold(self.x, self.y, 5, 15)]
 
     def load_image(self):
@@ -75,6 +76,7 @@ class SquaremonElite(Enemy):
         self.boundary = 2
         self.item_drop = [1,1,1]
         self.item_drop_rate = 0.08
+        self.xp_value = 10
         # self.droppable_items = [Gold(self.x, self.y, 1, 8), Gold(self.x, self.y, 5, 15)]
 
     def load_image(self):
@@ -93,6 +95,7 @@ class SquaremonGreen(Enemy):
         self.boundary = 2
         self.item_drop = [1]
         self.item_drop_rate = 0.03
+        self.xp_value = 2
         # self.droppable_items = [Gold(self.x, self.y, 1, 8), Gold(self.x, self.y, 5, 15)]
         #imgs[:]
 
@@ -111,6 +114,7 @@ class SquaremonGreenElite(Enemy):
         self.boundary = 2
         self.item_drop = [1,1,1,1,1]
         self.item_drop_rate = 0.09
+        self.xp_value = 20
         # self.droppable_items = [Gold(self.x, self.y, 1, 8), Gold(self.x, self.y, 5, 15)]
         #imgs[:]
 
@@ -129,6 +133,7 @@ class Trippet(Enemy):
         self.boundary = 2
         self.item_drop = [1,1]
         self.item_drop_rate = 0.06
+        self.xp_value = 10
         # self.droppable_items = [Gold(self.x, self.y, 1, 8), Gold(self.x, self.y, 5, 15)]
 
     def load_image(self):
@@ -147,6 +152,7 @@ class TrippetElite(Enemy):
         self.spawn_count = 5
         self.item_drop = [1,1,1,1]
         self.item_drop_rate = 0.16
+        self.xp_value = 25
         # self.droppable_items = [Gold(self.x, self.y, 1, 8), Gold(self.x, self.y, 5, 15)]
 
     def load_image(self):
@@ -172,6 +178,7 @@ class Yolkee(Enemy):
         self.boundary = 2
         self.item_drop = [1]
         self.item_drop_rate = 0.15
+        self.xp_value = 25
         # self.droppable_items = [Gold(self.x, self.y, 1, 8), Gold(self.x, self.y, 5, 15)]
 
     def load_image(self):
@@ -192,6 +199,7 @@ class Juju(Enemy):
         self.max_heal_timer = self.heal_timer = 46
         self.heal_amount = 10
         self.heal_range = 50
+        self.xp_value = 40
         # self.droppable_items = [Gold(self.x, self.y, 1, 8), Gold(self.x, self.y, 5, 15)]
 
     def load_image(self):
