@@ -177,6 +177,10 @@ class MinigunTower(Tower):
                                     resulting_damage = resulting_damage * (self.crit_damage + self.mod_crit_damage - enemy.crit_resist)
                                     color = (255,215,0)
                                     label_font_size = 18
+                                    if random.random() < self.headshot_chance:
+                                        resulting_damage *= self.headshot_multiplier
+                                        color = (20, 30, 250)
+                                        labels.append(Label(enemy.x, enemy.y, "HeadShot!", color, label_font_size))
                                 resulting_damage = int(resulting_damage)
                                 # cur_opponent.hp -= resulting_damage
                                 labels.append(Label(enemy.x, enemy.y, resulting_damage, color, label_font_size))

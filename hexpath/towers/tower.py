@@ -62,9 +62,10 @@ class Tower:
         self.stun_chance = 0
         self.stun_duration = 0
         self.pierce_chance = 0
+
         self.poison_chance = 0
         self.poison_damage = 0
-        # chance to upgrade crit to headshot causing X* damage
+        # chance to convert crit to headshot causing X* damage
         self.headshot_chance = 0
         self.headshot_multiplier = 25
         # split
