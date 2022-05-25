@@ -40,6 +40,8 @@ class Enemy:
         self.crit_resist = 0
         self.item_drop = []
         self.item_drop_rate = 0
+        self.survival_damage = 1
+        self.xp_value = 1
 
 
     """
