@@ -42,7 +42,7 @@ class Enemy:
         self.item_drop_rate = 0
         self.survival_damage = 1
         self.xp_value = 1
-
+        self.stun_timer = 0
 
     """
     def generate_item(self):
@@ -113,43 +113,48 @@ class Enemy:
         Move enemy
         :return: None
         """
-        self.anim_seq += 1
-        if (self.anim_seq > 5):
-            self.animation_count += 1
-            self.anim_seq = 0
-
-        if self.animation_count >= len(self.imgs):
-            self.animation_count = 0
-        try:
-            x1, y1 = self.path[self.path_pos]
-        except ValueError:
-            print("Too many values to unpack in:", self.path[self.path_pos], "at path_pos:", self.path_pos, "in:", self.path)
-        if self.path_pos + 1 >= len(self.path):
-            return
+        if self.stun_timer > 0:
+            self.stun_timer -= 1
+            if self.stun_timer <= 0:
+                stun_timer = 0
         else:
-            x2, y2 = self.path[self.path_pos + 1]
-        x2, y2 = self.path[self.path_pos+1]
+            self.anim_seq += 1
+            if (self.anim_seq > 5):
+                self.animation_count += 1
+                self.anim_seq = 0
 
-        delta_x = x2 - x1
-        delta_y = y2 - y1
-        y_mod = -1
-        if 0 < delta_y > 0:
-            y_mod = delta_y / abs(delta_y)
-        slope_angle = point_direction(x2, y2, x1, y1, False) * y_mod * 0.0174532925
-        new_move_x = self.speed_increase * -math.cos(slope_angle)
-        new_move_y = self.speed_increase * math.sin(slope_angle) * -1 * y_mod
+            if self.animation_count >= len(self.imgs):
+                self.animation_count = 0
+            try:
+                x1, y1 = self.path[self.path_pos]
+            except ValueError:
+                print("Too many values to unpack in:", self.path[self.path_pos], "at path_pos:", self.path_pos, "in:", self.path)
+            if self.path_pos + 1 >= len(self.path):
+                return
+            else:
+                x2, y2 = self.path[self.path_pos + 1]
+            x2, y2 = self.path[self.path_pos+1]
 
-        self.angle = point_direction(x1, y1, x2, y2, False) * -1
-        self.x = self.x + new_move_x
-        self.y = self.y + new_move_y
-        #  self.deviation[0]  self.deviation[1]
-        mod_boundery = 0
-        if self.path_pos == len(self.path):
-            mod_boundery = math.sqrt(self.deviation[0] ** 2 + self.deviation[1] ** 2)
-        enemy_distance_to_next_hop = math.sqrt((self.x - x2)**2 + (self.y - y2)**2)
-        if (-self.boundary - mod_boundery <= enemy_distance_to_next_hop <= self.boundary + mod_boundery):
-            self.travelled_path.append(enemy_distance_to_next_hop)
-            self.path_pos += 1
+            delta_x = x2 - x1
+            delta_y = y2 - y1
+            y_mod = -1
+            if 0 < delta_y > 0:
+                y_mod = delta_y / abs(delta_y)
+            slope_angle = point_direction(x2, y2, x1, y1, False) * y_mod * 0.0174532925
+            new_move_x = self.speed_increase * -math.cos(slope_angle)
+            new_move_y = self.speed_increase * math.sin(slope_angle) * -1 * y_mod
+
+            self.angle = point_direction(x1, y1, x2, y2, False) * -1
+            self.x = self.x + new_move_x
+            self.y = self.y + new_move_y
+            #  self.deviation[0]  self.deviation[1]
+            mod_boundery = 0
+            if self.path_pos == len(self.path):
+                mod_boundery = math.sqrt(self.deviation[0] ** 2 + self.deviation[1] ** 2)
+            enemy_distance_to_next_hop = math.sqrt((self.x - x2)**2 + (self.y - y2)**2)
+            if (-self.boundary - mod_boundery <= enemy_distance_to_next_hop <= self.boundary + mod_boundery):
+                self.travelled_path.append(enemy_distance_to_next_hop)
+                self.path_pos += 1
 
     def hit(self, damage):
         """

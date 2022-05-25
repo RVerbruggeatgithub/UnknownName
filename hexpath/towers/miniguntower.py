@@ -164,6 +164,9 @@ class MinigunTower(Tower):
                                 20x crit chance bonus will give a total of 41 total accuracy (linear this would be ~100)
                                 40x crit chance bonus will give a total of 48.5 total accuracy (linear would still be 100)
                                 """
+                                if random.random() < self.stun_chance:
+                                    enemy.stun_timer += self.stun_duration
+
                                 calculated_crit_chance = (self.mod_crit_chance * 100) / ((self.mod_crit_chance * 100) + 60)
                                 crit_adj = ((self.crit_chance * 100) + calculated_crit_chance * 50) / 100
 
