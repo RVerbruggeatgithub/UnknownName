@@ -33,6 +33,71 @@ pictogram_not_implemented = pygame.transform.scale(load_image("resources", "icon
 pictogram_shield = pygame.transform.scale(load_image("resources", "icon_shield.png").convert_alpha(), (100, 100))
 
 
+class MainGameMenu:
+    def __init__(self):
+        self.width = 1200
+        self.height = 900
+        self.win = pygame.display.set_mode((self.width, self.height), pygame.RESIZABLE)
+        """
+        Main menu stuff:
+        """
+        self.show_main_menu = True
+        self.start_menu = Menu(25, 25, self.width - 50, self.height - 50, None)
+        frame_width = 400
+        frame_height = 600
+        self.start_menu.add_frame((self.width//2 - frame_width//2), 80, frame_width, frame_height, (100,150,225, 100), (0,0,0, 0))
+        self.start_menu.add_plain_button("New Game", None, (self.width//2 - frame_width//2 + frame_width*0.1), 250, frame_width*0.8, 50, (0,0,0, 100))
+        self.start_menu.add_plain_button("Help", None, (self.width // 2 - frame_width // 2 + frame_width * 0.1),
+                                         325, frame_width * 0.8, 50, (0, 0, 0, 100))
+        self.show_start_menu = True
+        self.help_menu = Menu(25, 25, self.width - 50, self.height - 50, None)
+        self.show_help_menu = False
+        self.help_menu.add_frame((self.width//2 - 400), 80, 800, frame_height, (100,150,225, 100), (0,0,0, 0))
+        self.help_menu.add_plain_button("Back", None, (self.width//2 - 400) + 725, 100, 65, 50, (0,0,0, 100))
+
+    def draw_current_menu(self, current_menu):
+        self.win.fill([255, 255, 255])
+        current_menu.draw(self.win)
+        pygame.display.update()
+
+    def run(self):
+        game = Game()
+        game.run()
+
+    def main_menu(self):
+        # draw the main menu
+        while self.show_main_menu:
+            if self.show_start_menu:
+                mouse_pos = pygame.mouse.get_pos()
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        self.show_main_menu = False
+                    if event.type == pygame.MOUSEBUTTONUP:
+                        for button in self.start_menu.buttons:
+                            if button.click(mouse_pos[0], mouse_pos[1]) and button.button_text == "New Game":
+                                self.run()
+                            if button.click(mouse_pos[0], mouse_pos[1]) and button.button_text == "Help":
+                                self.show_start_menu = False
+                                self.show_help_menu = True
+                draw_menu = self.start_menu
+
+            if self.show_help_menu:
+                mouse_pos = pygame.mouse.get_pos()
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        self.show_main_menu = False
+                    if event.type == pygame.MOUSEBUTTONUP:
+                        for button in self.help_menu.buttons:
+                            if button.click(mouse_pos[0], mouse_pos[1]) and button.button_text == "Back":
+                                self.show_help_menu = False
+                                self.show_start_menu = True
+                draw_menu = self.help_menu
+            self.draw_current_menu(draw_menu)
+
+        pygame.quit()
+
+
+
 class Game:
     def __init__(self):
         self.width = 1200
@@ -93,6 +158,9 @@ class Game:
                         "color": (255, 255, 255, 200), "background_color": (255, 255, 255, 255)},
             "BULSP_1": {"Description": "Projectile speed + 10%", "modifier": 0.1, "pictogram": pictogram_projectile_speed,
                       "color": (255, 255, 255, 200), "background_color": (255, 255, 255, 255)},
+            "HEAL_1": {"Description": "Heal 10%", "modifier": 0.1,
+                        "pictogram": pictogram_not_implemented,
+                        "color": (255, 255, 255, 200), "background_color": (255, 255, 255, 255)},
         }
         self.action_list2 = {
             "ATK_2" : {"Description": "Attack Damage + 2", "modifier" : 2, "pictogram" : pictogram_attack_damage, "color" : (0, 32, 255, 200), "background_color" : (0, 32, 255,255) },
@@ -107,6 +175,8 @@ class Game:
                         "color": (0, 32, 255, 200), "background_color": (0, 32, 255, 255)},
             "SHIELD_1": {"Description": "Protect cities +1", "modifier": 1.00, "pictogram": pictogram_shield,
                         "color": (0, 32, 255, 200), "background_color": (0, 32, 255, 255)},
+            "HEAL_2": {"Description": "Heal 25%", "modifier": 0.25, "pictogram": pictogram_not_implemented,
+                         "color": (0, 32, 255, 200), "background_color": (0, 32, 255, 255)},
         }
         self.action_list3 = {
             "ATK_3": {"Description": "Attack Damage + 3", "modifier": 3, "pictogram": pictogram_attack_damage,
@@ -117,6 +187,8 @@ class Game:
                         "color": (221,160,221, 200), "background_color": (221,160,221, 255)},
             "OBSTACLE_2": {"Description": "Obstacle +2", "modifier": 2, "pictogram": pictogram_not_implemented,
                          "color": (221,160,221, 200), "background_color": (221,160,221, 255)},
+            "HEAL_3": {"Description": "Heal 100%", "modifier": 1, "pictogram": pictogram_not_implemented,
+                           "color": (221, 160, 221, 200), "background_color": (221, 160, 221, 255)},
         }
 
         self.bonus_options = []
@@ -254,59 +326,17 @@ class Game:
         self.move_tower = False
         self.auto_target = True
         self.interval = 500
-        """
-        Main menu stuff:
-        """
-        self.show_main_menu = True
-        self.start_menu = Menu(25, 25, self.width - 50, self.height - 50, None)
-        frame_width = 400
-        frame_height = 600
-        self.start_menu.add_frame((self.width//2 - frame_width//2), 80, frame_width, frame_height, (100,150,225, 100), (0,0,0, 0))
-        self.start_menu.add_plain_button("New Game", None, (self.width//2 - frame_width//2 + frame_width*0.1), 250, frame_width*0.8, 50, (0,0,0, 100))
-        self.start_menu.add_plain_button("Help", None, (self.width // 2 - frame_width // 2 + frame_width * 0.1),
-                                         325, frame_width * 0.8, 50, (0, 0, 0, 100))
-        self.show_start_menu = True
-        self.help_menu = Menu(25, 25, self.width - 50, self.height - 50, None)
-        self.show_help_menu = False
-        self.help_menu.add_frame((self.width//2 - 400), 80, 800, frame_height, (100,150,225, 100), (0,0,0, 0))
-        self.help_menu.add_plain_button("Back", None, (self.width//2 - 400) + 725, 100, 65, 50, (0,0,0, 100))
+
         self.game_speed = 20
         self.items_list = []
         self.gems = 0
+        self.max_health = self.health = 25
+        self.guardian = 1
+        self.used_guardian = 0
 
-
-    def main_menu(self):
-        # draw the main menu
-        while self.show_main_menu:
-            if self.show_start_menu:
-                mouse_pos = pygame.mouse.get_pos()
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        self.show_main_menu = False
-                    if event.type == pygame.MOUSEBUTTONUP:
-                        for button in self.start_menu.buttons:
-                            if button.click(mouse_pos[0], mouse_pos[1]) and button.button_text == "New Game":
-                                self.run()
-                            if button.click(mouse_pos[0], mouse_pos[1]) and button.button_text == "Help":
-                                self.show_start_menu = False
-                                self.show_help_menu = True
-                draw_menu = self.start_menu
-
-            if self.show_help_menu:
-                mouse_pos = pygame.mouse.get_pos()
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        self.show_main_menu = False
-                    if event.type == pygame.MOUSEBUTTONUP:
-                        for button in self.help_menu.buttons:
-                            if button.click(mouse_pos[0], mouse_pos[1]) and button.button_text == "Back":
-                                self.show_help_menu = False
-                                self.show_start_menu = True
-                draw_menu = self.help_menu
-            self.draw_current_menu(draw_menu)
-
-        pygame.quit()
-
+        self.xp = 0
+        self.level = 0
+        self.xp_req = [5, 10, 20, 50, 100, 175, 300, 500, 800, 1200, 1750, 2500, 3500, 5000, 7500, 12000, 20000, 32000, 50000, 80000, 130000, 99999999]
 
     def run(self):
         run = True
@@ -457,9 +487,9 @@ class Game:
                             bonus_menu_button = self.bonus_menu.get_clicked(mouse_pos[0], mouse_pos[1])
                             # change below to only happen if button is clicked..
                             if bonus_menu_button is not None:
-                                # apply structure related directly, don't add to bonuses
-                                structures = ["OBSTACLE_1", "OBSTACLE_2", "TOWER_1"]
-                                if bonus_menu_button in structures:
+                                # These are instant bonuses, not applied to towers
+                                specials = ["OBSTACLE_1", "OBSTACLE_2", "TOWER_1", "SHIELD_1", "HEAL_1", "HEAL_2", "HEAL_3"]
+                                if bonus_menu_button in specials:
                                     if bonus_menu_button == "TOWER_1":
                                         for button in self.menu.buttons:
                                             if button.name == "buy_minigun":
@@ -472,6 +502,11 @@ class Game:
                                         for button in self.menu.buttons:
                                             if button.name == "buy_obstacle":
                                                 button.update_quantity(2)
+                                    if bonus_menu_button == "SHIELD_1":
+                                        self.guardian += 1
+                                        self.applied_bonuses.append(bonus_menu_button)
+                                    if bonus_menu_button == "HEAL_1" or bonus_menu_button == "HEAL_2" or bonus_menu_button == "HEAL_3":
+                                        self.apply_bonus(bonus_menu_button)
                                 else:
                                     self.applied_bonuses.append(bonus_menu_button)
                                 self.update_bonuses = True
@@ -625,9 +660,15 @@ class Game:
                                 enemies_count_prev = len(self.enemies)
                                 enemy.dead_action(self.enemies)
                                 enemies_count_next = len(self.enemies)
-                                count_dif =  enemies_count_next - enemies_count_prev
+                                self.xp += enemy.xp_value
+                                if self.xp > self.xp_req[self.level]:
+                                    self.level += 1
+                                print("XP:", self.xp, "Level:", self.level)
+                                count_dif = enemies_count_next - enemies_count_prev
                                 self.wave_enemy_total += count_dif
                                 self.enemy_counter += count_dif
+                            else:
+                                self.take_damage(enemy.survival_damage)
                             to_del.append(enemy)
 
                     for enemy in to_del:
@@ -651,6 +692,7 @@ class Game:
                                 self.label_collector.append(label)
 
                     if self.enemies_removed == self.wave_enemy_total:
+                        print("Guardian stuff:" ,self.guardian, self.used_guardian)
                         self.wave_complete = True
                         self.wave_enemy_total = 0
                         self.enemy_counter = 0
@@ -661,6 +703,7 @@ class Game:
                         self.show_bonus_menu = True
                         self.show_build_menu = False
                         self.spawned_from_spawn_list_counter = 0
+                        self.used_guardian = 0
                         # add a new path at wave #
                         if self.wave == 25:
                             """
@@ -685,6 +728,57 @@ class Game:
         """
         return spr.y
 
+    def draw_xp_bar(self):
+        """
+        draw XP bar above health bar
+        :return: None
+        """
+        length = self.width - 50
+        health_bar = 0
+        prev_level_xp = 0
+        if self.level > 0:
+            prev_level_xp = self.xp_req[self.level - 1]
+
+        if self.level > len(self.xp_req):
+            req_xp = self.xp_req[self.level] - prev_level_xp
+            cur_xp = self.xp - prev_level_xp
+
+            move_by = length / req_xp
+            health_bar = round(move_by * cur_xp)
+            # print(cur_xp, prev_level_xp, req_xp, move_by, health_bar)
+        xp_bar_color = (121, 100, 50)
+        pygame.draw.rect(self.win, (50,50,50), (25, self.height - 145, length, 6), 0)
+        pygame.draw.rect(self.win, xp_bar_color, (25, self.height - 145, health_bar, 6), 0)
+
+    def take_damage(self, dmg):
+        if dmg > 0:
+            if self.guardian > 0 and self.used_guardian < self.guardian:
+                self.used_guardian += dmg
+                if self.used_guardian > self.guardian:
+                    self.health -= self.used_guardian - self.guardian
+                    self.used_guardian = self.guardian
+            else:
+                self.health -= dmg
+        else:
+            self.health -= dmg
+            if self.health > self.max_health:
+                self.health = self.max_health
+
+    def draw_health_bar(self):
+        """
+        draw health bar above HUD
+        :return: None
+        """
+        length = self.width - 50
+        move_by = length / self.max_health
+        health_bar = round(move_by * self.health)
+        health_bar_color = (0, 255, 0)
+        if self.guardian > 0 and self.used_guardian < self.guardian:
+            health_bar_color = (255, 215, 0)
+        pygame.draw.rect(self.win, (255, 255, 255), (25, self.height - 136, length, 6), 0)
+        pygame.draw.rect(self.win, (255,0,0), (25, self.height - 136, length, 6), 0)
+        pygame.draw.rect(self.win, health_bar_color, (25, self.height - 136, health_bar, 6), 0)
+
     def build_bonus_menu(self):
         u = 0
 
@@ -705,49 +799,59 @@ class Game:
                 self.bonus_menu.add_btn(key, action_item["Description"], action_item["modifier"], action_item["pictogram"], action_item["color"], action_item["background_color"], 50)
                 u += 1
 
+    def apply_bonus(self, bonus_selector, target=None):
+        if bonus_selector == "ATK_1":
+            target.mod_damage += self.action_list[bonus_selector]["modifier"]
+        if bonus_selector == "ATK_2":
+            target.mod_damage += self.action_list2[bonus_selector]["modifier"]
+        if bonus_selector == "ATK_3":
+            target.mod_damage += self.action_list3[bonus_selector]["modifier"]
+        if bonus_selector == "CRITC_1":
+            target.mod_crit_chance += self.action_list[bonus_selector]["modifier"]
+
+        if bonus_selector == "CRITD_1":
+            target.mod_crit_damage += target.crit_damage * \
+                                     self.action_list2[bonus_selector]["modifier"]
+        if bonus_selector == "SPEED_1":
+            target.mod_attack_speed += target.attack_speed * self.action_list[bonus_selector]["modifier"]
+        if bonus_selector == "SPEED_2":
+            target.mod_attack_speed += target.attack_speed * self.action_list2[bonus_selector]["modifier"]
+        if bonus_selector == "SPEED_3":
+            target.mod_attack_speed += target.attack_speed * self.action_list3[bonus_selector]["modifier"]
+        if bonus_selector == "ACC_1":
+            target.mod_accuracy += self.action_list[bonus_selector]["modifier"]
+        if bonus_selector == "BULSP_1":
+            target.mod_projectile_speed += target.projectile_speed * \
+                                          self.action_list[bonus_selector]["modifier"]
+        if bonus_selector == "RANGE_1":
+            target.mod_attack_range += target.range * \
+                                      self.action_list[bonus_selector]["modifier"]
+        if bonus_selector == "RANGE_2":
+            target.mod_attack_range += target.range * \
+                                      self.action_list2[bonus_selector]["modifier"]
+        if bonus_selector == "RADIUS_1":
+            target.mod_max_splash_range += target.max_splash_range * \
+                                          self.action_list[bonus_selector]["modifier"]
+            target.mod_projectile_size += self.action_list[bonus_selector]["modifier"] * 20
+        if bonus_selector == "RADIUS_2":
+            target.mod_max_splash_range += target.max_splash_range * \
+                                          self.action_list2[bonus_selector]["modifier"]
+            target.mod_projectile_size += self.action_list2[bonus_selector]["modifier"] * 20
+        if bonus_selector == "HEAL_1":
+            hp_heal = self.max_health * self.action_list[bonus_selector]["modifier"]
+            self.take_damage(-hp_heal)
+        if bonus_selector == "HEAL_2":
+            hp_heal = self.max_health * self.action_list2[bonus_selector]["modifier"]
+            self.take_damage(-hp_heal)
+        if bonus_selector == "HEAL_3":
+            hp_heal = self.max_health * self.action_list3[bonus_selector]["modifier"]
+            self.take_damage(-hp_heal)
+
     def apply_bonuses_to_towers(self):
         for tower in self.attack_towers:
             tower.clear_modifiers()
             for bonus in self.applied_bonuses:
-
-                if bonus == "ATK_1":
-                    tower.mod_damage += self.action_list[bonus]["modifier"]
-                if bonus == "ATK_2":
-                    tower.mod_damage += self.action_list2[bonus]["modifier"]
-                if bonus == "ATK_3":
-                    tower.mod_damage += self.action_list3[bonus]["modifier"]
-                if bonus == "CRITC_1":
-                    tower.mod_crit_chance += self.action_list[bonus]["modifier"]
-
-                if bonus == "CRITD_1":
-                    tower.mod_crit_damage += tower.crit_damage * \
-                                             self.action_list2[bonus]["modifier"]
-                if bonus == "SPEED_1":
-                    tower.mod_attack_speed += tower.attack_speed * self.action_list[bonus]["modifier"]
-                if bonus == "SPEED_2":
-                    tower.mod_attack_speed += tower.attack_speed * self.action_list2[bonus]["modifier"]
-                if bonus == "SPEED_3":
-                    tower.mod_attack_speed += tower.attack_speed * self.action_list3[bonus]["modifier"]
-                if bonus == "ACC_1":
-                    tower.mod_accuracy += self.action_list[bonus]["modifier"]
-                if bonus == "BULSP_1":
-                    tower.mod_projectile_speed += tower.projectile_speed * \
-                                             self.action_list[bonus]["modifier"]
-                if bonus == "RANGE_1":
-                    tower.mod_attack_range += tower.range * \
-                                             self.action_list[bonus]["modifier"]
-                if bonus == "RANGE_2":
-                    tower.mod_attack_range += tower.range * \
-                                             self.action_list2[bonus]["modifier"]
-                if bonus == "RADIUS_1":
-                    tower.mod_max_splash_range += tower.max_splash_range *\
-                                              self.action_list[bonus]["modifier"]
-                    tower.mod_projectile_size += self.action_list[bonus]["modifier"] * 20
-                if bonus == "RADIUS_2":
-                    tower.mod_max_splash_range += tower.max_splash_range *\
-                                              self.action_list2[bonus]["modifier"]
-                    tower.mod_projectile_size += self.action_list2[bonus]["modifier"] * 20
-
+                self.apply_bonus(bonus, tower)
             tower.print_modifiers()
 
     def add_enemy_path(self, src, destination):
@@ -800,10 +904,7 @@ class Game:
         except Exception as e:
             print(str(e) + "Invalid name")
 
-    def draw_current_menu(self, current_menu):
-        self.win.fill([255, 255, 255])
-        current_menu.draw(self.win)
-        pygame.display.update()
+
 
 
     def draw(self):
@@ -852,6 +953,9 @@ class Game:
                 if label.despawn_timer <= 0:
                     self.label_collector.remove(label)
 
+        self.draw_health_bar()
+        self.draw_xp_bar()
+
         if self.show_bonus_menu:
             self.bonus_menu.draw(self.win)
 
@@ -891,6 +995,6 @@ class Game:
         self.win.blit(gems, (10, 165))
         pygame.display.update()
 
-g = Game()
+g = MainGameMenu()
 g.main_menu()
 #g.run()
