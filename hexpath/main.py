@@ -445,6 +445,9 @@ class Game:
                             self.play_pause_button.toggle()
                             if self.pause:
                                 print("paused")
+                                for twr in self.attack_towers:
+                                    for projectile in twr.projectiles:
+                                        print(projectile)
                             else:
                                 print("unpaused")
                             self.play_pause_button.paused = self.pause
@@ -736,19 +739,31 @@ class Game:
         length = self.width - 50
         health_bar = 0
         prev_level_xp = 0
+        req_xp = self.xp_req[self.level]
+        cur_xp = self.xp
         if self.level > 0:
             prev_level_xp = self.xp_req[self.level - 1]
 
-        if self.level > len(self.xp_req):
+        # hit the max level?
+        # if self.level > len(self.xp_req):
             req_xp = self.xp_req[self.level] - prev_level_xp
             cur_xp = self.xp - prev_level_xp
 
-            move_by = length / req_xp
-            health_bar = round(move_by * cur_xp)
+        move_by = length / req_xp
+        health_bar = round(move_by * cur_xp)
+        if health_bar == length:
+            health_bar = 0
             # print(cur_xp, prev_level_xp, req_xp, move_by, health_bar)
         xp_bar_color = (121, 100, 50)
         pygame.draw.rect(self.win, (50,50,50), (25, self.height - 145, length, 6), 0)
         pygame.draw.rect(self.win, xp_bar_color, (25, self.height - 145, health_bar, 6), 0)
+
+        small_font = pygame.font.SysFont("segoeuisemilight", 12)
+        phrase = "LvL:" + str(self.level) + "XP:" + str(cur_xp) + "/" + str(req_xp)
+        xp_line = small_font.render(str(phrase), 1, (255, 255, 255))
+        x_center = self.width / 2 - xp_line.get_width() / 2
+        self.win.blit(xp_line, (x_center, (self.height - 152)))
+
 
     def take_damage(self, dmg):
         if dmg > 0:
@@ -986,7 +1001,6 @@ class Game:
             phase = "Attack phase"
         else:
             phase = "Preparation phase"
-
 
         step = small_font.render(str(phase), 1, (47, 79, 79))
         self.win.blit(wave, (10, 75))
