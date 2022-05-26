@@ -68,9 +68,9 @@ class Tower:
         # chance to convert crit to headshot causing X* damage
         self.headshot_chance = 0
         self.headshot_multiplier = 25
-        # split
-        self.split_chance = 0
-        self.split_count = 0
+        # explosive shell on kill
+        self.fragment_chance = 0.4
+        self.fragment_count = 4
         self.bonus_xp = 0
 
     def draw(self, win):
@@ -309,3 +309,12 @@ class Tower:
 
     def get_location(self):
         return [self.x, self.y]
+
+    def explode_on_impact(self, x, y, fragment_count):
+        """
+        Action performed on impact
+        :param x: int x location
+        :param y: int y locaiton
+        :param fragment_count: int amount of fragements
+        :return: None
+        """

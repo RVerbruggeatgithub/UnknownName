@@ -186,6 +186,9 @@ class MinigunTower(Tower):
                                 labels.append(Label(enemy.x, enemy.y, resulting_damage, color, label_font_size))
 
                                 enemy.hit(resulting_damage)
+
+                                if random.random() < self.fragment_chance:
+                                    self.explode_on_impact(projectile.x, projectile.y, self.fragment_count)
                                     # death_ = pygame.mixer.Sound(projectile.target.death_sound)
                                     # death_.set_volume(0.1)
                                     # death_.play()
@@ -196,10 +199,11 @@ class MinigunTower(Tower):
                                 label_font_size = 14
                                 labels.append(Label(enemy.x, enemy.y, "DODGED", (66, 66, 66), label_font_size))
                         # add
+
+
                     if random.random() < self.pierce_chance and not projectile.force_delete:
                         projectile.delete = False
                         projectile.force_move()
-                        print("Piercing!")
                         # this is causing 'double jeopardy' hitting same enemy multiple times, but only at 100%
 
                     if  projectile.delete or projectile.force_delete:
@@ -294,4 +298,9 @@ class MinigunTower(Tower):
 
         return money
 
+    def explode_on_impact(self, x, y, fragment_count):
+        for t in range(0, fragment_count):
+            target_x = x + (random.random()*100 -50)
+            target_y = y + (random.random()*100 -50)
+            self.projectiles.append(Bullet(x, y, target_x, target_y, None, (self.projectile_speed + self.mod_projectile_speed),  2))
 

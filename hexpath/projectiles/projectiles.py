@@ -23,6 +23,9 @@ class Projectile:
         self.change_size(size)
         self.delete = False
         self.force_delete = False
+        self.projectile_max_distance = 400
+        self.source_x = self.x
+        self.source_y = self.y
 
 
     def draw(self, win):

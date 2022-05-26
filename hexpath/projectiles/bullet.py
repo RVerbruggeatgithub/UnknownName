@@ -42,24 +42,11 @@ class Bullet(Projectile):
         :param win: surface
         :return: None
         """
-
-        max_w, max_h = win.get_size()
-
-        if self.x < 0 or self.x >= max_w:
-            self.force_delete = True
-
-        if self.y < 0 or self.y >= max_h:
-            self.force_delete = True
-
-        if not self.delete and not self.force_delete:
-            range = self.base_size + self.modifier
-            surface = pygame.Surface((range, range), pygame.SRCALPHA, 32)
-            pygame.draw.circle(surface, (50, 50, 50, 255), (range//2, range//2), range//2, 0)
-            win.blit(surface, (self.x - range//2, self.y - range//2))
-            # pivot_point = [self.x, self.y]
-            # offset = pygame.math.Vector2(0, 70)
-            # projectile_img, rect = self.rotate(self.angle, offset, pivot_point)
-            # win.blit(projectile_img, (self.x-self.img.get_width()//2, self.y-self.img.get_height()//2))
+        # if not self.delete and not self.force_delete:
+        range = self.base_size + self.modifier
+        surface = pygame.Surface((range, range), pygame.SRCALPHA, 32)
+        pygame.draw.circle(surface, (50, 50, 50, 255), (range//2, range//2), range//2, 0)
+        win.blit(surface, (self.x - range//2, self.y - range//2))
 
     def set_direction(self):
         delta_x =  self.x - self.target_x
@@ -87,6 +74,9 @@ class Bullet(Projectile):
         if self.animation_count >= len(self.imgs):
             self.animation_count = 0
         """
+        if get_distance(self.x, self.y, self.source_x, self.source_y) >= self.projectile_max_distance:
+            self.force_delete = True
+
         for enemy in enemies:
             check_distance = self.get_distance(enemy.x, enemy.y)
             if check_distance < self.boundary:
