@@ -8,7 +8,7 @@ class Projectile:
     """
     Abstract class for projectiles
     """
-    def __init__(self, x, y, target_x, target_y, target, speed, size=0):
+    def __init__(self, x, y, target_x, target_y, target, speed, size=0, is_fragment=False):
         self.x = x
         self.y = y
         self.target_x = target_x
@@ -26,6 +26,7 @@ class Projectile:
         self.projectile_max_distance = 400
         self.source_x = self.x
         self.source_y = self.y
+        self.is_fragment = is_fragment
 
 
     def draw(self, win):

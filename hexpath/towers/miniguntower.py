@@ -6,7 +6,7 @@ from menu.menu import *
 from functions import *
 from projectiles.bullet import *
 from objects.labels import *
-from effects.poison import *
+from effects.bonuses import *
 import random
 
 pygame.mixer.pre_init(44100, 16, 2, 4096)
@@ -153,6 +153,7 @@ class MinigunTower(Tower):
                                 # The closer the unit to the source 'explosion' the more damage.
                                 projectile.delete = True
                                 resulting_damage = self.damage + self.mod_damage
+
                                 color = (255, 0, 0)
                                 label_font_size = 14
                                 """
@@ -165,22 +166,25 @@ class MinigunTower(Tower):
                                 20x crit chance bonus will give a total of 41 total accuracy (linear this would be ~100)
                                 40x crit chance bonus will give a total of 48.5 total accuracy (linear would still be 100)
                                 """
-                                if random.random() < self.stun_chance:
-                                    enemy.stun_timer += self.stun_duration
+
+                                if random.random() < self.stun.chance:
+                                    enemy.stun_timer += self.stun.duration
 
                                 calculated_crit_chance = (self.mod_crit_chance * 100) / ((self.mod_crit_chance * 100) + 60)
                                 crit_adj = ((self.crit_chance * 100) + calculated_crit_chance * 50) / 100
 
                                 resulting_damage = int((self.damage + self.mod_damage)  * (1+(random.random() * 25) / 100))
-                                poison_dmg = resulting_damage
+                                if projectile.is_fragment:
+                                    resulting_damage = resulting_damage * self.fragmentation.damage
+                                poison_dmg = resulting_damage/4
 
                                 if random.random() < crit_adj - enemy.crit_resist_rate:
                                     resulting_damage = int(resulting_damage + resulting_damage * (random.random() * 50 - 25) / 100)
                                     resulting_damage = resulting_damage * (self.crit_damage + self.mod_crit_damage - enemy.crit_resist)
                                     color = (255,215,0)
                                     label_font_size = 18
-                                    if random.random() < self.headshot_chance:
-                                        resulting_damage *= self.headshot_multiplier
+                                    if random.random() < self.headshot.chance:
+                                        resulting_damage *= self.headshot.headshot_multiplier
                                         color = (20, 30, 250)
                                         labels.append(Label(enemy.x, enemy.y, "HeadShot!", color, label_font_size))
                                 resulting_damage = int(resulting_damage)
@@ -188,14 +192,13 @@ class MinigunTower(Tower):
                                 labels.append(Label(enemy.x, enemy.y, resulting_damage, color, label_font_size))
 
                                 enemy.hit(resulting_damage)
-
-                                if random.random() < self.poison_chance - enemy.poison_resist_rate:
+                                if random.random() < self.poison.chance - enemy.poison_resist_rate:
                                     # stack poison counters max
-                                    if len(enemy.poison_counters) < self.max_poison_stacks:
-                                    enemy.poison_counters.append(Poison(self.poison_duration, poison_dmg * self.poison_damage, self.poison_frequency))
+                                    if len(enemy.poison_counters) < self.poison.max_stacks:
+                                        enemy.poison_counters.append(Poison(level=0, chance=self.poison.chance, duration=self.poison.duration, damage=poison_dmg, frequency=self.poison.frequency))
 
-                                if random.random() < self.fragment_chance:
-                                    self.explode_on_impact(projectile.x, projectile.y, self.fragment_count)
+                                if random.random() < self.fragmentation.chance:
+                                    self.explode_on_impact(projectile.x, projectile.y, self.fragmentation.fragments)
                                     # death_ = pygame.mixer.Sound(projectile.target.death_sound)
                                     # death_.set_volume(0.1)
                                     # death_.play()
@@ -207,7 +210,7 @@ class MinigunTower(Tower):
                         # add
 
 
-                    if random.random() < self.pierce_chance and not projectile.force_delete:
+                    if random.random() < self.piercing.chance and not projectile.force_delete:
                         projectile.delete = False
                         projectile.force_move()
                         # this is causing 'double jeopardy' hitting same enemy multiple times, but only at 100%

@@ -1,4 +1,6 @@
 import pygame
+
+from effects.bonuses import *
 from menu.menu import *
 import os
 import math
@@ -58,6 +60,12 @@ class Tower:
         self.mod_attack_speed = 0
         self.mod_attack_range = 0
         self.mod_projectile_size = 0
+        self.stun = Stun(0)
+        self.poison = Poison(0)
+        self.piercing = Piercing(0)
+        self.headshot = Headshot(0)
+        self.fragmentation = Fragmentation(0)
+
         #specials:
         # Stun stuff -----
         self.stun_chance = 0
@@ -67,7 +75,7 @@ class Tower:
         self.pierce_chance = 0
 
         # Poison stuff -----
-        self.poison_chance = 1
+        self.poison_chance = 0
         # percentage of regular damage done in poison (ignored crit/headshots)
         self.poison_damage = 0.25
         self.poison_duration = 100

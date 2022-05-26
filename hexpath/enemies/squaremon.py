@@ -188,7 +188,7 @@ class Juju(Enemy):
     def __init__(self, path):
         super().__init__(path)
         self.name = "Juju"
-        self.max_health = 400
+        self.max_health = 500
         self.health = self.max_health
         self.imgs = self.load_image()
         self.speed_increase = 1
@@ -197,8 +197,8 @@ class Juju(Enemy):
         self.item_drop = [1]
         self.item_drop_rate = 0.12
         self.max_heal_timer = self.heal_timer = 46
-        self.heal_amount = 10
-        self.heal_range = 50
+        self.heal_amount = 25
+        self.heal_range = 75
         self.xp_value = 40
         self.poison_resist_rate = 0.25
         # self.droppable_items = [Gold(self.x, self.y, 1, 8), Gold(self.x, self.y, 5, 15)]

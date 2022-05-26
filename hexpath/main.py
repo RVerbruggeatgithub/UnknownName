@@ -6,6 +6,7 @@ from towers.obstacle import Obstacle
 from objects.portal import Portal
 from objects.city import City
 from objects.items import *
+from effects.bonuses import *
 
 pygame.display.init()
 pygame.display.set_mode((500, 500), pygame.RESIZABLE)
@@ -238,7 +239,7 @@ class Game:
                 [{"type": "Trippet", "count": 50, "interval": 4}, {"type": "TrippetElite", "count": 50, "interval": 4}],
                 [{"type": "Yolkee", "count": 18, "interval": 1.5}, {"type": "Trippet", "count": 30, "interval": 1}],
                 [{"type": "Yolkee", "count": 18, "interval": 1.5}, {"type": "Trippet", "count": 30, "interval": 1}],
-                #wave 31:
+                # wave 31:
                 [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
                 [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
                 [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
@@ -249,6 +250,7 @@ class Game:
                 [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
                 [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
                 [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+                # wave 41:
                 [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
                 [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
                 [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
@@ -259,7 +261,8 @@ class Game:
                 [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
                 [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
                 [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
-                [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
+                # wave 51
+                [{"type": "Juju", "count": 25, "interval": 3}],
                 [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
                 [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
                 [{"type": "TrippetElite", "count": 5, "interval": 3}, {"type": "Trippet", "count": 10, "interval": 1}],
@@ -337,6 +340,13 @@ class Game:
         self.xp = 0
         self.level = 0
         self.xp_req = [5, 10, 20, 50, 100, 175, 300, 500, 800, 1200, 1750, 2500, 3500, 5000, 7500, 12000, 20000, 32000, 50000, 80000, 130000, 99999999]
+
+        self.stun = Stun()
+        self.poison = Poison()
+        self.piercing = Piercing()
+        self.headshot = Headshot()
+        self.fragmentation = Fragmentation()
+
 
     def run(self):
         run = True
@@ -611,6 +621,7 @@ class Game:
                 if not self.pause:
                     if self.update_bonuses:
                         self.apply_bonuses_to_towers()
+                        self.apply_specials()
                         self.update_bonuses = False
 
                     if len(self.paths) > 0 and self.wave < len(self.waves):
@@ -730,6 +741,20 @@ class Game:
                 # End of if not pause block
         # pygame.quit()
 
+    def apply_specials(self):
+        # self.specials
+        print("Applying bonuseses")
+        self.stun.update_stats()
+        self.poison.update_stats()
+        self.piercing.update_stats()
+        self.headshot.update_stats()
+        self.fragmentation.update_stats()
+        for twr in self.attack_towers:
+            twr.stun = self.stun
+            twr.poison = self.poison
+            twr.piercing = self.piercing
+            twr.headshot = self.headshot
+            twr.fragmentation = self.fragmentation
 
     def sort_by_y(self, spr):
         """
