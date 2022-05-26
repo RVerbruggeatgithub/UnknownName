@@ -759,7 +759,7 @@ class Game:
         pygame.draw.rect(self.win, xp_bar_color, (25, self.height - 145, health_bar, 6), 0)
 
         small_font = pygame.font.SysFont("segoeuisemilight", 12)
-        phrase = "LvL:" + str(self.level) + "XP:" + str(cur_xp) + "/" + str(req_xp)
+        phrase = "LvL:" + str(self.level) + " - XP:" + str(cur_xp) + "/" + str(req_xp)
         xp_line = small_font.render(str(phrase), 1, (255, 255, 255))
         x_center = self.width / 2 - xp_line.get_width() / 2
         self.win.blit(xp_line, (x_center, (self.height - 152)))
