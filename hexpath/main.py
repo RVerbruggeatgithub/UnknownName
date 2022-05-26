@@ -658,6 +658,14 @@ class Game:
                     for enemy in self.enemies:
                         enemy.move()
                         enemy.move_action(self.enemies, self.label_collector)
+                        for poison_counter in enemy.poison_counters:
+                            hit, dmg = poison_counter.action()
+                            if hit:
+                                enemy.hit(dmg)
+                                self.label_collector.append(Label(enemy.x, enemy.y, dmg, (20, 200, 20), 12))
+                            if poison_counter.duration <= 0:
+                                enemy.poison_counters.remove(poison_counter)
+
                         if enemy.path_pos >= len(enemy.path) - 1 or enemy.health <= 0:
                             if enemy.health <= 0:
                                 enemies_count_prev = len(self.enemies)

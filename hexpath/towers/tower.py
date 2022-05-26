@@ -59,18 +59,30 @@ class Tower:
         self.mod_attack_range = 0
         self.mod_projectile_size = 0
         #specials:
+        # Stun stuff -----
         self.stun_chance = 0
         self.stun_duration = 0
+
+        # Piercing stuff -----
         self.pierce_chance = 0
 
-        self.poison_chance = 0
-        self.poison_damage = 0
+        # Poison stuff -----
+        self.poison_chance = 1
+        # percentage of regular damage done in poison (ignored crit/headshots)
+        self.poison_damage = 0.25
+        self.poison_duration = 100
+        self.poison_frequency = 25
+        self.max_poison_stacks = 5
+
+        # Headshot stuff -----
         # chance to convert crit to headshot causing X* damage
         self.headshot_chance = 0
         self.headshot_multiplier = 25
-        # explosive shell on kill
-        self.fragment_chance = 0.4
-        self.fragment_count = 4
+
+        # Fragmentation stuff -----
+        self.fragment_chance = 0
+        self.fragment_count = 0
+
         self.bonus_xp = 0
 
     def draw(self, win):

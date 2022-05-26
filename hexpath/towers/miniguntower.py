@@ -6,6 +6,7 @@ from menu.menu import *
 from functions import *
 from projectiles.bullet import *
 from objects.labels import *
+from effects.poison import *
 import random
 
 pygame.mixer.pre_init(44100, 16, 2, 4096)
@@ -171,6 +172,7 @@ class MinigunTower(Tower):
                                 crit_adj = ((self.crit_chance * 100) + calculated_crit_chance * 50) / 100
 
                                 resulting_damage = int((self.damage + self.mod_damage)  * (1+(random.random() * 25) / 100))
+                                poison_dmg = resulting_damage
 
                                 if random.random() < crit_adj - enemy.crit_resist_rate:
                                     resulting_damage = int(resulting_damage + resulting_damage * (random.random() * 50 - 25) / 100)
@@ -187,12 +189,16 @@ class MinigunTower(Tower):
 
                                 enemy.hit(resulting_damage)
 
+                                if random.random() < self.poison_chance - enemy.poison_resist_rate:
+                                    # stack poison counters max
+                                    if len(enemy.poison_counters) < self.max_poison_stacks:
+                                    enemy.poison_counters.append(Poison(self.poison_duration, poison_dmg * self.poison_damage, self.poison_frequency))
+
                                 if random.random() < self.fragment_chance:
                                     self.explode_on_impact(projectile.x, projectile.y, self.fragment_count)
                                     # death_ = pygame.mixer.Sound(projectile.target.death_sound)
                                     # death_.set_volume(0.1)
                                     # death_.play()
-
                                     # dropping_items.append(enemy.items)
                                     # enemies.remove(enemy)
                             else:

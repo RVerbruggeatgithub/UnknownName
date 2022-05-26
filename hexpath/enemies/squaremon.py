@@ -200,6 +200,7 @@ class Juju(Enemy):
         self.heal_amount = 10
         self.heal_range = 50
         self.xp_value = 40
+        self.poison_resist_rate = 0.25
         # self.droppable_items = [Gold(self.x, self.y, 1, 8), Gold(self.x, self.y, 5, 15)]
 
     def load_image(self):

@@ -1,4 +1,5 @@
 from objects.labels import *
+from functions.functions import *
 
 
 class Enemy:
@@ -18,10 +19,9 @@ class Enemy:
         self.move_count = 0
         self.move_dis = 0
         self.imgs = []
-        #self.flipped = False
         self.max_health = 0
         self.speed_increase = 1
-        # upon survival it will do this much damage to the gate
+        # upon survival, it will do this much damage to the gate
         self.gate_damage = 1
         self.angle = 0
         self.anim_seq = 0
@@ -34,7 +34,7 @@ class Enemy:
         self.deviation = [0, 0]
         self.resist_splash_range = 0
         self.dodge_rate = 0
-        # reduces chances of getting crit hit on this enemy
+        # reduce chances of getting crit hit on this enemy
         self.crit_resist_rate = 0
         # reduces crit damage taken
         self.crit_resist = 0
@@ -43,7 +43,8 @@ class Enemy:
         self.survival_damage = 1
         self.xp_value = 1
         self.stun_timer = 0
-
+        self.poison_counters = []
+        self.poison_resist_rate = 0
     """
     def generate_item(self):
         item_t = random.choice(self.droppable_items)
@@ -93,18 +94,18 @@ class Enemy:
         health_bar = round(move_by * self.health)
         if self.health < self.max_health:
             pygame.draw.rect(win, (255, 255, 255), (self.x - 31, self.y - 41, (length+2), 6), 0)
-            pygame.draw.rect(win, (255,0,0), (self.x-30, self.y- 40, length, 4), 0)
+            pygame.draw.rect(win, (255, 0, 0), (self.x-30, self.y - 40, length, 4), 0)
             pygame.draw.rect(win, (0, 255, 0), (self.x-30, self.y - 40, health_bar, 4), 0)
 
-    def collide(self, X, Y):
+    def collide(self, x, y):
         """
         Returns if position has hit enemy
         :param x: int
         :param y: int
         :return: Bool
         """
-        if X <= self.x + self.width and X >= self.x:
-            if Y <= self.y + self.height and Y >= self.y:
+        if x <= self.x + self.width and x >= self.x:
+            if y <= self.y + self.height and y >= self.y:
                 return True
         return False
 
@@ -116,15 +117,16 @@ class Enemy:
         if self.stun_timer > 0:
             self.stun_timer -= 1
             if self.stun_timer <= 0:
-                stun_timer = 0
+                self.stun_timer = 0
         else:
             self.anim_seq += 1
-            if (self.anim_seq > 5):
+            if self.anim_seq > 5:
                 self.animation_count += 1
                 self.anim_seq = 0
 
             if self.animation_count >= len(self.imgs):
                 self.animation_count = 0
+            x1, y1 = [[0, 0], [0, 0]]
             try:
                 x1, y1 = self.path[self.path_pos]
             except ValueError:
@@ -135,7 +137,6 @@ class Enemy:
                 x2, y2 = self.path[self.path_pos + 1]
             x2, y2 = self.path[self.path_pos+1]
 
-            delta_x = x2 - x1
             delta_y = y2 - y1
             y_mod = -1
             if 0 < delta_y > 0:
@@ -148,11 +149,11 @@ class Enemy:
             self.x = self.x + new_move_x
             self.y = self.y + new_move_y
             #  self.deviation[0]  self.deviation[1]
-            mod_boundery = 0
+            mod_boundary = 0
             if self.path_pos == len(self.path):
-                mod_boundery = math.sqrt(self.deviation[0] ** 2 + self.deviation[1] ** 2)
+                mod_boundary = math.sqrt(self.deviation[0] ** 2 + self.deviation[1] ** 2)
             enemy_distance_to_next_hop = math.sqrt((self.x - x2)**2 + (self.y - y2)**2)
-            if (-self.boundary - mod_boundery <= enemy_distance_to_next_hop <= self.boundary + mod_boundery):
+            if -self.boundary - mod_boundary <= enemy_distance_to_next_hop <= self.boundary + mod_boundary:
                 self.travelled_path.append(enemy_distance_to_next_hop)
                 self.path_pos += 1
 
@@ -181,7 +182,7 @@ class Enemy:
     def get_distance(self, x, y):
         return math.sqrt((self.x - x) ** 2 + (self.y - y) ** 2)
 
-    def dead_action(self, enemies=[]):
+    def dead_action(self, enemies):
         """
         Action to perform if killed
         :param enemies: list of enemies
