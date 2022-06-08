@@ -1,10 +1,13 @@
 import itertools
 from hex.hexmap import Hexmap
 from enemies.squaremon import *
+from menu import viewport
+from menu.viewport import Manager
 from towers.miniguntower import MinigunTower
 from towers.obstacle import Obstacle
 from objects.portal import Portal
 from objects.city import City
+from objects.popup import *
 from objects.items import *
 from effects.bonuses import *
 
@@ -12,7 +15,15 @@ pygame.display.init()
 pygame.display.set_mode((500, 500), pygame.RESIZABLE)
 pygame.event.set_allowed([pygame.QUIT, pygame.MOUSEBUTTONUP, pygame.MOUSEBUTTONDOWN])
 
+tech_tree_map = load_image("resources", "techtree.png")
 background_image = load_image("resources", "porro_village.png")
+sm_green_hex = pygame.transform.scale(load_image("resources", "menu_small_green_hex.png").convert_alpha(), (25, 25))
+sm_lblue_hex = pygame.transform.scale(load_image("resources", "menu_small_lblue_hex.png").convert_alpha(), (25, 25))
+sm_pink_hex = pygame.transform.scale(load_image("resources", "menu_small_pink_hex.png").convert_alpha(), (25, 25))
+sm_purple_hex = pygame.transform.scale(load_image("resources", "menu_small_purple_hex.png").convert_alpha(), (25, 25))
+sm_red_hex = pygame.transform.scale(load_image("resources", "menu_small_red_hex.png").convert_alpha(), (25, 25))
+sm_yellow_hex = pygame.transform.scale(load_image("resources", "menu_small_yellow_hex.png").convert_alpha(), (25, 25))
+
 play_btn = pygame.transform.scale(load_image("resources", "button_play.png").convert_alpha(), (32, 32))
 pause_btn = pygame.transform.scale(load_image("resources", "button_pause.png").convert_alpha(), (32, 32))
 reg_speed = pygame.transform.scale(load_image("resources", "button_reg_speed.png").convert_alpha(), (32, 32))
@@ -33,6 +44,8 @@ pictogram_splash_range = pygame.transform.scale(load_image("resources", "icon_sp
 pictogram_not_implemented = pygame.transform.scale(load_image("resources", "icon_not_implemented.png").convert_alpha(), (100, 100))
 pictogram_shield = pygame.transform.scale(load_image("resources", "icon_shield.png").convert_alpha(), (100, 100))
 
+GEMS = 150
+
 
 class MainGameMenu:
     def __init__(self):
@@ -48,24 +61,54 @@ class MainGameMenu:
         frame_height = 600
         self.start_menu.add_frame((self.width//2 - frame_width//2), 80, frame_width, frame_height, (100,150,225, 100), (0,0,0, 0))
         self.start_menu.add_plain_button("New Game", None, (self.width//2 - frame_width//2 + frame_width*0.1), 250, frame_width*0.8, 50, (0,0,0, 100))
-        self.start_menu.add_plain_button("Help", None, (self.width // 2 - frame_width // 2 + frame_width * 0.1),
+        self.start_menu.add_plain_button("Upgrades", None, (self.width // 2 - frame_width // 2 + frame_width * 0.1),
                                          325, frame_width * 0.8, 50, (0, 0, 0, 100))
+        self.start_menu.add_plain_button("Help", None, (self.width // 2 - frame_width // 2 + frame_width * 0.1),
+                                         400, frame_width * 0.8, 50, (0, 0, 0, 100))
         self.show_start_menu = True
         self.help_menu = Menu(25, 25, self.width - 50, self.height - 50, None)
         self.show_help_menu = False
+        self.show_upgrade_menu = False
         self.help_menu.add_frame((self.width//2 - 400), 80, 800, frame_height, (100,150,225, 100), (0,0,0, 0))
         self.help_menu.add_plain_button("Back", None, (self.width//2 - 400) + 725, 100, 65, 50, (0,0,0, 100))
 
-    def draw_current_menu(self, current_menu):
-        self.win.fill([255, 255, 255])
+        self.upgrade_menu = Menu(25, 25, self.width/4 - 50, self.height - 50, None)
+        self.upgrade_menu.add_plain_button("Back", None, (self.width//2 - 400) + 725, 100, 65, 50, (0,0,0, 100))
+        self.popup_content = None
+
+
+
+
+    def draw_current_menu(self, current_menu, fill=True):
+        if fill:
+            self.win.fill([255, 255, 255])
         current_menu.draw(self.win)
-        pygame.display.update()
+
+
 
     def run(self):
         game = Game()
         game.run()
 
     def main_menu(self):
+        rectangle = pygame.Rect(300, 80, 500, 500)
+        VP_surface = pygame.Surface((500, 500), pygame.SRCALPHA, 32)
+        mousebeingpressed = False
+        stage = viewport.Manager(2000, 2000, 2)
+        focus = stage.add_object(0, viewport.moveable_obj(stage.w / 2, stage.h / 2))
+        stage.add_object(0, viewport.img_obj(0, 0, 2000, 2000, tech_tree_map, "Background Image", "", None, False))
+        stage.add_object(1, viewport.img_obj(1002, 882, 40, 40, sm_green_hex, "Attack +1", "ATK001", None, False, cost=50))
+
+        stage.add_object(1, viewport.img_obj(926, 844, 40, 40, sm_green_hex, "Attack +1", "ATK002", "ATK001", False, cost=80))
+        stage.add_object(1, viewport.img_obj(1078, 844, 40, 40, sm_green_hex, "Attack +1", "ATK003", "ATK002", False, cost=125))
+        stage.add_object(1, viewport.img_obj(926, 760, 40, 40, sm_green_hex, "Attack +1", "ATK004", "ATK003", False, cost=200))
+        stage.add_object(1, viewport.img_obj(1078, 760, 40, 40, sm_green_hex, "Attack +1", "ATK005", "ATK004", False, cost=300))
+        stage.add_object(1, viewport.img_obj(1002, 718, 40, 40, sm_green_hex, "Attack +1", "ATK006", "ATK005", False, cost=500))
+
+        stage.add_object(1, viewport.img_obj(1002, 1100, 40, 40, sm_yellow_hex, "Accuracy +1%", "ACC001", None, False))
+        stage.add_object(0, viewport.block_obj(1050, 1200, 80, 250))
+        stage.viewport.center_on_x(1000)
+        stage.viewport.center_on_y(1000)
         # draw the main menu
         while self.show_main_menu:
             if self.show_start_menu:
@@ -77,10 +120,17 @@ class MainGameMenu:
                         for button in self.start_menu.buttons:
                             if button.click(mouse_pos[0], mouse_pos[1]) and button.button_text == "New Game":
                                 self.run()
+                            if button.click(mouse_pos[0], mouse_pos[1]) and button.button_text == "Upgrades":
+                                self.show_start_menu = False
+                                self.show_help_menu = False
+                                self.show_upgrade_menu = True
                             if button.click(mouse_pos[0], mouse_pos[1]) and button.button_text == "Help":
                                 self.show_start_menu = False
                                 self.show_help_menu = True
+                                self.show_upgrade_menu = False
                 draw_menu = self.start_menu
+                self.draw_current_menu(draw_menu)
+                pygame.display.update()
 
             if self.show_help_menu:
                 mouse_pos = pygame.mouse.get_pos()
@@ -93,7 +143,53 @@ class MainGameMenu:
                                 self.show_help_menu = False
                                 self.show_start_menu = True
                 draw_menu = self.help_menu
-            self.draw_current_menu(draw_menu)
+                self.draw_current_menu(draw_menu)
+                pygame.display.update()
+
+            if self.show_upgrade_menu:
+                global GEMS
+                mouse_pos = pygame.mouse.get_pos()
+
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        self.show_main_menu = False
+
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        mousebeingpressed = True
+                    if event.type == pygame.MOUSEBUTTONUP:
+                        mousebeingpressed = False
+                        stage.focus_off()
+                        opt_clicked = stage.get_clicked(mouse_pos[0], mouse_pos[1])
+                        if opt_clicked:
+                            print("available gems:", GEMS)
+                            # action to take on click
+                            if opt_clicked.cost <= GEMS and opt_clicked.enabled:
+                                GEMS -= opt_clicked.cost
+                                opt_clicked.selected = True
+                        for button in self.help_menu.buttons:
+                            if button.click(mouse_pos[0], mouse_pos[1]) and button.button_text == "Back":
+                                print("Following bonusses will be applied:", stage.acquired)
+                                self.show_upgrade_menu = False
+                                self.show_start_menu = True
+                    if event.type == pygame.MOUSEMOTION and mousebeingpressed:
+                        stage.focus_on(focus)
+                    if event.type == pygame.MOUSEMOTION:
+                        hover_obj = stage.get_hover(mouse_pos[0], mouse_pos[1])
+                        if hover_obj:
+                            print(">>", hover_obj.desc)
+                            self.popup_content = Popup(hover_obj.x - stage.viewport.x + 50, hover_obj.y - stage.viewport.y + 5, hover_obj.desc)
+                        else:
+                            self.popup_content = None
+
+                draw_menu = self.upgrade_menu
+                # self.win.fill([255, 255, 255])
+                stage.do()
+                self.draw_current_menu(draw_menu, False)
+                # self.win.blit(VP_surface, rectangle)
+                if self.popup_content is not None:
+                    self.popup_content.draw(self.win)
+                pygame.display.update()
+
 
         pygame.quit()
 

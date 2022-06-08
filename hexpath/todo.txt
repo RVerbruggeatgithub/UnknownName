@@ -2,14 +2,14 @@
 
 Features:
 Add Escaped enemy counter and limit
-Add Protective Dome/ Shield, if an enemy escapes, dome protection counter will be reduced by 1, if at 0, escaped enemy counter will increase.
-    protective domes are restored next wave. Escaped enemy counter is not.
 Add 4 background / Maps
 Add main menu
 Add toggle switch for auto/manual tower ?
 Add fast forward option (tick speed?)
 Add shop
-
+Add Experience + Tower bonuses (Knock-back? Stun? Piercing? Poison Damage? Exploding, 1 extra per level? headshot 10x dmg?, +x bonus xp?, +x% auto heal per wave , +x max health)
+Add enemy  ghosting, becomes transparent(?) cannot be directly hit
+Add enemy randomly spawn another
 
 Fixes needed:
 

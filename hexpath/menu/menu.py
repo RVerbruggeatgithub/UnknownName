@@ -1,5 +1,6 @@
 import pygame
 from functions.functions import *
+
 pygame.font.init()
 pygame.display.init()
 pygame.display.set_mode((1500, 800))
