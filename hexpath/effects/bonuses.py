@@ -40,9 +40,9 @@ class Poison(Bonus):
         return hit, damage
 
     def update_stats(self):
-        _chance = [0, 0.1, 0.15, 0.20, 0.25, 0.30]
-        _duration = [0, 40, 60, 90, 80, 100]
-        _frequency = [0, 40, 30, 30, 20, 20]
+        _chance = [0, 0.12, 0.17, 0.23, 0.30, 0.40]
+        _duration = [0, 60, 90, 80, 100, 105]
+        _frequency = [0, 30, 30, 20, 20, 15]
         self.chance = _chance[self.level]
         self.duration = _duration[self.level]
         self.frequency = _frequency[self.level]
@@ -75,7 +75,7 @@ class Headshot(Bonus):
         self.headshot_multiplier = 1
 
     def update_stats(self):
-        _chance = [0, 0.1, 0.2, 0.3, 0.4, 0.5]
+        _chance = [0, 0.1, 0.15, 0.22, 0.3, 0.4]
         _headshot_multiplier = [1, 10, 10, 15, 15, 20]
         self.chance = _chance[self.level]
         self.headshot_multiplier = _headshot_multiplier[self.level]
