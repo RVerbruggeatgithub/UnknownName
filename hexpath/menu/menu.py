@@ -5,7 +5,7 @@ pygame.font.init()
 pygame.display.init()
 pygame.display.set_mode((1500, 800))
 
-ico_background_image = pygame.transform.scale(load_image("resources", "button_empty.png").convert_alpha(), (64,64))
+ico_background_image = pygame.transform.scale(load_image("resources", "button_empty.png").convert_alpha(), (38,38))
 # upgrade_btn = pygame.transform.scale(load_image("resources", "button_upgrade.png").convert_alpha(), (32, 32))
 sell_btn = pygame.transform.scale(load_image("resources", "button_sell.png").convert_alpha(), (32, 32))
 pictogram_attack_speed = pygame.transform.scale(load_image("resources", "icon_atk_speed.png").convert_alpha(), (50, 50))
@@ -79,15 +79,16 @@ class PlainButton():
     Button class for menu objects
     """
     def __init__(self, button_text, button_sub_text, x, y, width, height, text_color=(100,50,77, 250), bg_color=(100,50,77, 150), border_color=(100,50,77, 250)):
-        self.button_text = button_text
+        self.name = self.button_text = button_text
         self.button_sub_text = button_sub_text
         self.width = width
         self.height = height
         self.x = x
         self.y = y
-        self.text_color = text_color
+        self.text_color = self.orig_text_color = text_color
         self.bg_color = bg_color
-        self.border_color = border_color
+        self.border_color = self.orig_border_color = border_color
+        self.quantity = 0
 
     def click(self, X, Y):
         """
@@ -101,6 +102,11 @@ class PlainButton():
                 return True
         return False
 
+    def hover_over(self, x, y):
+        if x <= self.x + self.width and x >= self.x:
+            if y <= self.y + self.height and y >= self.y :
+                return True
+        return False
 
     def draw(self, win):
         """
@@ -115,12 +121,11 @@ class PlainButton():
         pygame.draw.rect(win, self.border_color, rectangle, width=2, border_radius=6)
 
         if self.button_text is not None:
-
             if self.button_sub_text is None:
-                reg_font = pygame.font.SysFont("segoeuisemilight", 26)
+                reg_font = pygame.font.SysFont("segoeuisymbol", 26)
                 y_adj = 5
             else:
-                reg_font = pygame.font.SysFont("segoeuisemilight", 16)
+                reg_font = pygame.font.SysFont("segoeuisymbol", 16)
                 y_adj = 0
             btn_txt = reg_font.render(str(self.button_text), 1, self.text_color)
             win.blit(btn_txt, (self.x + self.width//2 - btn_txt.get_width()//2, self.y + y_adj))
@@ -153,10 +158,10 @@ class BuildMenuIcon(Button):
         win.blit(self.buildmenu_icon_background_image, (self.x-5, self.y-8))
         small_font = pygame.font.SysFont("segoeuisemilight", 10)
         title = small_font.render(self.fullname, 1, (255, 255, 255))
-        qty = small_font.render("QTY:" + str(self.quantity), 1, (255, 255, 255))
+        qty = small_font.render("x" + str(self.quantity), 1, (255, 255, 255))
         win.blit(self.img, (self.x, self.y))
         win.blit(title, (self.x + self.img.get_width()/2 - title.get_width()/2 + 2, self.y + self.img.get_height()/2 + 10))
-        win.blit(qty, (self.x + self.img.get_width() / 2 - title.get_width() / 2 + 2, self.y + self.img.get_height() / 2 + 30))
+        win.blit(qty, (self.x + self.img.get_width() - qty.get_width(), self.y + self.img.get_height() / 2 - 24))
 
     def click(self, X, Y):
         """
@@ -527,6 +532,21 @@ class Menu:
         self.items += 1
         self.buttons.append(configured_button)
 
+    def on_hover(self, x, y):
+        """
+        return the clicked item from the menu
+        :param X: int
+        :param Y: int
+        :return: str
+        """
+        for btn in self.buttons:
+            if btn.hover_over(x, y):
+                btn.text_color = (255, 255, 255, 255)
+                btn.border_color = (255, 255, 255, 255)
+            else:
+                btn.text_color = btn.orig_text_color
+                btn.border_color = btn.orig_border_color
+
     def get_clicked(self, X, Y):
         """
         return the clicked item from the menu
@@ -576,6 +596,7 @@ class IconMenu(Menu):
     def __init__(self, x, y, width, height, menu_bg=None):
         super().__init__(x, y, width, height, menu_bg)
         self.icons = []
+        self.buttons = []
         self.width = width
         self.height = height
         self.x = x
@@ -616,9 +637,14 @@ class IconMenu(Menu):
             "CRITD": pictogram_crit_damage,
             "BULSP": pictogram_projectile_speed,
             "RADIUS": pictogram_splash_range,
-            "SHIELD": pictogram_shield
+            "SHIELD": pictogram_shield,
+            "PEN": pictogram_not_implemented,
+            "PSN": pictogram_not_implemented,
+            "HST": pictogram_not_implemented,
+            "FRG": pictogram_not_implemented,
+            "STN": pictogram_not_implemented,
         }
-        button = Button(self, icon_map[name], name, self.x + (self.items * 51) + 20, self.y + 10, title)
+        button = Button(self, icon_map[name], name, self.x + (self.items * 51) + 20, self.y, title)
         self.icons.append(button)
         self.items += 1
 
@@ -638,6 +664,9 @@ class IconMenu(Menu):
 
         for icon in self.icons:
             icon.draw(win)
+
+        for btn in self.buttons:
+            btn.draw(win)
 
 class buildingMenu(Menu):
     """
