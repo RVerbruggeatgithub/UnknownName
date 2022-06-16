@@ -52,7 +52,6 @@ class MainGameMenu:
     def __init__(self):
         savegame_data.load_game()
         self.gems = savegame_data.gems
-        self.gems = 10000
         self.width = 1200
         self.height = 750
         self.win = pygame.display.set_mode((self.width, self.height), pygame.FULLSCREEN)
@@ -402,7 +401,7 @@ class Game:
         self.portals = []
         self.cities = []
         self.waves = [
-            [{"type": "TestUnit", "count": 25, "interval": 5}],
+            # [{"type": "TestUnit", "count": 25, "interval": 5}],
                 [{"type": "Squaremon", "count": 1, "interval": 0.8}],
                 [{"type": "Squaremon", "count": 2, "interval": 0.8}],
                 [{"type": "Squaremon", "count": 3, "interval": 1.0}],
