@@ -1,8 +1,8 @@
 import itertools
 from hex.hexmap import Hexmap
 from enemies.squaremon import *
+from hexpath.objects.natobjects import NatObject
 from menu import viewport
-from menu.viewport import Manager
 from towers.miniguntower import MinigunTower
 from towers.obstacle import Obstacle
 from objects.portal import Portal
@@ -10,9 +10,12 @@ from objects.city import City
 from objects.popup import *
 from objects.items import *
 from effects.bonuses import *
+from functions.functions import *
+from savegame.save import *
 
 pygame.display.init()
-pygame.display.set_mode((500, 500), pygame.RESIZABLE)
+SCRN_SIZE = (1200, 750)
+pygame.display.set_mode(SCRN_SIZE, pygame.RESIZABLE)
 pygame.event.set_allowed([pygame.QUIT, pygame.MOUSEBUTTONUP, pygame.MOUSEBUTTONDOWN])
 
 tech_tree_map = load_image("resources", "techtree.png")
@@ -26,10 +29,8 @@ sm_yellow_hex = pygame.transform.scale(load_image("resources", "menu_small_yello
 
 play_btn = pygame.transform.scale(load_image("resources", "button_play.png").convert_alpha(), (32, 32))
 pause_btn = pygame.transform.scale(load_image("resources", "button_pause.png").convert_alpha(), (32, 32))
-reg_speed = pygame.transform.scale(load_image("resources", "button_reg_speed.png").convert_alpha(), (32, 32))
-high_speed = pygame.transform.scale(load_image("resources", "button_hi_speed.png").convert_alpha(), (32, 32))
-ico_minigun = pygame.transform.scale(load_image("resources", "ico_minigun.png").convert_alpha(), (50, 50))
-ico_obstruction = pygame.transform.scale(load_image("resources", "ico_obstruction.png").convert_alpha(), (50, 50))
+ico_minigun = pygame.transform.scale(load_image("resources", "ico_minigun.png").convert_alpha(), (30, 30))
+ico_obstruction = pygame.transform.scale(load_image("resources", "ico_obstruction.png").convert_alpha(), (30, 30))
 attack_tower_names = ["Minigun Tower"]
 obstacles = ["Obstacle"]
 pictogram_attack_speed = pygame.transform.scale(load_image("resources", "icon_atk_speed.png").convert_alpha(), (100, 100))
@@ -44,14 +45,17 @@ pictogram_splash_range = pygame.transform.scale(load_image("resources", "icon_sp
 pictogram_not_implemented = pygame.transform.scale(load_image("resources", "icon_not_implemented.png").convert_alpha(), (100, 100))
 pictogram_shield = pygame.transform.scale(load_image("resources", "icon_shield.png").convert_alpha(), (100, 100))
 
-GEMS = 150
+savegame_data = GameData()
 
 
 class MainGameMenu:
     def __init__(self):
+        savegame_data.load_game()
+        self.gems = savegame_data.gems
+        self.gems = 10000
         self.width = 1200
-        self.height = 900
-        self.win = pygame.display.set_mode((self.width, self.height), pygame.RESIZABLE)
+        self.height = 750
+        self.win = pygame.display.set_mode((self.width, self.height), pygame.FULLSCREEN)
         """
         Main menu stuff:
         """
@@ -65,6 +69,8 @@ class MainGameMenu:
                                          325, frame_width * 0.8, 50, (0, 0, 0, 100))
         self.start_menu.add_plain_button("Help", None, (self.width // 2 - frame_width // 2 + frame_width * 0.1),
                                          400, frame_width * 0.8, 50, (0, 0, 0, 100))
+        self.start_menu.add_plain_button("Quit", None, (self.width // 2 - frame_width // 2 + frame_width * 0.1),
+                                         475, frame_width * 0.8, 50, (0, 0, 0, 100))
         self.show_start_menu = True
         self.help_menu = Menu(25, 25, self.width - 50, self.height - 50, None)
         self.show_help_menu = False
@@ -96,30 +102,69 @@ class MainGameMenu:
         mousebeingpressed = False
         stage = viewport.Manager(2000, 2000, 2)
         focus = stage.add_object(0, viewport.moveable_obj(stage.w / 2, stage.h / 2))
+        # savegame_data.upgrades
         stage.add_object(0, viewport.img_obj(0, 0, 2000, 2000, tech_tree_map, "Background Image", "", None, False))
-        stage.add_object(1, viewport.img_obj(1002, 882, 40, 40, sm_green_hex, "Attack +1", "ATK001", None, False, cost=50))
 
-        stage.add_object(1, viewport.img_obj(926, 844, 40, 40, sm_green_hex, "Attack +1", "ATK002", "ATK001", False, cost=80))
-        stage.add_object(1, viewport.img_obj(1078, 844, 40, 40, sm_green_hex, "Attack +1", "ATK003", "ATK002", False, cost=125))
-        stage.add_object(1, viewport.img_obj(926, 760, 40, 40, sm_green_hex, "Attack +1", "ATK004", "ATK003", False, cost=200))
-        stage.add_object(1, viewport.img_obj(1078, 760, 40, 40, sm_green_hex, "Attack +1", "ATK005", "ATK004", False, cost=300))
-        stage.add_object(1, viewport.img_obj(1002, 718, 40, 40, sm_green_hex, "Attack +1", "ATK006", "ATK005", False, cost=500))
+        stage.add_object(1, viewport.img_obj(1002, 882, 40, 40, sm_green_hex, "Attack +1", "ATKA01", None, "ATKA01" in savegame_data.upgrades, cost=50))
+        # x, y, w, h, img, desc, code, prerequisite, selected, status=False, cost=0
+        stage.add_object(1, viewport.img_obj(926, 844, 40, 40, sm_green_hex, "Attack +1", "ATKA02", ["ATKA01"], "ATKA02" in savegame_data.upgrades, cost=80))
+        stage.add_object(1, viewport.img_obj(1078, 844, 40, 40, sm_green_hex, "Attack +1", "ATKA03", ["ATKA01"], "ATKA03" in savegame_data.upgrades, cost=125))
+        stage.add_object(1, viewport.img_obj(926, 760, 40, 40, sm_green_hex, "Attack +1", "ATKA04", ["ATKA02"], "ATKA04" in savegame_data.upgrades, cost=200))
+        stage.add_object(1, viewport.img_obj(1078, 760, 40, 40, sm_green_hex, "Attack +1", "ATKA05", ["ATKA03"], "ATKA05" in savegame_data.upgrades, cost=300))
+        stage.add_object(1, viewport.img_obj(1002, 718, 40, 40, sm_green_hex, "Poison 5% chance", "SPECB01", ["ATKA05", "ATKA04"], "SPECB01" in savegame_data.upgrades, cost=500))
 
-        stage.add_object(1, viewport.img_obj(1002, 1100, 40, 40, sm_yellow_hex, "Accuracy +1%", "ACC001", None, False))
-        stage.add_object(0, viewport.block_obj(1050, 1200, 80, 250))
+        stage.add_object(1, viewport.img_obj(1002, 1100, 40, 40, sm_yellow_hex, "Accuracy +1", "ACCA01", None, "ACCA01" in savegame_data.upgrades, cost=50))
+        stage.add_object(1, viewport.img_obj(926, 1142, 40, 40, sm_yellow_hex, "Accuracy +1", "ACCA02", ["ACCA01"], "ACCA02" in savegame_data.upgrades, cost=80))
+        stage.add_object(1, viewport.img_obj(1078, 1142, 40, 40, sm_yellow_hex, "Accuracy +1", "ACCA03", ["ACCA01"], "ACCA03" in savegame_data.upgrades, cost=125))
+        stage.add_object(1, viewport.img_obj(926, 1226, 40, 40, sm_yellow_hex, "Accuracy +1", "ACCA04", ["ACCA02"], "ACCA04" in savegame_data.upgrades, cost=200))
+        stage.add_object(1, viewport.img_obj(1078, 1226, 40, 40, sm_yellow_hex, "Accuracy +1", "ACCA05", ["ACCA03"], "ACCA05" in savegame_data.upgrades, cost=300))
+        stage.add_object(1, viewport.img_obj(1002, 1264, 40, 40, sm_yellow_hex, "Penetrate 5% chance", "SPECA01", ["ACCA05", "ACCA04"], "SPECA01" in savegame_data.upgrades, cost=500))
+
+        # top
+        stage.add_object(1, viewport.img_obj(1171, 809, 40, 40, sm_red_hex, "Crit +1", "CRITA05", ["CRITA03"], "CRITA05" in savegame_data.upgrades, cost=300))
+        # left_top
+        stage.add_object(1, viewport.img_obj(1095, 851, 40, 40, sm_red_hex, "Crit +1", "CRITA03", ["CRITA01"], "CRITA03" in savegame_data.upgrades, cost=125))
+        # right_top
+        stage.add_object(1, viewport.img_obj(1247, 851, 40, 40, sm_red_hex, "Headshot 10% chance", "SPECC01", ["CRITA05", "CRITA04"], "SPECC01" in savegame_data.upgrades, cost=500))
+        # left_bottom
+        stage.add_object(1, viewport.img_obj(1095, 937, 40, 40, sm_red_hex, "Crit +1", "CRITA01", None, "CRITA01" in savegame_data.upgrades, cost=50))
+        # right_bottom
+        stage.add_object(1, viewport.img_obj(1247, 937, 40, 40, sm_red_hex, "Crit +1", "CRITA04", ["CRITA02"], "CRITA04" in savegame_data.upgrades, cost=200))
+        # bottom
+        stage.add_object(1, viewport.img_obj(1171, 979, 40, 40, sm_red_hex, "Crit +1", "CRITA02", ["CRITA01"], "CRITA02" in savegame_data.upgrades, cost=80))
+
+        # top
+        stage.add_object(1, viewport.img_obj(837, 809, 40, 40, sm_pink_hex, "Bullet speed +1", "BUSPA05", ["BUSPA03"], "BUSPA05" in savegame_data.upgrades, cost=300))
+        # left_top
+        stage.add_object(1, viewport.img_obj(761, 851, 40, 40, sm_pink_hex, "Bullet Fragmentation 10% chance", "SPECD01", ["BUSPA04", "BUSPA05"], "SPECD01" in savegame_data.upgrades, cost=500))
+        # right_top
+        stage.add_object(1, viewport.img_obj(911, 851, 40, 40, sm_pink_hex, "Bullet speed  +1", "BUSPA03", ["BUSPA01"], "BUSPA03" in savegame_data.upgrades, cost=125))
+        # left_bottom
+        stage.add_object(1, viewport.img_obj(761, 937, 40, 40, sm_pink_hex, "Bullet speed  +1", "BUSPA04", ["BUSPA02"], "BUSPA04" in savegame_data.upgrades, cost=200))
+        # right_bottom
+        stage.add_object(1, viewport.img_obj(911, 937, 40, 40, sm_pink_hex, "Bullet speed  +1", "BUSPA01", None, "BUSPA01" in savegame_data.upgrades, cost=50))
+        # bottom
+        stage.add_object(1, viewport.img_obj(837, 979, 40, 40, sm_pink_hex, "Bullet speed  +1", "BUSPA02", ["BUSPA01"], "BUSPA02" in savegame_data.upgrades, cost=80))
+
+        # stage.add_object(0, viewport.block_obj(1050, 1200, 80, 250))
         stage.viewport.center_on_x(1000)
         stage.viewport.center_on_y(1000)
         # draw the main menu
         while self.show_main_menu:
             if self.show_start_menu:
                 mouse_pos = pygame.mouse.get_pos()
+                draw_menu = self.start_menu
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         self.show_main_menu = False
+                    if event.type == pygame.MOUSEMOTION:
+                        self.start_menu.on_hover(mouse_pos[0], mouse_pos[1])
                     if event.type == pygame.MOUSEBUTTONUP:
                         for button in self.start_menu.buttons:
                             if button.click(mouse_pos[0], mouse_pos[1]) and button.button_text == "New Game":
                                 self.run()
+                                savegame_data.load_game()
+                                self.gems = savegame_data.gems
                             if button.click(mouse_pos[0], mouse_pos[1]) and button.button_text == "Upgrades":
                                 self.show_start_menu = False
                                 self.show_help_menu = False
@@ -128,12 +173,21 @@ class MainGameMenu:
                                 self.show_start_menu = False
                                 self.show_help_menu = True
                                 self.show_upgrade_menu = False
-                draw_menu = self.start_menu
+                                self.show_upgrade_menu = True
+                            if button.click(mouse_pos[0], mouse_pos[1]) and button.button_text == "Quit":
+                                self.show_start_menu = False
+                                self.show_help_menu = False
+                                self.show_upgrade_menu = False
+                                self.show_main_menu = False
                 self.draw_current_menu(draw_menu)
                 pygame.display.update()
 
             if self.show_help_menu:
                 mouse_pos = pygame.mouse.get_pos()
+                draw_menu = self.help_menu
+                self.show_start_menu = False
+                self.show_help_menu = True
+                self.show_upgrade_menu = False
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         self.show_main_menu = False
@@ -142,14 +196,16 @@ class MainGameMenu:
                             if button.click(mouse_pos[0], mouse_pos[1]) and button.button_text == "Back":
                                 self.show_help_menu = False
                                 self.show_start_menu = True
-                draw_menu = self.help_menu
+                                self.show_upgrade_menu = False
                 self.draw_current_menu(draw_menu)
                 pygame.display.update()
 
             if self.show_upgrade_menu:
-                global GEMS
                 mouse_pos = pygame.mouse.get_pos()
-
+                draw_menu = self.upgrade_menu
+                self.show_start_menu = False
+                self.show_help_menu = False
+                self.show_upgrade_menu = True
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         self.show_main_menu = False
@@ -161,14 +217,17 @@ class MainGameMenu:
                         stage.focus_off()
                         opt_clicked = stage.get_clicked(mouse_pos[0], mouse_pos[1])
                         if opt_clicked:
-                            print("available gems:", GEMS)
                             # action to take on click
-                            if opt_clicked.cost <= GEMS and opt_clicked.enabled:
-                                GEMS -= opt_clicked.cost
+                            if opt_clicked.cost <= self.gems and opt_clicked.enabled and not opt_clicked.selected:
+                                self.gems -= opt_clicked.cost
+                                savegame_data.gems = self.gems
+                                savegame_data.save_gamedata()
                                 opt_clicked.selected = True
                         for button in self.help_menu.buttons:
                             if button.click(mouse_pos[0], mouse_pos[1]) and button.button_text == "Back":
                                 print("Following bonusses will be applied:", stage.acquired)
+                                savegame_data.upgrades = stage.acquired
+                                savegame_data.save_gamedata()
                                 self.show_upgrade_menu = False
                                 self.show_start_menu = True
                     if event.type == pygame.MOUSEMOTION and mousebeingpressed:
@@ -176,18 +235,27 @@ class MainGameMenu:
                     if event.type == pygame.MOUSEMOTION:
                         hover_obj = stage.get_hover(mouse_pos[0], mouse_pos[1])
                         if hover_obj:
-                            print(">>", hover_obj.desc)
-                            self.popup_content = Popup(hover_obj.x - stage.viewport.x + 50, hover_obj.y - stage.viewport.y + 5, hover_obj.desc)
+                            self.popup_content = Popup(hover_obj.x - stage.viewport.x + 50, hover_obj.y - stage.viewport.y + 5, hover_obj.desc, hover_obj.cost)
                         else:
                             self.popup_content = None
 
-                draw_menu = self.upgrade_menu
+
                 # self.win.fill([255, 255, 255])
                 stage.do()
                 self.draw_current_menu(draw_menu, False)
                 # self.win.blit(VP_surface, rectangle)
                 if self.popup_content is not None:
                     self.popup_content.draw(self.win)
+                ###
+                surface = pygame.Surface((180, 50), pygame.SRCALPHA, 32)
+                surface.fill((192, 192, 192, 175))
+                med_font = pygame.font.SysFont("segoeuisemilight", 25)
+                small_font = pygame.font.SysFont("segoeuisemilight", 18)
+                rectangle = pygame.Rect(-2, 160, 180, 50)
+                self.win.blit(surface, rectangle)
+                pygame.draw.rect(self.win, (192, 192, 192, 175), rectangle, width=2, border_radius=0)
+                gems = med_font.render("Gems: " + str(self.gems), 1, (47, 79, 79))
+                self.win.blit(gems, (10, 165))
                 pygame.display.update()
 
 
@@ -198,15 +266,40 @@ class MainGameMenu:
 class Game:
     def __init__(self):
         self.width = 1200
-        self.height = 900
-        self.win = pygame.display.set_mode((self.width, self.height), pygame.RESIZABLE)
+        self.height = 750
+        self.win = pygame.display.set_mode((self.width, self.height), pygame.FULLSCREEN)
         self.pause = True
         self.timer = 0
         self.bg = pygame.transform.scale(background_image, (self.width, self.height))
+        # natural objects
+        self.natobjects = []
+        # usable hex locations:
+        hexmap_data = [[400, 130.0], [450, 130.0], [500, 130.0], [550, 130.0], [600, 130.0], [650, 130.0], [700, 130.0], [750, 130.0], [225, 173.30127018922192], [275, 173.30127018922192], [325, 173.30127018922192], [375, 173.30127018922192], [425, 173.30127018922192], [475, 173.30127018922192], [525, 173.30127018922192], [575, 173.30127018922192], [625, 173.30127018922192], [675, 173.30127018922192], [725, 173.30127018922192], [775, 173.30127018922192], [825, 173.30127018922192], [875, 173.30127018922192], [925, 173.30127018922192], [150, 216.60254037844385], [200, 216.60254037844385], [250, 216.60254037844385], [300, 216.60254037844385], [350, 216.60254037844385], [400, 216.60254037844385], [450, 216.60254037844385], [500, 216.60254037844385], [550, 216.60254037844385], [600, 216.60254037844385], [650, 216.60254037844385], [700, 216.60254037844385], [750, 216.60254037844385], [800, 216.60254037844385], [850, 216.60254037844385], [900, 216.60254037844385], [950, 216.60254037844385], [1000, 216.60254037844385], [1050, 216.60254037844385], [175, 259.9038105676658], [225, 259.9038105676658], [275, 259.9038105676658], [325, 259.9038105676658], [375, 259.9038105676658], [425, 259.9038105676658], [475, 259.9038105676658], [525, 259.9038105676658], [575, 259.9038105676658], [625, 259.9038105676658], [675, 259.9038105676658], [725, 259.9038105676658], [775, 259.9038105676658], [825, 259.9038105676658], [875, 259.9038105676658], [925, 259.9038105676658], [975, 259.9038105676658], [1025, 259.9038105676658], [1075, 259.9038105676658], [200, 303.2050807568877], [250, 303.2050807568877], [300, 303.2050807568877], [350, 303.2050807568877], [400, 303.2050807568877], [450, 303.2050807568877], [500, 303.2050807568877], [550, 303.2050807568877], [600, 303.2050807568877], [650, 303.2050807568877], [700, 303.2050807568877], [750, 303.2050807568877], [800, 303.2050807568877], [850, 303.2050807568877], [900, 303.2050807568877], [950, 303.2050807568877], [1000, 303.2050807568877], [1050, 303.2050807568877], [75, 346.50635094610965], [125, 346.50635094610965], [175, 346.50635094610965], [225, 346.50635094610965], [275, 346.50635094610965], [325, 346.50635094610965], [375, 346.50635094610965], [425, 346.50635094610965], [475, 346.50635094610965], [525, 346.50635094610965], [575, 346.50635094610965], [625, 346.50635094610965], [675, 346.50635094610965], [725, 346.50635094610965], [775, 346.50635094610965], [825, 346.50635094610965], [875, 346.50635094610965], [925, 346.50635094610965], [975, 346.50635094610965], [1025, 346.50635094610965], [1075, 346.50635094610965], [100, 389.8076211353316], [150, 389.8076211353316], [200, 389.8076211353316], [250, 389.8076211353316], [300, 389.8076211353316], [350, 389.8076211353316], [400, 389.8076211353316], [450, 389.8076211353316], [500, 389.8076211353316], [550, 389.8076211353316], [600, 389.8076211353316], [650, 389.8076211353316], [700, 389.8076211353316], [750, 389.8076211353316], [800, 389.8076211353316], [850, 389.8076211353316], [900, 389.8076211353316], [950, 389.8076211353316], [1000, 389.8076211353316], [1050, 389.8076211353316], [1100, 389.8076211353316], [1150, 389.8076211353316], [75, 433.1088913245535], [125, 433.1088913245535], [175, 433.1088913245535], [225, 433.1088913245535], [275, 433.1088913245535], [325, 433.1088913245535], [375, 433.1088913245535], [425, 433.1088913245535], [475, 433.1088913245535], [525, 433.1088913245535], [575, 433.1088913245535], [625, 433.1088913245535], [675, 433.1088913245535], [725, 433.1088913245535], [775, 433.1088913245535], [825, 433.1088913245535], [875, 433.1088913245535], [925, 433.1088913245535], [975, 433.1088913245535], [1025, 433.1088913245535], [1075, 433.1088913245535], [1125, 433.1088913245535], [100, 476.41016151377545], [150, 476.41016151377545], [200, 476.41016151377545], [250, 476.41016151377545], [300, 476.41016151377545], [350, 476.41016151377545], [400, 476.41016151377545], [450, 476.41016151377545], [500, 476.41016151377545], [550, 476.41016151377545], [600, 476.41016151377545], [650, 476.41016151377545], [700, 476.41016151377545], [750, 476.41016151377545], [800, 476.41016151377545], [850, 476.41016151377545], [900, 476.41016151377545], [950, 476.41016151377545], [1000, 476.41016151377545], [1050, 476.41016151377545], [1100, 476.41016151377545], [175, 519.7114317029974], [225, 519.7114317029974], [275, 519.7114317029974], [325, 519.7114317029974], [375, 519.7114317029974], [425, 519.7114317029974], [475, 519.7114317029974], [525, 519.7114317029974], [575, 519.7114317029974], [625, 519.7114317029974], [675, 519.7114317029974], [725, 519.7114317029974], [775, 519.7114317029974], [825, 519.7114317029974], [875, 519.7114317029974], [925, 519.7114317029974], [975, 519.7114317029974], [250, 563.0127018922193], [300, 563.0127018922193], [350, 563.0127018922193], [400, 563.0127018922193], [450, 563.0127018922193], [500, 563.0127018922193], [550, 563.0127018922193], [600, 563.0127018922193], [650, 563.0127018922193], [700, 563.0127018922193], [750, 563.0127018922193], [800, 563.0127018922193], [850, 563.0127018922193], [900, 563.0127018922193], [950, 563.0127018922193], [375, 606.3139720814413], [425, 606.3139720814413], [475, 606.3139720814413], [525, 606.3139720814413], [575, 606.3139720814413], [625, 606.3139720814413], [675, 606.3139720814413], [725, 606.3139720814413], [775, 606.3139720814413], [825, 606.3139720814413], [875, 606.3139720814413], [300, 649.6152422706632], [350, 649.6152422706632], [400, 649.6152422706632], [450, 649.6152422706632], [500, 649.6152422706632], [550, 649.6152422706632], [600, 649.6152422706632], [650, 649.6152422706632], [700, 649.6152422706632], [750, 649.6152422706632], [800, 649.6152422706632], [850, 649.6152422706632]]
 
-        hexmap_data = [[400, 136.60254037844385], [450, 136.60254037844385], [650, 136.60254037844385], [700, 136.60254037844385], [750, 136.60254037844385], [275, 179.9038105676658], [375, 179.9038105676658], [425, 179.9038105676658], [475, 179.9038105676658], [525, 179.9038105676658], [575, 179.9038105676658], [625, 179.9038105676658], [675, 179.9038105676658], [725, 179.9038105676658], [775, 179.9038105676658], [825, 179.9038105676658], [250, 223.20508075688772], [300, 223.20508075688772], [350, 223.20508075688772], [400, 223.20508075688772], [450, 223.20508075688772], [500, 223.20508075688772], [550, 223.20508075688772], [600, 223.20508075688772], [650, 223.20508075688772], [700, 223.20508075688772], [850, 223.20508075688772], [900, 223.20508075688772], [950, 223.20508075688772], [1000, 223.20508075688772], [1050, 223.20508075688772], [175, 266.50635094610965], [225, 266.50635094610965], [275, 266.50635094610965], [325, 266.50635094610965], [375, 266.50635094610965], [425, 266.50635094610965], [725, 266.50635094610965], [825, 266.50635094610965], [875, 266.50635094610965], [925, 266.50635094610965], [975, 266.50635094610965], [1025, 266.50635094610965], [200, 309.8076211353316], [250, 309.8076211353316], [300, 309.8076211353316], [350, 309.8076211353316], [400, 309.8076211353316], [450, 309.8076211353316], [650, 309.8076211353316], [700, 309.8076211353316], [750, 309.8076211353316], [800, 309.8076211353316], [850, 309.8076211353316], [900, 309.8076211353316], [950, 309.8076211353316], [1000, 309.8076211353316], [1050, 309.8076211353316], [175, 353.1088913245535], [225, 353.1088913245535], [275, 353.1088913245535], [325, 353.1088913245535], [475, 353.1088913245535], [525, 353.1088913245535], [575, 353.1088913245535], [625, 353.1088913245535], [675, 353.1088913245535], [875, 353.1088913245535], [925, 353.1088913245535], [975, 353.1088913245535], [1025, 353.1088913245535], [1075, 353.1088913245535], [100, 396.41016151377545], [150, 396.41016151377545], [200, 396.41016151377545], [250, 396.41016151377545], [300, 396.41016151377545], [350, 396.41016151377545], [450, 396.41016151377545], [500, 396.41016151377545], [550, 396.41016151377545], [600, 396.41016151377545], [650, 396.41016151377545], [850, 396.41016151377545], [900, 396.41016151377545], [950, 396.41016151377545], [1000, 396.41016151377545], [1050, 396.41016151377545], [125, 439.7114317029974], [175, 439.7114317029974], [225, 439.7114317029974], [275, 439.7114317029974], [325, 439.7114317029974], [475, 439.7114317029974], [525, 439.7114317029974], [575, 439.7114317029974], [625, 439.7114317029974], [675, 439.7114317029974], [725, 439.7114317029974], [775, 439.7114317029974], [825, 439.7114317029974], [875, 439.7114317029974], [925, 439.7114317029974], [975, 439.7114317029974], [1025, 439.7114317029974], [1075, 439.7114317029974], [100, 483.0127018922193], [150, 483.0127018922193], [200, 483.0127018922193], [250, 483.0127018922193], [300, 483.0127018922193], [350, 483.0127018922193], [450, 483.0127018922193], [750, 483.0127018922193], [800, 483.0127018922193], [850, 483.0127018922193], [900, 483.0127018922193], [950, 483.0127018922193], [1000, 483.0127018922193], [1050, 483.0127018922193], [1100, 483.0127018922193], [125, 526.3139720814413], [175, 526.3139720814413], [225, 526.3139720814413], [275, 526.3139720814413], [325, 526.3139720814413], [375, 526.3139720814413], [425, 526.3139720814413], [475, 526.3139720814413], [725, 526.3139720814413], [775, 526.3139720814413], [825, 526.3139720814413], [875, 526.3139720814413], [925, 526.3139720814413], [975, 526.3139720814413], [1025, 526.3139720814413], [1075, 526.3139720814413], [100, 569.6152422706632], [150, 569.6152422706632], [200, 569.6152422706632], [250, 569.6152422706632], [300, 569.6152422706632], [350, 569.6152422706632], [400, 569.6152422706632], [450, 569.6152422706632], [500, 569.6152422706632], [550, 569.6152422706632], [600, 569.6152422706632], [650, 569.6152422706632], [700, 569.6152422706632], [750, 569.6152422706632], [800, 569.6152422706632], [850, 569.6152422706632], [900, 569.6152422706632], [950, 569.6152422706632], [1000, 569.6152422706632], [1050, 569.6152422706632], [1100, 569.6152422706632], [175, 612.9165124598851], [225, 612.9165124598851], [275, 612.9165124598851], [325, 612.9165124598851], [375, 612.9165124598851], [425, 612.9165124598851], [475, 612.9165124598851], [525, 612.9165124598851], [575, 612.9165124598851], [625, 612.9165124598851], [675, 612.9165124598851], [725, 612.9165124598851], [775, 612.9165124598851], [825, 612.9165124598851], [875, 612.9165124598851], [925, 612.9165124598851], [975, 612.9165124598851], [250, 656.217782649107], [300, 656.217782649107], [350, 656.217782649107], [400, 656.217782649107], [450, 656.217782649107], [500, 656.217782649107], [550, 656.217782649107], [600, 656.217782649107], [650, 656.217782649107], [700, 656.217782649107], [750, 656.217782649107], [800, 656.217782649107], [850, 656.217782649107], [900, 656.217782649107], [950, 656.217782649107], [375, 699.519052838329], [425, 699.519052838329], [475, 699.519052838329], [525, 699.519052838329], [575, 699.519052838329], [625, 699.519052838329], [675, 699.519052838329], [725, 699.519052838329], [775, 699.519052838329], [825, 699.519052838329], [875, 699.519052838329], [925, 699.519052838329], [400, 742.8203230275509], [450, 742.8203230275509], [500, 742.8203230275509], [550, 742.8203230275509], [600, 742.8203230275509], [650, 742.8203230275509], [700, 742.8203230275509], [800, 742.8203230275509], [850, 742.8203230275509]]
+        # these locations hold object
+        self.non_buildable_objects = [[625, 606.3139720814413], [650, 563.0127018922193], [700, 563.0127018922193],
+                                 [600, 649.6152422706632], [850, 476.41016151377545], [825, 433.1088913245535],
+                                 [850, 389.8076211353316], [900, 389.8076211353316], [875, 433.1088913245535],
+                                 [700, 303.2050807568877], [675, 259.9038105676658], [625, 259.9038105676658],
+                                 [450, 389.8076211353316], [425, 433.1088913245535], [450, 476.41016151377545],
+                                 [400, 476.41016151377545], [375, 433.1088913245535], [325, 433.1088913245535],
+                                 [400, 216.60254037844385], [350, 216.60254037844385], [375, 259.9038105676658],
+                                 [400, 303.2050807568877], [650, 216.60254037844385], [925, 259.9038105676658],
+                                 [975, 259.9038105676658], [600, 476.41016151377545], [425, 606.3139720814413],
+                                 [400, 563.0127018922193], [200, 303.2050807568877], [175, 259.9038105676658],
+                                 [225, 259.9038105676658], [200, 216.60254037844385], [200, 476.41016151377545],
+                                 [150, 476.41016151377545], [100, 476.41016151377545], [600, 130.0],
+                                 [400, 130.0], [825, 606.3139720814413], [850, 563.0127018922193],
+                                 ]
+
+        # map = hexmap_data - non_buildable_objects\
+        for nbo in self.non_buildable_objects:
+            hexmap_data.remove(nbo)
+            self.natobjects.append(NatObject(nbo[0], nbo[1]))
 
         # remove hexmap_data param to use full map
+        self.build_mode = False
+
         self.base_map = Hexmap(self.width, self.height - 100, hexmap_data)
         self.start = self.end = [0, 0]
         self.set_start = False
@@ -218,14 +311,17 @@ class Game:
         self.attack_towers = []
         self.obstacles = []
         self.label_collector = []
-        self.menu = buildingMenu(25, self.height - 10, 225, 80)
-        self.play_pause_button = PlayPauseButton(play_btn, pause_btn, 40, self.height - 110)
+        self.menu = buildingMenu(25, 140, 225, 50)
+        self.play_pause_button = PlayPauseButton(play_btn, pause_btn, 50, 30)
         self.menu.add_configured_btn(self.play_pause_button)
+
         self.menu.add_btn(ico_minigun, "buy_minigun", "Minigun", 3)
         self.menu.add_btn(ico_obstruction, "buy_obstacle", "Obstacle", 5)
+        self.close_game_button = PlainButton("❌", "Quit", self.width - 50, 20, 50, 50)
+
         self.gate_health = 10000
         # This mode allow to create a path from point A to B returns start and end location as lists in console.
-        self.build_mode = False
+
         self.wave_complete = True
         self.enemy_counter = 0
         self.wave = 0
@@ -238,7 +334,8 @@ class Game:
         self.spawned_from_spawn_list_counter = 0
         # Should we go through the list of bonuses and apply them to the tower?
         self.update_bonuses = False
-        self.icon_menu = IconMenu(250, self.height - 130, 925, 80)
+        self.icon_menu = IconMenu(250, 20, 900, 50)
+        self.icon_menu.add_configured_btn(self.close_game_button)
         self.bonus_menu = RouletteMenu(self.win, 8) # BonusPickerMenu(self.win, 5)
         self.action_list = {
             "ATK_1" : {"Description": "Attack Damage + 1", "modifier" : 1, "pictogram" : pictogram_attack_damage,
@@ -290,16 +387,22 @@ class Game:
 
         self.bonus_options = []
         self.applied_bonuses = []
+
+        savegame_data.load_game()
+        self.applied_bonuses = self.applied_bonuses + savegame_data.get_mapped_bonus_ids()
+
         self.build_bonus_menu()
         self.show_bonus_menu = False
         self.show_build_menu = True
         self.enemy_spawn_points = [
-            {"source": [575, 699.519052838329], "destination": [600, 396.41016151377545]},
+            {"source": [650, 649.6152422706632], "destination": [625, 346.50635094610965]},
         ]
         # {"source": [750, 223.20508075688772], "destination": [450, 656.217782649107]}
+        # 1050, 476.41016151377545 ; 1000, 216.60254037844385; 750, 130.0; 250, 216.60254037844385; 225 519.7114317029974
         self.portals = []
         self.cities = []
         self.waves = [
+            [{"type": "TestUnit", "count": 25, "interval": 5}],
                 [{"type": "Squaremon", "count": 1, "interval": 0.8}],
                 [{"type": "Squaremon", "count": 2, "interval": 0.8}],
                 [{"type": "Squaremon", "count": 3, "interval": 1.0}],
@@ -444,15 +547,23 @@ class Game:
         self.fragmentation = Fragmentation()
 
 
+
+        self.icon_menu.add_or_update_icon(self.applied_bonuses)
+        self.update_bonuses = True
+        self.apply_specials()
+
+
     def run(self):
         run = True
         clock = pygame.time.Clock()
-
-        for enemy_spawn_point in self.enemy_spawn_points:
-            self.cities.append(City(enemy_spawn_point["destination"][0], enemy_spawn_point["destination"][1]))
-            self.portals.append(Portal(enemy_spawn_point["source"][0], enemy_spawn_point["source"][1]))
-            path = self.base_map.find_path(enemy_spawn_point["source"], enemy_spawn_point["destination"])
-            self.paths.append(self.base_map.get_path_from_path_data(path))
+        try:
+            for enemy_spawn_point in self.enemy_spawn_points:
+                self.cities.append(City(enemy_spawn_point["destination"][0], enemy_spawn_point["destination"][1]))
+                self.portals.append(Portal(enemy_spawn_point["source"][0], enemy_spawn_point["source"][1]))
+                path = self.base_map.find_path(enemy_spawn_point["source"], enemy_spawn_point["destination"])
+                self.paths.append(self.base_map.get_path_from_path_data(path))
+        except TypeError as e:
+            print(e)
 
         while run:
             clock.tick(self.game_speed)
@@ -480,6 +591,7 @@ class Game:
                             # if map_location.collide(mouse_pos[0], mouse_pos[1]):
                             if map_location.click(mouse_pos[0], mouse_pos[1]):
                                 clicked_location = map_location
+                                print(map_location.x, map_location.y)
                         if event.button == 1:
                             tiles = []
                             if clicked_location is not None:
@@ -531,6 +643,8 @@ class Game:
                                 self.moving_object.place_color = (255, 0, 0, 100)
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
+                        savegame_data.gems = self.gems
+                        savegame_data.save_gamedata()
                         run = False
                     for item in self.items_list:
                         if item.collide(mouse_pos[0], mouse_pos[1]):
@@ -543,9 +657,15 @@ class Game:
                     if event.type == pygame.MOUSEMOTION:
                         if self.show_bonus_menu:
                             self.bonus_menu.on_hover_over(mouse_pos[0], mouse_pos[1])
+                        self.icon_menu.on_hover(mouse_pos[0], mouse_pos[1])
+                        # self.close_game_button.hover_over(mouse_pos[0], mouse_pos[1])
 
                     if event.type == pygame.MOUSEBUTTONUP:
                         self.move_tower = False
+                        if self.close_game_button.click(mouse_pos[0], mouse_pos[1]):
+                            savegame_data.gems += self.gems
+                            savegame_data.save_gamedata()
+                            run = False
                         if self.play_pause_button.click(mouse_pos[0], mouse_pos[1]):
                             self.pause = not (self.pause)
                             self.play_pause_button.toggle()
@@ -569,7 +689,6 @@ class Game:
                                     3. remove tower from tower list (is this needed?)
                                     4. Toggle hex, update paths 
                                     """
-                                    print("mouse pos", mouse_pos, tw.get_location(), coordinates_of_hex)
                                     sel_tower = tw.ico_name
                                     self.add_tower(tw.ico_name)
                                     self.move_tower = True
@@ -741,6 +860,7 @@ class Game:
                                         "TrippetElite": TrippetElite(generated_path),
                                         "Yolkee": Yolkee(generated_path),
                                         "Juju": Juju(generated_path),
+                                        "TestUnit": TestUnit(generated_path),
                                     }
                                     wave_enemy = enemies.get(enemy_wave["type"])
                                     wave_enemy.set_deviation(deviation)
@@ -781,7 +901,6 @@ class Game:
                                 self.xp += enemy.xp_value
                                 if self.xp > self.xp_req[self.level]:
                                     self.level += 1
-                                print("XP:", self.xp, "Level:", self.level)
                                 count_dif = enemies_count_next - enemies_count_prev
                                 self.wave_enemy_total += count_dif
                                 self.enemy_counter += count_dif
@@ -810,7 +929,6 @@ class Game:
                                 self.label_collector.append(label)
 
                     if self.enemies_removed == self.wave_enemy_total:
-                        print("Guardian stuff:" ,self.guardian, self.used_guardian)
                         self.wave_complete = True
                         self.wave_enemy_total = 0
                         self.enemy_counter = 0
@@ -823,14 +941,24 @@ class Game:
                         self.spawned_from_spawn_list_counter = 0
                         self.used_guardian = 0
                         # add a new path at wave #
-                        if self.wave == 25:
+                        if self.wave == 10 or self.wave == 25 or self.wave == 45 or self.wave == 70 or self.wave == 100:
                             """
                             [1075, 439.7114317029974][600, 396.41016151377545]
                             [750, 136.60254037844385][600, 396.41016151377545]
                             [200, 396.41016151377545][600, 396.41016151377545]
                             """
                             # {"source": [750, 223.20508075688772], "destination": [450, 656.217782649107]}
-                            self.add_enemy_path([750, 136.60254037844385], [600, 396.41016151377545])
+                            sources = [[1050, 476.41016151377545],
+                            [1000, 216.60254037844385],
+                            [750, 130.0],
+                            [250, 216.60254037844385],
+                            [225, 519.7114317029974]]
+
+                            end = [625, 346.50635094610965]
+                            # check self.portals or allow overlap.
+                            source = random.choice(sources)
+
+                            self.add_enemy_path(source, end)
                         self.wave += 1
                         print("Next wave:", self.wave)
             self.draw()
@@ -884,14 +1012,14 @@ class Game:
             health_bar = 0
             # print(cur_xp, prev_level_xp, req_xp, move_by, health_bar)
         xp_bar_color = (121, 100, 50)
-        pygame.draw.rect(self.win, (50,50,50), (25, self.height - 145, length, 6), 0)
-        pygame.draw.rect(self.win, xp_bar_color, (25, self.height - 145, health_bar, 6), 0)
+        pygame.draw.rect(self.win, (50,50,50), (25, self.height - 45, length, 6), 0)
+        pygame.draw.rect(self.win, xp_bar_color, (25, self.height - 45, health_bar, 6), 0)
 
         small_font = pygame.font.SysFont("segoeuisemilight", 12)
         phrase = "LvL:" + str(self.level) + " - XP:" + str(cur_xp) + "/" + str(req_xp)
         xp_line = small_font.render(str(phrase), 1, (255, 255, 255))
         x_center = self.width / 2 - xp_line.get_width() / 2
-        self.win.blit(xp_line, (x_center, (self.height - 152)))
+        self.win.blit(xp_line, (x_center, (self.height - 52)))
 
 
     def take_damage(self, dmg):
@@ -919,9 +1047,14 @@ class Game:
         health_bar_color = (0, 255, 0)
         if self.guardian > 0 and self.used_guardian < self.guardian:
             health_bar_color = (255, 215, 0)
-        pygame.draw.rect(self.win, (255, 255, 255), (25, self.height - 136, length, 6), 0)
-        pygame.draw.rect(self.win, (255,0,0), (25, self.height - 136, length, 6), 0)
-        pygame.draw.rect(self.win, health_bar_color, (25, self.height - 136, health_bar, 6), 0)
+        pygame.draw.rect(self.win, (255, 255, 255), (25, self.height - 36, length, 6), 0)
+        pygame.draw.rect(self.win, (255,0,0), (25, self.height - 36, length, 6), 0)
+        pygame.draw.rect(self.win, health_bar_color, (25, self.height - 36, health_bar, 6), 0)
+        small_font = pygame.font.SysFont("segoeuisemilight", 12)
+        phrase = "Health:" + str(self.health)
+        hp_line = small_font.render(str(phrase), 1, (66, 66, 66))
+        x_center = self.width / 2 - hp_line.get_width() / 2
+        self.win.blit(hp_line, (x_center, (self.height - 40)))
 
     def build_bonus_menu(self):
         u = 0
@@ -990,6 +1123,51 @@ class Game:
         if bonus_selector == "HEAL_3":
             hp_heal = self.max_health * self.action_list3[bonus_selector]["modifier"]
             self.take_damage(-hp_heal)
+        if bonus_selector == "PEN_1":
+            if self.piercing.level < 1:
+                self.piercing.level = 1
+        if bonus_selector == "PEN_2":
+            if self.piercing.level < 2:
+                self.piercing.level = 2
+        if bonus_selector == "PEN_3":
+            if self.piercing.level < 3:
+                self.piercing.level = 3
+        if bonus_selector == "PEN_4":
+            if self.piercing.level < 4:
+                self.piercing.level = 4
+        if bonus_selector == "PEN_5":
+            if self.piercing.level < 5:
+                self.piercing.level = 5
+        if bonus_selector == "PSN_1":
+            self.poison.level = 1
+        if bonus_selector == "PSN_2":
+            self.poison.level = 2
+        if bonus_selector == "PSN_3":
+            self.poison.level = 3
+        if bonus_selector == "PSN_4":
+            self.poison.level = 4
+        if bonus_selector == "PSN_5":
+            self.poison.level = 5
+        if bonus_selector == "HST_1":
+            self.headshot.level = 1
+        if bonus_selector == "HST_2":
+            self.headshot.level = 2
+        if bonus_selector == "HST_3":
+            self.headshot.level = 3
+        if bonus_selector == "HST_4":
+            self.headshot.level = 4
+        if bonus_selector == "HST_5":
+            self.headshot.level = 5
+        if bonus_selector == "FRG_1":
+            self.fragmentation.level = 1
+        if bonus_selector == "FRG_2":
+            self.fragmentation.level = 2
+        if bonus_selector == "FRG_3":
+            self.fragmentation.level = 3
+        if bonus_selector == "FRG_4":
+            self.fragmentation.level = 4
+        if bonus_selector == "FRG_5":
+            self.fragmentation.level = 5
 
     def apply_bonuses_to_towers(self):
         for tower in self.attack_towers:
@@ -1057,8 +1235,18 @@ class Game:
         if len(self.attack_towers) == 0 and self.moving_object:
             self.moving_object.draw_placement(self.win)
 
+        for natobj in self.natobjects:
+            natobj.draw(self.win)
+
         for portal in self.portals:
             portal.draw(self.win)
+
+
+        city_counter = 0
+        for city in self.cities:
+            if city_counter == 0:
+                city.draw(self.win)
+
 
         if self.pause:
             self.base_map.clear_paths()

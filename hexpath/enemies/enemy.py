@@ -13,7 +13,7 @@ class Enemy:
         self.travelled_path = []
         self.x = self.path[0][0]
         self.y = self.path[0][1]
-        self.img = pygame.image.load(os.path.join("resources", "rocket.png")).convert_alpha()
+        self.img = pygame.image.load(os.path.join("resources", "lives.png")).convert_alpha()
         self.dis = 0
         self.path_pos = 0
         self.move_count = 0

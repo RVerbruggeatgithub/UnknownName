@@ -6,6 +6,7 @@ class Hexmap:
     def __init__(self, width, height, map_data=None):
         self.width = width
         self.height = height
+        self.top_clearance = 80
         self.map_data = []
         if map_data is None:
             self.map_data = self.generate_full_map()
@@ -28,7 +29,7 @@ class Hexmap:
 
                 if (col * (radius * 2) + (radius * 3) + x_adj) < self.width:
                     x = col * (radius * 2) + (radius * 2) + x_adj
-                    self.map_data.append(Hex(x, y))
+                    self.map_data.append(Hex(x, y + self.top_clearance))
                 col += 1
             col = 0
             row += 1
