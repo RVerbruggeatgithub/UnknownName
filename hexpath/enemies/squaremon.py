@@ -257,3 +257,77 @@ class Juju(Enemy):
         self.img = pygame.transform.rotate(self.img, (self.angle+90))
         win.blit(self.img, (self.x - self.img.get_width()/2, self.y - self.img.get_height()/2))
         self.draw_health_bar(win)
+
+class TestUnit(Enemy):
+    def __init__(self, path):
+        super().__init__(path)
+        self.name = "TestUnit"
+        self.max_health = 5000
+        self.health = self.max_health
+        self.imgs = self.load_image()
+        self.speed_increase = 1
+        self.size = 0.3
+        self.boundary = 2
+        self.item_drop = [1]
+        self.item_drop_rate = 0.12
+        self.max_heal_timer = self.heal_timer = 25
+        self.heal_amount = 20
+        self.heal_range = 120
+        self.xp_value = 500
+        self.poison_resist_rate = 0.25
+        # self.droppable_items = [Gold(self.x, self.y, 1, 8), Gold(self.x, self.y, 5, 15)]
+
+    def load_image(self):
+        return juju_img
+
+    def move_action(self, target, params=[]):
+        """
+        Action(s) to perform when moving
+        :param target: list of one or multiple targets the move_action is performed on
+        :param params: list of additional parameters
+        :return:
+        """
+        if self.heal_timer > 1:
+            self.heal_timer -= 1
+
+        if self.heal_timer == 1:
+            self.heal_timer = self.max_heal_timer
+            for enemy in target:
+                if enemy.get_distance(self.x, self.y) <= self.heal_range:
+                    enemy.hit(-self.heal_amount)
+                    params.append(Label(enemy.x, enemy.y, "+"+str(self.heal_amount), (144,238,144), 16))
+        return False
+
+    def draw(self, win):
+        """
+        Draws the enemy with the given images
+        :param win: surface
+        :return: None
+        """
+        """
+        for dot in self.path:
+            pygame.draw.circle(win, (255,0,255), dot, 10, 0)
+        """
+
+        self.img = self.imgs[self.animation_count]
+        # Draw shadow
+        shadow_radius = self.img.get_width() / 4 * self.size
+        surface = pygame.Surface((200, 200), pygame.SRCALPHA, 32)
+        pygame.draw.circle(surface, (0, 0, 0, 94), (32, (32 + shadow_radius / 2)), shadow_radius, 0)
+        win.blit(surface, (self.x - 32, self.y - 32))
+        if self.heal_timer <= 4 or (self.max_heal_timer - self.heal_timer) < 9:
+            surface = pygame.Surface((self.heal_range * 4, self.heal_range * 4), pygame.SRCALPHA, 32)
+            placement_circle = self.heal_range
+
+            if self.heal_timer <= 3:
+                mod = self.heal_timer
+            else:
+                mod = (self.max_heal_timer - self.heal_timer) + 1
+
+            pygame.draw.circle(surface, (144,238,144, (160/mod)), (placement_circle, placement_circle), placement_circle, 0)
+            win.blit(surface, (self.x - placement_circle, self.y - placement_circle))
+
+        self.img = pygame.transform.scale(self.img, (self.width * self.size, self.height * self.size))
+        self.img = pygame.transform.rotate(self.img, (self.angle+90))
+        win.blit(self.img, (self.x - self.img.get_width()/2, self.y - self.img.get_height()/2))
+        self.draw_health_bar(win)
