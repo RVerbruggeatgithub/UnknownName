@@ -401,7 +401,6 @@ class Game:
         self.portals = []
         self.cities = []
         self.waves = [
-            # [{"type": "TestUnit", "count": 25, "interval": 5}],
                 [{"type": "Squaremon", "count": 1, "interval": 0.8}],
                 [{"type": "Squaremon", "count": 2, "interval": 0.8}],
                 [{"type": "Squaremon", "count": 3, "interval": 1.0}],
@@ -858,6 +857,7 @@ class Game:
                                         "Trippet": Trippet(generated_path),
                                         "TrippetElite": TrippetElite(generated_path),
                                         "Yolkee": Yolkee(generated_path),
+                                        "YolkeeElite":YolkeeElite(generated_path),
                                         "Juju": Juju(generated_path),
                                         "TestUnit": TestUnit(generated_path),
                                     }
