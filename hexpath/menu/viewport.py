@@ -98,6 +98,23 @@ class Manager:
                 if obj.selected:
                     self.acquired.append(obj.code)
 
+    def have_prerequisites(self, prereqs):
+        # I have: self.acquired
+        # I need: list of prereq.
+        if prereqs is None:
+            return True
+        need_preq_ct = len(prereqs)
+        need_matches = 0
+        for prereq in prereqs:
+            if prereq in self.acquired:
+                need_matches += 1
+
+        if need_matches == need_preq_ct:
+            return True
+        else:
+            return False
+
+
     def do(self):
         self.acquired = []
         self.get_acquired()
@@ -106,7 +123,8 @@ class Manager:
                 x = obj.x - self.viewport.x
                 y = obj.y - self.viewport.y
 
-                if obj.prerequisite in self.acquired or not obj.prerequisite:
+                # check if object prerequisites are met or if it has any prereq.
+                if self.have_prerequisites(obj.prerequisite) or not obj.prerequisite:
                     obj.enabled = True
 
                 if obj.movable:
@@ -184,8 +202,8 @@ class img_obj:
         mx, my = pygame.mouse.get_pos()
         obj_x = obj.x - x_adj
         obj_y = obj.y - y_adj
-        if mx <= obj_x + obj.w and mx >= obj_x:
-            if my <= obj_y + obj.h and my >= obj_y:
+        if mx <= obj_x + obj.w - 15 and mx >= obj_x:
+            if my <= obj_y + obj.h - 15 and my >= obj_y:
                 return True
         return False
 

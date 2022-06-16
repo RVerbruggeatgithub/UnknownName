@@ -1,7 +1,7 @@
 import pygame
 from functions.functions import *
 
-projectile_image = pygame.transform.scale(load_image("resources", "rocket.png"),(50, 50))
+projectile_image = pygame.transform.scale(load_image("resources", "lives.png"),(50, 50))
 
 
 class Projectile:
